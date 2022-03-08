@@ -19,7 +19,6 @@
         "ingest_status": {
           "description": "The status of the object being ingested",
           "enum": [
-            "",
             "ready_for_s3_transfer",
             "transferred_to_s3",
             "transferred_to_s3_successful",
