@@ -7,7 +7,7 @@ from health.application.controllers.health_get_controller import HealthGetContro
 
 class TestHealthGetController(TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.app = flask.Flask(__name__)
 
     def test_call_happy_path(self) -> None:
