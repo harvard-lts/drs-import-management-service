@@ -10,4 +10,4 @@ services:
     ports:
       - "13880:5000"
     volumes:
-      - ./app:/home/imsuser/app
+      - ./app:/home/dimsuser/app
