@@ -1,7 +1,8 @@
 # Ignore everything
 **
 
-# ... except for dependencies and source
+# ... except for dependencies, .env file, and source
+!.env
 !Pipfile
 !Pipfile.lock
 !app/

@@ -2,15 +2,12 @@ version: "3.8"
 
 services:
 
-  ims:
+  dims:
     build:
       context: .
       dockerfile: ./Dockerfile
-    environment:
-      - ENV_CONFIG=development
-      - FLASK_DEBUG=1
     restart: on-failure
     ports:
-      - "5000:5000"
+      - "13880:5000"
     volumes:
       - ./app:/home/imsuser/app

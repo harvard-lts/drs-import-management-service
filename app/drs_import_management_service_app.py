@@ -3,7 +3,7 @@ from connexion import FlaskApp
 from .health.application.controllers.health_get_controller import HealthGetController
 
 
-class ImportManagementServiceApp(FlaskApp):
+class DrsImportManagementServiceApp(FlaskApp):
 
     def __init__(self, import_name: str, **kwargs) -> None:
         super().__init__(import_name, **kwargs)

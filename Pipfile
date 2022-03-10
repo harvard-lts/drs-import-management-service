@@ -9,6 +9,7 @@ pytest = "==7.0.1"
 [packages]
 flask = "==2.0.3"
 connexion = "==2.12.0"
+python-dotenv = "==0.19.2"
 
 [requires]
 python_version = "3.10.2"

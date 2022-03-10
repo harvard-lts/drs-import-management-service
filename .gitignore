@@ -1,6 +1,7 @@
 /.project
 
-# virtualenv
+# Environments
+.env
 .venv
 venv/
 
