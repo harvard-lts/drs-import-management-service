@@ -12,7 +12,7 @@ Create an .env file by copying the existing .env.example file from the repositor
 
 DIMS is intended to be executed in a Docker container, so it has its own Docker Image, which is defined within this repository in a Dockerfile.
 
-To run an DIMS development container on the local machine, there are two supported options: do it using the docker-compose file available in the repository or using Docker commands.
+To run a DIMS development container on the local machine, there are two supported options: do it using the docker-compose file available in the repository or using Docker commands.
 
 #### Run using docker-compose
 

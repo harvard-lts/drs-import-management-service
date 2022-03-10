@@ -2,11 +2,13 @@ FROM python:3.10.2-slim
 
 RUN pip install pipenv
 
-RUN useradd --create-home imsuser
-WORKDIR /home/imsuser
-USER imsuser
+RUN groupadd -r -g 55020 dimsadm \
+    && useradd -u 55020 -g 55020 --create-home dimsuser
 
-COPY . /home/imsuser/
+WORKDIR /home/dimsuser
+USER dimsuser
+
+COPY . /home/dimsuser/
 RUN pipenv install --deploy --system
 
 CMD [ "python3", "wsgi.py" ]
