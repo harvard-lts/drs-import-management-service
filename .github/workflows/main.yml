@@ -34,3 +34,7 @@ jobs:
       - name: Run unit tests
         run: |
           pytest test/
+
+      # Run Pyflakes
+      - name: Run pyflakes
+        uses: reviewdog/action-pyflakes@v1
