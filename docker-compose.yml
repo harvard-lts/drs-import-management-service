@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+
+  dims:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: on-failure
+    ports:
+      - "13880:5000"
+    volumes:
+      - ./app:/home/dimsuser/app
