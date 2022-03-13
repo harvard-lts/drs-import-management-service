@@ -1,11 +1,15 @@
 FROM openjdk:8-jdk-alpine
 
-RUN wget https://archive.apache.org/dist/activemq/5.16.3/apache-activemq-5.16.3-bin.tar.gz \
-    && tar -xzf apache-activemq-5.16.3-bin.tar.gz && rm apache-activemq-5.16.3-bin.tar.gz
+ENV ACTIVEMQ_VERSION=5.16.3
+ENV ACTIVEMQ_DOWNLOAD_URL=https://archive.apache.org/dist/activemq/${ACTIVEMQ_VERSION}/apache-activemq-${ACTIVEMQ_VERSION}-bin.tar.gz
+ENV ACTIVEMQ_DIRECTORY=/opt/apache-activemq
 
-RUN mv apache-activemq-5.16.3 /opt/apache-activemq-5.16.3
-RUN sed -i "s|127.0.0.1|0.0.0.0|g" /opt/apache-activemq-5.16.3/conf/jetty.xml
+RUN wget ${ACTIVEMQ_DOWNLOAD_URL} \
+    && tar -xzf apache-activemq-${ACTIVEMQ_VERSION}-bin.tar.gz && rm apache-activemq-${ACTIVEMQ_VERSION}-bin.tar.gz
 
-WORKDIR /opt/apache-activemq-5.16.3/bin
+RUN mv apache-activemq-${ACTIVEMQ_VERSION} ${ACTIVEMQ_DIRECTORY}
+RUN sed -i "s|127.0.0.1|0.0.0.0|g" ${ACTIVEMQ_DIRECTORY}/conf/jetty.xml
+
+WORKDIR ${ACTIVEMQ_DIRECTORY}/bin
 
 ENTRYPOINT ["./activemq","console"]

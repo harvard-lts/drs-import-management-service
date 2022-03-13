@@ -20,4 +20,4 @@ services:
     ports:
       - "8161:8161"
     volumes:
-      - ./activemq/data:/opt/apache-activemq-5.16.3/data
+      - ./activemq/data:/opt/apache-activemq/data
