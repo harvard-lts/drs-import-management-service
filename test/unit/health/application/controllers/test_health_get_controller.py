@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import flask
 
-from health.application.controllers.health_get_controller import HealthGetController
+from app.health.application.controllers.health_get_controller import HealthGetController
 
 
 class TestHealthGetController(TestCase):

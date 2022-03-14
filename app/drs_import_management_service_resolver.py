@@ -5,8 +5,9 @@ from .ingest.application.controllers.ingest_post_controller import IngestPostCon
 
 
 class DrsImportManagementServiceResolver(Resolver):
+    # TODO: Dependency Injection
     OPERATION_MAPPING = {
-        "initiateIngest": IngestPostController()
+        "initiateIngest": IngestPostController(None)
     }
 
     def resolve(self, operation: AbstractOperation) -> Resolution:
