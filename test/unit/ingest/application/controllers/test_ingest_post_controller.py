@@ -13,13 +13,13 @@ class TestIngestPostController(TestCase):
         self.app = flask.Flask(__name__)
 
     def test_call_happy_path(self) -> None:
-        ingest_service = Mock(spect=IngestService)
-        sut = IngestPostController(ingest_service)
+        ingest_service_mock = Mock(spect=IngestService)
+        sut = IngestPostController(ingest_service_mock)
 
         with self.app.test_request_context("/ingest"):
             actual_response_body, actual_response_http_code = sut.__call__()
 
-        ingest_service.initiate_ingest.assert_called_once()
+        ingest_service_mock.initiate_ingest.assert_called_once()
 
         expected_response_http_code = 202
         self.assertEqual(actual_response_http_code, expected_response_http_code)
