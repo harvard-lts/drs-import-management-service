@@ -1,0 +1,33 @@
+openapi: 3.0.3
+info:
+  title: DRS Import Managament Service API
+  version: 0.1.0
+
+paths:
+  /ingest:
+    post:
+      operationId: initiateIngest
+      summary: Initiates a new ingest
+      responses:
+        202:
+          description: Ingest accepted and started processing
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/IngestConfirmation"
+
+components:
+  schemas:
+    IngestConfirmation:
+      type: object
+      required:
+        - ingest_status
+      properties:
+        ingest_status:
+          type: string
+          description: Ingest status
