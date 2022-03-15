@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from app.ingest.application.queue.initiate_ingest_queue_publisher import InitiateIngestQueuePublisher
+from app.ingest.application.mq.initiate_ingest_queue_publisher import InitiateIngestQueuePublisher
 from app.ingest.domain.services.ingest_service import IngestService
 
 
