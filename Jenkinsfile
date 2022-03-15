@@ -172,7 +172,7 @@ pipeline {
    environment {
     imageName = 'dims'
     stackName = 'HDC3A'
-    registryCredentialsId = '${env.REGISTRY_ID}'
+    registryCredentialsId = "${env.REGISTRY_ID}"
     registryUri = 'https://registry.lts.harvard.edu'
    }
  }
