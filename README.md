@@ -6,7 +6,7 @@ DRS Import Management Service (DIMS) is a Python/Flask project written in Python
 
 ### Create .env file
 
-Create an .env file by copying the existing .env.example file from the repository.
+Create an .env file by copying the existing env.example file from the repository.
 
 ### Run development environment
 
