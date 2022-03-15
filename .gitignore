@@ -7,8 +7,32 @@ venv/
 
 # IDEs
 .idea
+/.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# for Nginx
+webapp.conf
+
+# JWT Keys just in case they happen later
+jwtkeys.py
+
+# Editor configs
+*.editorconfig
+.project
+.pydevproject
+.vscode/
+# Local cache
+.DS_Store
+.bash_history
+.cache/
+.local/
+supervisord.pid
+
+# Logs
+*.log
+/logs/*
+!/logs/.keep
