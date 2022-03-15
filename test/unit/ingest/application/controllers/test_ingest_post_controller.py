@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import flask
 
 from app.ingest.application.controllers.ingest_post_controller import IngestPostController
-from ingest.domain.services.ingest_service import IngestService
+from app.ingest.domain.services.ingest_service import IngestService
 
 
 class TestIngestPostController(TestCase):
