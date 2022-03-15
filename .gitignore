@@ -5,6 +5,7 @@
 .venv
 venv/
 
+# IDEs
 .idea
 
 # Byte-compiled / optimized / DLL files
