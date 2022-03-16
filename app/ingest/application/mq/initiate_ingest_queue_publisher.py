@@ -15,6 +15,9 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher):
         self.__mq_host = os.getenv('MQ_HOST')
         self.__mq_port = os.getenv('MQ_PORT')
         self.__mq_queue_name = os.getenv('MQ_QUEUE')
+        self.__mq_ssl_enabled = os.getenv('MQ_SSL_ENABLED')
+        self.__mq_user = os.getenv('MQ_USER')
+        self.__mq_password = os.getenv('MQ_PASSWORD')
 
     def publish_message(self) -> None:
         message_json = {}
@@ -39,6 +42,8 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher):
                 reason=str(e)
             )
 
+        connection.disconnect()
+
     def __create_mq_connection(self) -> stomp.Connection:
         connection = stomp.Connection(
             host_and_ports=[(self.__mq_host, self.__mq_port)],
@@ -46,12 +51,12 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher):
             keepalive=True
         )
 
-        if os.getenv('MQ_SSL_ENABLED') == 'True':
+        if self.__mq_ssl_enabled == 'True':
             connection.set_ssl([(self.__mq_host, self.__mq_port)])
 
         connection.connect(
-            os.getenv('MQ_USER'),
-            os.getenv('MQ_PASSWORD'),
+            self.__mq_user,
+            self.__mq_password,
             wait=True
         )
 

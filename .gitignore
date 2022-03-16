@@ -2,6 +2,7 @@
 
 # Environments
 .env
+.test.env
 .venv
 venv/
 

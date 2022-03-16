@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./activemq/Dockerfile
+    restart: on-failure
     ports:
       - "8162:8161"
       - "61614:61613"

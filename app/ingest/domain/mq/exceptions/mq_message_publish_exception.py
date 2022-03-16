@@ -6,5 +6,5 @@ class MqMessagePublishException(MqException):
         message = f"An error occurred while publishing message to queue {queue_name} on host " \
                   f"{queue_host}, port {queue_port}"
         if reason:
-            message = message + f" .Reason was {reason}"
+            message = message + f". Reason was: {reason}"
         super().__init__(message)
