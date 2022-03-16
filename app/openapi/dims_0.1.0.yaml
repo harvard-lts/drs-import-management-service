@@ -17,12 +17,33 @@ paths:
                 type: object
                 required:
                   - data
+                  - error
                 properties:
                   data:
                     $ref: "#/components/schemas/IngestConfirmation"
+                  error:
+                    type: string
+                    nullable: true
+        500:
+          $ref: "#/components/responses/InternalError"
 
 components:
   schemas:
+    InternalError:
+      description: Internal error
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+              - error
+            properties:
+              error:
+                type: string
+              data:
+                type: object
+                nullable: true
     IngestConfirmation:
       type: object
       required:
