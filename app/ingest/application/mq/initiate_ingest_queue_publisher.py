@@ -4,8 +4,8 @@ import os
 import stomp
 
 from app.ingest.domain.mq.initiate_ingest_queue_publisher import IInitiateIngestQueuePublisher
-from app.ingest.domain.mq.mq_connection_exception import MqConnectionException
-from app.ingest.domain.mq.mq_message_publish_exception import MqMessagePublishException
+from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnectionException
+from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
 
 
 class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher):

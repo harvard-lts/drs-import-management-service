@@ -2,9 +2,10 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 from app.ingest.domain.mq.initiate_ingest_queue_publisher import IInitiateIngestQueuePublisher
-from app.ingest.domain.mq.mq_connection_exception import MqConnectionException
-from app.ingest.domain.mq.mq_message_publish_exception import MqMessagePublishException
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnectionException
+from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
+from app.ingest.domain.services.exceptions.initiate_ingest_exception import InitiateIngestException
 
 
 class TestIngestService(TestCase):
@@ -22,7 +23,7 @@ class TestIngestService(TestCase):
         initiate_ingest_queue_publisher_stub.publish_message.side_effect = MqConnectionException("test", "test", "test")
         sut = IngestService(initiate_ingest_queue_publisher_stub)
 
-        with self.assertRaises(MqConnectionException):
+        with self.assertRaises(InitiateIngestException):
             sut.initiate_ingest()
 
     def test_initiate_ingest_publisher_raises_mq_message_publish_exception(self) -> None:
@@ -31,5 +32,5 @@ class TestIngestService(TestCase):
                                                                                                      "test", "test")
         sut = IngestService(initiate_ingest_queue_publisher_stub)
 
-        with self.assertRaises(MqMessagePublishException):
+        with self.assertRaises(InitiateIngestException):
             sut.initiate_ingest()
