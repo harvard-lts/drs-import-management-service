@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+
+  test_activemq:
+    build:
+      context: .
+      dockerfile: ./activemq/Dockerfile
+    ports:
+      - "8162:8161"
+      - "61614:61613"

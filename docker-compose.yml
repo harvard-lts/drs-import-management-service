@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
 
-  dims:
+  dev_dims:
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -12,7 +12,7 @@ services:
     volumes:
       - ./app:/home/dimsuser/app
 
-  activemq:
+  dev_activemq:
     build:
       context: .
       dockerfile: ./activemq/Dockerfile
