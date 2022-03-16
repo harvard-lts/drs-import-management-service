@@ -28,7 +28,7 @@ paths:
           $ref: "#/components/responses/InternalError"
 
 components:
-  schemas:
+  responses:
     InternalError:
       description: Internal error
       content:
@@ -44,6 +44,7 @@ components:
               data:
                 type: object
                 nullable: true
+  schemas:
     IngestConfirmation:
       type: object
       required:
