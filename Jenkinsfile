@@ -18,7 +18,7 @@ pipeline {
       when { anyOf { branch 'main'; branch 'trial' } }
       steps {
         echo 'Building'
-        sh 'docker build -t registry.lts.harvard.edu/lts/{imageName} .'
+        sh 'docker build -t registry.lts.harvard.edu/lts/${imageName} .'
       }
     }
 
@@ -35,16 +35,16 @@ pipeline {
             if (GIT_TAG != "") {
                 echo "$GIT_TAG"
                 docker.withRegistry(registryUri, registryCredentialsId){
-                def customImage = docker.build("registry.lts.harvard.edu/lts/{imageName}:$GIT_TAG")
+                def customImage = docker.build("registry.lts.harvard.edu/lts/${imageName}:$GIT_TAG")
                 customImage.push()
                 }
             } else {
                     echo "$GIT_HASH"
                     docker.withRegistry(registryUri, registryCredentialsId){
                     // this says build but its really just using the build from above and tagging it
-                    def customImage = docker.build("registry.lts.harvard.edu/lts/{imageName}-snapshot:$GIT_HASH")
+                    def customImage = docker.build("registry.lts.harvard.edu/lts/${imageName}-snapshot:$GIT_HASH")
                     customImage.push()
-                    def devImage = docker.build("registry.lts.harvard.edu/lts/{imageName}-snapshot:dev")
+                    def devImage = docker.build("registry.lts.harvard.edu/lts/${imageName}-snapshot:dev")
                     devImage.push()
                     }
             }
@@ -61,12 +61,12 @@ pipeline {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
                   sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} {stackName}_{imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               } else {
                       echo "$GIT_HASH"
                       sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} {stackName}_{imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               }
           }
@@ -85,15 +85,15 @@ pipeline {
             if (GIT_TAG != "") {
                 echo "$GIT_TAG"
                 docker.withRegistry(registryUri, registryCredentialsId){
-                def customImage = docker.build("registry.lts.harvard.edu/lts/{imageName}:$GIT_TAG")
+                def customImage = docker.build("registry.lts.harvard.edu/lts/${imageName}:$GIT_TAG")
                 customImage.push()
                 }
             } else {
                     echo "$GIT_HASH"
                     docker.withRegistry(registryUri, registryCredentialsId){
-                    def customImage = docker.build("registry.lts.harvard.edu/lts/{imageName}-snapshot:$GIT_HASH")
+                    def customImage = docker.build("registry.lts.harvard.edu/lts/${imageName}-snapshot:$GIT_HASH")
                     customImage.push()
-                    def devImage = docker.build("registry.lts.harvard.edu/lts/{imageName}-snapshot:dev")
+                    def devImage = docker.build("registry.lts.harvard.edu/lts/${imageName}-snapshot:dev")
                     devImage.push()
                     }
             }
@@ -110,12 +110,12 @@ pipeline {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
                   sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} {stackName}_{imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               } else {
                       echo "$GIT_HASH"
                       sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} {stackName}_{imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               }
           }
@@ -133,13 +133,13 @@ pipeline {
             if (GIT_TAG != "") {
                 echo "$GIT_TAG"
                 docker.withRegistry(registryUri, registryCredentialsId){
-                def customImage = docker.build("registry.lts.harvard.edu/lts/{imageName}:$GIT_TAG")
+                def customImage = docker.build("registry.lts.harvard.edu/lts/${imageName}:$GIT_TAG")
                 customImage.push()
                 }
             } else {
                     echo "$GIT_HASH"
                     docker.withRegistry(registryUri, registryCredentialsId){
-                    def qaImage = docker.build("registry.lts.harvard.edu/lts/{imageName}-snapshot:qa")
+                    def qaImage = docker.build("registry.lts.harvard.edu/lts/${imageName}-snapshot:qa")
                     qaImage.push()
                     }
             }
@@ -156,12 +156,12 @@ pipeline {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
                   sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} {stackName}_{imageName}'"
+                      sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               } else {
                       echo "$GIT_HASH"
                       sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} {stackName}_{imageName}'"
+                      sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               }
           }
@@ -172,7 +172,7 @@ pipeline {
    environment {
     imageName = 'dims'
     stackName = 'HDC3A'
-    registryCredentialsId = '${env.REGISTRY_ID}'
+    registryCredentialsId = "${env.REGISTRY_ID}"
     registryUri = 'https://registry.lts.harvard.edu'
    }
  }
