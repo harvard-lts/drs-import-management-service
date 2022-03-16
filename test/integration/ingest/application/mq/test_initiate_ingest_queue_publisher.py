@@ -22,7 +22,7 @@ class TestInitiateIngestQueuePublisher(IntegrationTestBase):
         sut = InitiateIngestQueuePublisher()
         sut.publish_message()
 
-        self.__wait_until_message_received_or_timeout()
+        self.__await_until_message_received_or_timeout()
 
         if not test_message_received:
             self.fail(msg="The queue did not receive the published message")
@@ -55,7 +55,7 @@ class TestInitiateIngestQueuePublisher(IntegrationTestBase):
 
         return connection
 
-    def __wait_until_message_received_or_timeout(self) -> None:
+    def __await_until_message_received_or_timeout(self) -> None:
         timeout = time.time() + self.__MESSAGE_AWAIT_TIMEOUT_SECONDS
         while not test_message_received and time.time() < timeout:
             time.sleep(1)
