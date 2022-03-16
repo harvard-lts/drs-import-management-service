@@ -45,7 +45,7 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher):
             keepalive=True
         )
 
-        if os.getenv('DIMS_ENVIRONMENT') == 'production':
+        if os.getenv('MQ_SSL_ENABLED') == 'True':
             connection.set_ssl([(self.__MQ_HOST, self.__MQ_PORT)])
 
         connection.connect(
