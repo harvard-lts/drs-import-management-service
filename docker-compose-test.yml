@@ -9,6 +9,8 @@ services:
       dockerfile: ./testrunner.Dockerfile
     tty: true
     restart: on-failure
+    volumes:
+      - ./test:/home/dimsuser/test
 
   test_activemq:
     container_name: "test_activemq"
@@ -18,4 +20,3 @@ services:
     restart: on-failure
     ports:
       - "8162:8161"
-      - "61614:61613"
