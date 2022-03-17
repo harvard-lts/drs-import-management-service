@@ -10,6 +10,7 @@ services:
     tty: true
     restart: on-failure
     volumes:
+      - ./app:/home/dimsuser/app
       - ./test:/home/dimsuser/test
 
   test_activemq:

@@ -45,6 +45,9 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher):
         connection.disconnect()
 
     def __create_mq_connection(self) -> stomp.Connection:
+        """
+        Creates a stomp.Connection to MQ.
+        """
         connection = stomp.Connection(
             host_and_ports=[(self.__mq_host, self.__mq_port)],
             heartbeats=(self.__STOMP_CONN_HEARTBEATS_MS, self.__STOMP_CONN_HEARTBEATS_MS),

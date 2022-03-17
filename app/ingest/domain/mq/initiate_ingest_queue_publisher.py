@@ -5,4 +5,6 @@ class IInitiateIngestQueuePublisher(ABC):
 
     @abstractmethod
     def publish_message(self) -> None:
-        pass
+        """
+        Publish a message with ingest details to MQ.
+        """
