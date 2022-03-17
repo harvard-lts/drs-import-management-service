@@ -43,17 +43,36 @@ Remember to add the above run command environment variable and volume mapping to
 
 ## Test environment setup
 
-### Create .test.env file
+### Create .env file
 
 First, a .test.env file must be created inside /test/integration by copying the existing test.env.example file which can be found in the same folder.
 
 ### Run test environment
 
-Similar to the development environment, for running a local integration test environment there is a docker-compose-test.yml file, which only contains an ActiveMQ service, as it is currently the only external DIMS dependency.
+Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and an ActiveMQ container (for integration tests).
 
-Before executing the integration tests locally, the environment must be up and running:
+Before running tests locally, the environment must be up and running:
 ````
 docker-compose -f docker-compose-test.yml up
+````
+
+### Running tests
+
+Once the test environment is up and running, you can run the tests by executing pytest within the test runner container.
+
+Running all tests:
+````
+docker exec -it test_runner pytest test
+````
+
+Running unit tests:
+````
+docker exec -it test_runner pytest test/unit
+````
+
+Running integration tests:
+````
+docker exec -it test_runner pytest test/integration
 ````
 
 If you want to use a remote test environment for integration testing, you will need to update the environment variables in the .test.env file to access the desired environment.
