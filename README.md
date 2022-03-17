@@ -45,7 +45,7 @@ Remember to add the above run command environment variable and volume mapping to
 
 ### Create .test.env file
 
-First, a .test.env file must be created inside /test/integration by copying the existing .test.env.example file which can be found in the same folder.
+First, a .test.env file must be created inside /test/integration by copying the existing test.env.example file which can be found in the same folder.
 
 ### Run test environment
 

@@ -1,0 +1,10 @@
+# Ignore everything
+**
+
+# ... except for dependencies, .env file, source and tests
+!.env
+!Pipfile
+!Pipfile.lock
+!app/
+!test/
+!*.py

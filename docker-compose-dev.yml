@@ -3,6 +3,7 @@ version: "3.8"
 services:
 
   dev_dims:
+    container_name: "dev_dims"
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -13,9 +14,10 @@ services:
       - ./app:/home/dimsuser/app
 
   dev_activemq:
+    container_name: "dev_activemq"
     build:
       context: .
-      dockerfile: ./activemq/Dockerfile
+      dockerfile: ./activemq/activemq.Dockerfile
     restart: on-failure
     ports:
       - "8161:8161"
