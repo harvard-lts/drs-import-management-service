@@ -8,5 +8,5 @@ WORKDIR /home/dimsuser
 
 USER dimsuser
 
-COPY .. /home/dimsuser/
+COPY . /home/dimsuser/
 RUN pipenv install --deploy --system
