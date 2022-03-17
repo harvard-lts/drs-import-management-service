@@ -1,3 +1,8 @@
+"""
+This module defines an InitiateIngestQueuePublisher, an implementation of IInitiateIngestQueuePublisher
+which includes the necessary logic to connect to a remote MQ and publish a message for ingestion initiation.
+"""
+
 import json
 import os
 
