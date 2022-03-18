@@ -1,10 +1,15 @@
+"""
+This module defines a StompInteractor, which is an abstract class intended to define common behavior for
+stomp-implemented MQ components. Currently: IngestCompletedQueueListener and InitiateIngestQueuePublisher.
+"""
+
 import os
 from abc import ABC
 
 import stomp
 
-from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnectionException
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
+from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnectionException
 
 
 class StompInteractor(ABC):
