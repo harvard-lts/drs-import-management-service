@@ -27,5 +27,4 @@ class DrsImportManagementServiceApp(FlaskApp):
         )
 
     def __setup_queue_listeners(self) -> None:
-        ingest_completed_queue_listener = IngestCompletedQueueListener()
-        ingest_completed_queue_listener.listen()
+        IngestCompletedQueueListener()
