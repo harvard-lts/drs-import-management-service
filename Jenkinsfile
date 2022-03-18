@@ -155,12 +155,12 @@ pipeline {
           script {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
-                  sshagent(credentials : ['hgl_svcupd']) {
+                  sshagent(credentials : ['qatest']) {
                       sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               } else {
                       echo "$GIT_HASH"
-                      sshagent(credentials : ['hgl_svcupd']) {
+                      sshagent(credentials : ['qatest']) {
                       sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
                   }
               }
