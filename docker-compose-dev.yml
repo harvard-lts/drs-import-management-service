@@ -7,9 +7,11 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    env_file:
+      - .env
     restart: on-failure
     ports:
-      - "13880:5000"
+      - "10580:8443"
     volumes:
       - ./app:/home/dimsuser/app
 
