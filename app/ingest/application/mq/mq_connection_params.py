@@ -1,5 +1,5 @@
 class MqConnectionParams:
-    def __init__(self, mq_host, mq_port, mq_user, mq_password):
+    def __init__(self, mq_host, mq_port, mq_user, mq_password) -> None:
         """
         :param mq_host: MQ host to connect
         :type mq_host: str
