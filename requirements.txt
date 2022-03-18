@@ -25,3 +25,5 @@ virtualenv==20.13.3
 virtualenv-clone==0.5.7
 Werkzeug==2.0.3
 structlog==20.1.0
+dependency-injector==4.38.0
+stomp.py==7.0.0

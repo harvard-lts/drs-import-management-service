@@ -2,6 +2,7 @@
 
 # Environments
 .env
+.test.env
 .venv
 venv/
 
@@ -25,6 +26,7 @@ jwtkeys.py
 .project
 .pydevproject
 .vscode/
+
 # Local cache
 .DS_Store
 .bash_history

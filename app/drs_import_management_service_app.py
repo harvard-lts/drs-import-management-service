@@ -1,5 +1,6 @@
 from connexion import FlaskApp
 
+from .drs_import_management_service_resolver import DrsImportManagementServiceResolver
 from .health.application.controllers.health_get_controller import HealthGetController
 
 
@@ -9,9 +10,14 @@ class DrsImportManagementServiceApp(FlaskApp):
         super().__init__(import_name, **kwargs)
 
         health_controller = HealthGetController()
-        health_controller.__name__ = "health.application.controllers.health_get_controller.HealthGetController"
+        health_controller.__name__ = "app.health.application.controllers.health_get_controller.HealthGetController"
         self.add_url_rule(
             rule="/health",
             endpoint="health",
             view_func=health_controller,
+        )
+
+        self.add_api(
+            specification="openapi/dims_0.1.0.yaml",
+            resolver=DrsImportManagementServiceResolver()
         )

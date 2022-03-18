@@ -1,0 +1,9 @@
+# Ignore everything
+**
+
+# ... except for dependencies, .env file, source and tests
+!.env
+!requirements.txt
+!app/
+!test/
+!*.py
