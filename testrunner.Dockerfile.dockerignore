@@ -3,8 +3,7 @@
 
 # ... except for dependencies, .env file, source and tests
 !.env
-!Pipfile
-!Pipfile.lock
+!requirements.txt
 !app/
 !test/
 !*.py
