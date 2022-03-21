@@ -1,5 +1,5 @@
 """
-This module defines an IngestService, which is domain service that defines ingesting operations
+This module defines an IngestService, which is a domain service that defines ingesting operations
 """
 
 from app.ingest.domain.mq.exceptions.mq_exception import MqException
