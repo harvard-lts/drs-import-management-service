@@ -4,6 +4,7 @@ import time
 from unittest.mock import patch
 
 from app.ingest.application.mq.ingest_completed_queue_listener import IngestCompletedQueueListener
+from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
 
 
@@ -25,12 +26,20 @@ class TestIngestCompletedQueueListener(StompIntegrationTestBase):
             self.fail(msg="The listener did not receive the published message")
 
     def __send_test_message(self) -> None:
-        connection = self._create_mq_connection()
+        connection = self._create_mq_connection(
+            MqConnectionParams(
+                mq_host=os.getenv('MQ_PROCESS_HOST'),
+                mq_port=os.getenv('MQ_PROCESS_PORT'),
+                mq_ssl_enabled=os.getenv('MQ_PROCESS_SSL_ENABLED'),
+                mq_user=os.getenv('MQ_PROCESS_USER'),
+                mq_password=os.getenv('MQ_PROCESS_PASSWORD')
+            )
+        )
 
         test_message_json = {}
         test_message_json_str = json.dumps(test_message_json)
 
-        mq_queue_name = os.getenv('MQ_QUEUE')
+        mq_queue_name = os.getenv('MQ_PROCESS_QUEUE')
         connection.send(mq_queue_name, test_message_json_str)
 
         connection.disconnect()

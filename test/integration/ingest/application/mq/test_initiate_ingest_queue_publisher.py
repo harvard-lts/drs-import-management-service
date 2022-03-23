@@ -5,6 +5,7 @@ import stomp
 from stomp.utils import Frame
 
 from app.ingest.application.mq.initiate_ingest_queue_publisher import InitiateIngestQueuePublisher
+from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
 
 test_message_received = False
@@ -29,9 +30,17 @@ class TestInitiateIngestQueuePublisher(StompIntegrationTestBase):
             self.fail(msg="The queue did not receive the published message")
 
     def __create_subscribed_mq_connection(self) -> stomp.Connection:
-        mq_queue_name = os.getenv('MQ_QUEUE')
+        connection = self._create_mq_connection(
+            MqConnectionParams(
+                mq_host=os.getenv('MQ_STARFISH_HOST'),
+                mq_port=os.getenv('MQ_STARFISH_PORT'),
+                mq_ssl_enabled=os.getenv('MQ_STARFISH_SSL_ENABLED'),
+                mq_user=os.getenv('MQ_STARFISH_USER'),
+                mq_password=os.getenv('MQ_STARFISH_PASSWORD')
+            )
+        )
 
-        connection = self._create_mq_connection()
+        mq_queue_name = os.getenv('MQ_STARFISH_QUEUE')
         connection.subscribe(destination=mq_queue_name, id=1)
 
         connection.set_listener('', TestConnectionListener())

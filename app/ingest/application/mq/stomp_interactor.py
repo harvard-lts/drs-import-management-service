@@ -3,7 +3,6 @@ This module defines a StompInteractor, which is an abstract class intended to de
 stomp-implemented MQ components. Currently: IngestCompletedQueueListener and InitiateIngestQueuePublisher.
 """
 
-import os
 from abc import ABC
 
 import stomp
@@ -15,9 +14,6 @@ from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnection
 class StompInteractor(ABC):
     __STOMP_CONN_HEARTBEATS_MS = 40000
 
-    def __init__(self) -> None:
-        self.__mq_ssl_enabled = os.getenv('MQ_SSL_ENABLED')
-
     def _create_mq_connection(self, mq_connection_params: MqConnectionParams) -> stomp.Connection:
         """
         Creates a stomp.Connection to MQ.
@@ -25,19 +21,25 @@ class StompInteractor(ABC):
         :param mq_connection_params: MQ connection parameters
         :type mq_connection_params: MqConnectionParams
         """
+        mq_host = mq_connection_params.mq_host
+        mq_port = mq_connection_params.mq_port
+        mq_ssl_enabled = mq_connection_params.mq_ssl_enabled
+        mq_user = mq_connection_params.mq_user
+        mq_password = mq_connection_params.mq_password
+
         try:
             connection = stomp.Connection(
-                host_and_ports=[(mq_connection_params.mq_host, mq_connection_params.mq_port)],
+                host_and_ports=[(mq_host, mq_port)],
                 heartbeats=(self.__STOMP_CONN_HEARTBEATS_MS, self.__STOMP_CONN_HEARTBEATS_MS),
                 keepalive=True
             )
 
-            if self.__mq_ssl_enabled == 'True':
-                connection.set_ssl([(mq_connection_params.mq_host, mq_connection_params.mq_port)])
+            if mq_ssl_enabled == 'True':
+                connection.set_ssl([(mq_host, mq_port)])
 
             connection.connect(
-                mq_connection_params.mq_user,
-                mq_connection_params.mq_password,
+                mq_user,
+                mq_password,
                 wait=True
             )
 
@@ -45,7 +47,7 @@ class StompInteractor(ABC):
 
         except Exception as e:
             raise MqConnectionException(
-                queue_host=mq_connection_params.mq_host,
-                queue_port=mq_connection_params.mq_port,
+                queue_host=mq_host,
+                queue_port=mq_port,
                 reason=str(e)
             )
