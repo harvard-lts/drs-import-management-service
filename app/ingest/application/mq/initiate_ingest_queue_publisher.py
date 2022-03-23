@@ -16,12 +16,12 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher, StompInteracto
 
     def __init__(self) -> None:
         super().__init__()
-        self.__mq_host = os.getenv('MQ_STARFISH_HOST')
-        self.__mq_port = os.getenv('MQ_STARFISH_PORT')
-        self.__mq_ssl_enabled = os.getenv('MQ_STARFISH_SSL_ENABLED')
-        self.__mq_user = os.getenv('MQ_STARFISH_USER')
-        self.__mq_password = os.getenv('MQ_STARFISH_PASSWORD')
-        self.__mq_queue_name = os.getenv('MQ_STARFISH_QUEUE')
+        self.__mq_host = os.getenv('MQ_TRANSFER_HOST')
+        self.__mq_port = os.getenv('MQ_TRANSFER_PORT')
+        self.__mq_ssl_enabled = os.getenv('MQ_TRANSFER_SSL_ENABLED')
+        self.__mq_user = os.getenv('MQ_TRANSFER_USER')
+        self.__mq_password = os.getenv('MQ_TRANSFER_PASSWORD')
+        self.__mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE')
 
     def publish_message(self) -> None:
         message_json = {}

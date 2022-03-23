@@ -32,15 +32,15 @@ class TestInitiateIngestQueuePublisher(StompIntegrationTestBase):
     def __create_subscribed_mq_connection(self) -> stomp.Connection:
         connection = self._create_mq_connection(
             MqConnectionParams(
-                mq_host=os.getenv('MQ_STARFISH_HOST'),
-                mq_port=os.getenv('MQ_STARFISH_PORT'),
-                mq_ssl_enabled=os.getenv('MQ_STARFISH_SSL_ENABLED'),
-                mq_user=os.getenv('MQ_STARFISH_USER'),
-                mq_password=os.getenv('MQ_STARFISH_PASSWORD')
+                mq_host=os.getenv('MQ_TRANSFER_HOST'),
+                mq_port=os.getenv('MQ_TRANSFER_PORT'),
+                mq_ssl_enabled=os.getenv('MQ_TRANSFER_SSL_ENABLED'),
+                mq_user=os.getenv('MQ_TRANSFER_USER'),
+                mq_password=os.getenv('MQ_TRANSFER_PASSWORD')
             )
         )
 
-        mq_queue_name = os.getenv('MQ_STARFISH_QUEUE')
+        mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE')
         connection.subscribe(destination=mq_queue_name, id=1)
 
         connection.set_listener('', TestConnectionListener())
