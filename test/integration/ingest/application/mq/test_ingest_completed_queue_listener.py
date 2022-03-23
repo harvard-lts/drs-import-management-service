@@ -39,7 +39,7 @@ class TestIngestCompletedQueueListener(StompIntegrationTestBase):
         test_message_json = {}
         test_message_json_str = json.dumps(test_message_json)
 
-        mq_queue_name = os.getenv('MQ_PROCESS_QUEUE')
+        mq_queue_name = os.getenv('MQ_PROCESS_QUEUE_DRS_INGEST_STATUS')
         connection.send(mq_queue_name, test_message_json_str)
 
         connection.disconnect()

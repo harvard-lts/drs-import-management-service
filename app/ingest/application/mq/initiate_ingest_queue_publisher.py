@@ -8,6 +8,7 @@ import os
 
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from app.ingest.application.mq.stomp_interactor import StompInteractor
+from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
 from app.ingest.domain.mq.initiate_ingest_queue_publisher import IInitiateIngestQueuePublisher
 
@@ -21,11 +22,10 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher, StompInteracto
         self.__mq_ssl_enabled = os.getenv('MQ_TRANSFER_SSL_ENABLED')
         self.__mq_user = os.getenv('MQ_TRANSFER_USER')
         self.__mq_password = os.getenv('MQ_TRANSFER_PASSWORD')
-        self.__mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE')
+        self.__mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE_TRANSFER_READY')
 
-    def publish_message(self) -> None:
-        message_json = {}
-        message_json_str = json.dumps(message_json)
+    def publish_message(self, ingest: Ingest) -> None:
+        message_json = self.__create_message_json(ingest)
 
         connection = self._create_mq_connection(
             MqConnectionParams(
@@ -37,6 +37,7 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher, StompInteracto
             )
         )
         try:
+            message_json_str = json.dumps(message_json)
             connection.send(self.__mq_queue_name, message_json_str)
         except Exception as e:
             raise MqMessagePublishException(
@@ -47,3 +48,11 @@ class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher, StompInteracto
             )
 
         connection.disconnect()
+
+    def __create_message_json(self, ingest: Ingest) -> json:
+        return {
+            's3_path': ingest.s3_path,
+            's3_bucket_name': ingest.s3_bucket_name,
+            'dropbox_name': ingest.dropbox_name,
+            'admin_metadata': ingest.admin_metadata,
+        }

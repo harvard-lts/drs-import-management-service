@@ -7,6 +7,7 @@ from stomp.utils import Frame
 from app.ingest.application.mq.initiate_ingest_queue_publisher import InitiateIngestQueuePublisher
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
+from test.resources.ingest.ingest_factory import create_ingest
 
 test_message_received = False
 
@@ -22,7 +23,8 @@ class TestInitiateIngestQueuePublisher(StompIntegrationTestBase):
 
     def test_publish_message_happy_path(self) -> None:
         sut = InitiateIngestQueuePublisher()
-        sut.publish_message()
+        test_ingest = create_ingest()
+        sut.publish_message(test_ingest)
 
         self.__await_until_message_received_or_timeout()
 
@@ -40,7 +42,7 @@ class TestInitiateIngestQueuePublisher(StompIntegrationTestBase):
             )
         )
 
-        mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE')
+        mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE_TRANSFER_READY')
         connection.subscribe(destination=mq_queue_name, id=1)
 
         connection.set_listener('', TestConnectionListener())

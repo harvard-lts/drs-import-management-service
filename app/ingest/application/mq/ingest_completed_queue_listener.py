@@ -20,7 +20,7 @@ class IngestCompletedQueueListener(stomp.ConnectionListener, StompInteractor):
         self.__ssl_enabled = os.getenv('MQ_PROCESS_SSL_ENABLED')
         self.__mq_user = os.getenv('MQ_PROCESS_USER')
         self.__mq_password = os.getenv('MQ_PROCESS_PASSWORD')
-        self.__mq_queue_name = os.getenv('MQ_PROCESS_QUEUE')
+        self.__mq_queue_name = os.getenv('MQ_PROCESS_QUEUE_DRS_INGEST_STATUS')
 
         self.__reconnect_on_disconnection = True
         self.__connection = self.__create_subscribed_mq_connection()
