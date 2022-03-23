@@ -1,30 +1,30 @@
 """
-This module defines an IngestService, which is a domain service that defines ingesting operations
+This module defines an IngestService, which is a domain service that defines ingesting operations.
 """
 
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.mq.exceptions.mq_exception import MqException
-from app.ingest.domain.mq.initiate_ingest_queue_publisher import IInitiateIngestQueuePublisher
+from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
 from app.ingest.domain.services.exceptions.initiate_ingest_exception import InitiateIngestException
 
 
 class IngestService:
 
-    def __init__(self, initiate_ingest_queue_publisher: IInitiateIngestQueuePublisher) -> None:
+    def __init__(self, transfer_ready_queue_publisher: ITransferReadyQueuePublisher) -> None:
         """
-        :param initiate_ingest_queue_publisher: an implementation of IInitiateIngestQueuePublisher
-        :type initiate_ingest_queue_publisher: IInitiateIngestQueuePublisher
+        :param transfer_ready_queue_publisher: an implementation of ITransferReadyQueuePublisher
+        :type transfer_ready_queue_publisher: ITransferReadyQueuePublisher
         """
-        self.__initiate_ingest_queue_publisher = initiate_ingest_queue_publisher
+        self.__transfer_ready_queue_publisher = transfer_ready_queue_publisher
 
     def initiate_ingest(self, ingest: Ingest) -> None:
         """
-        Initiates an ingest by calling ingest queue publisher to publish an ingest message.
+        Initiates an ingest by calling transfer ready queue publisher to publish a message.
 
         :param ingest: Ingest to initiate
         :type ingest: Ingest
         """
         try:
-            self.__initiate_ingest_queue_publisher.publish_message(ingest)
+            self.__transfer_ready_queue_publisher.publish_message(ingest)
         except MqException as mqe:
             raise InitiateIngestException(str(mqe))

@@ -1,5 +1,5 @@
 """
-This module defines an InitiateIngestQueuePublisher, an implementation of IInitiateIngestQueuePublisher
+This module defines an TransferReadyQueuePublisher, an implementation of ITransferReadyQueuePublisher
 which includes the necessary logic to connect to a remote MQ and publish a message for ingestion initiation.
 """
 
@@ -10,10 +10,10 @@ from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from app.ingest.application.mq.stomp_interactor import StompInteractor
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
-from app.ingest.domain.mq.initiate_ingest_queue_publisher import IInitiateIngestQueuePublisher
+from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
 
 
-class InitiateIngestQueuePublisher(IInitiateIngestQueuePublisher, StompInteractor):
+class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompInteractor):
 
     def __init__(self) -> None:
         super().__init__()

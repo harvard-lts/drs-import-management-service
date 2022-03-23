@@ -1,6 +1,6 @@
 """
 This module defines a StompInteractor, which is an abstract class intended to define common behavior for
-stomp-implemented MQ components. Currently: IngestCompletedQueueListener and InitiateIngestQueuePublisher.
+stomp-implemented MQ components. Currently: IngestCompletedQueueListener and TransferReadyQueuePublisher.
 """
 
 from abc import ABC

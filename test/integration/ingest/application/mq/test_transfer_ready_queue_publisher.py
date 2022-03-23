@@ -4,7 +4,7 @@ import time
 import stomp
 from stomp.utils import Frame
 
-from app.ingest.application.mq.initiate_ingest_queue_publisher import InitiateIngestQueuePublisher
+from app.ingest.application.mq.transfer_ready_queue_publisher import TransferReadyQueuePublisher
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
 from test.resources.ingest.ingest_factory import create_ingest
@@ -12,7 +12,7 @@ from test.resources.ingest.ingest_factory import create_ingest
 test_message_received = False
 
 
-class TestInitiateIngestQueuePublisher(StompIntegrationTestBase):
+class TestTransferReadyQueuePublisher(StompIntegrationTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -22,7 +22,7 @@ class TestInitiateIngestQueuePublisher(StompIntegrationTestBase):
         self.connection.disconnect()
 
     def test_publish_message_happy_path(self) -> None:
-        sut = InitiateIngestQueuePublisher()
+        sut = TransferReadyQueuePublisher()
         test_ingest = create_ingest()
         sut.publish_message(test_ingest)
 
