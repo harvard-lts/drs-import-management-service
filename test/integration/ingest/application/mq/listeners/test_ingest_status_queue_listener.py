@@ -3,20 +3,20 @@ import os
 import time
 from unittest.mock import patch
 
-from app.ingest.application.mq.ingest_completed_queue_listener import IngestCompletedQueueListener
+from app.ingest.application.mq.listeners.ingest_status_queue_listener import IngestStatusQueueListener
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
 
 
-class TestIngestCompletedQueueListener(StompIntegrationTestBase):
+class TestIngestStatusQueueListener(StompIntegrationTestBase):
     def setUp(self) -> None:
         super().setUp()
-        self.sut = IngestCompletedQueueListener()
+        self.sut = IngestStatusQueueListener()
 
     def tearDown(self) -> None:
         self.sut.disconnect()
 
-    @patch("app.ingest.application.mq.ingest_completed_queue_listener.IngestCompletedQueueListener.on_message")
+    @patch("app.ingest.application.mq.listeners.ingest_status_queue_listener.IngestStatusQueueListener.on_message")
     def test_on_message_happy_path(self, on_message_mock) -> None:
         self.__send_test_message()
 

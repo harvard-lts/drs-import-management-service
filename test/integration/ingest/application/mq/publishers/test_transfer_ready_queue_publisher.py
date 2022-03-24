@@ -4,7 +4,7 @@ import time
 import stomp
 from stomp.utils import Frame
 
-from app.ingest.application.mq.transfer_ready_queue_publisher import TransferReadyQueuePublisher
+from app.ingest.application.mq.publishers.transfer_ready_queue_publisher import TransferReadyQueuePublisher
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
 from test.resources.ingest.ingest_factory import create_ingest

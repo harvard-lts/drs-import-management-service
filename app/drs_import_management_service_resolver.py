@@ -1,7 +1,7 @@
 from connexion import Resolver, Resolution
 from connexion.operations import AbstractOperation
 
-from .ingest.application.controllers.ingest_post_controller import IngestPostController
+from app.ingest.application.controllers.ingest_post_controller import IngestPostController
 
 
 class DrsImportManagementServiceResolver(Resolver):

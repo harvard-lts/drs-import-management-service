@@ -1,8 +1,9 @@
 from connexion import FlaskApp
 
-from .drs_import_management_service_resolver import DrsImportManagementServiceResolver
-from .health.application.controllers.health_get_controller import HealthGetController
-from .ingest.application.mq.ingest_completed_queue_listener import IngestCompletedQueueListener
+from app.ingest.application.mq.listeners.ingest_status_queue_listener import IngestStatusQueueListener
+from app.ingest.application.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
+from app.drs_import_management_service_resolver import DrsImportManagementServiceResolver
+from app.health.application.controllers.health_get_controller import HealthGetController
 
 
 class DrsImportManagementServiceApp(FlaskApp):
@@ -27,4 +28,5 @@ class DrsImportManagementServiceApp(FlaskApp):
         )
 
     def __setup_queue_listeners(self) -> None:
-        IngestCompletedQueueListener()
+        TransferStatusQueueListener()
+        IngestStatusQueueListener()

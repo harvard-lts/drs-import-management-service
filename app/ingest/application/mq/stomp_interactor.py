@@ -1,9 +1,9 @@
 """
-This module defines a StompInteractor, which is an abstract class intended to define common behavior for
-stomp-implemented MQ components. Currently: IngestCompletedQueueListener and TransferReadyQueuePublisher.
+This module defines a StompInteractor, which is an abstract class intended
+to define common behavior for stomp-implemented MQ components.
 """
 
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import stomp
 
@@ -14,13 +14,12 @@ from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnection
 class StompInteractor(ABC):
     __STOMP_CONN_HEARTBEATS_MS = 40000
 
-    def _create_mq_connection(self, mq_connection_params: MqConnectionParams) -> stomp.Connection:
+    def _create_mq_connection(self) -> stomp.Connection:
         """
         Creates a stomp.Connection to MQ.
-
-        :param mq_connection_params: MQ connection parameters
-        :type mq_connection_params: MqConnectionParams
         """
+        mq_connection_params = self._get_mq_connection_params()
+
         mq_host = mq_connection_params.mq_host
         mq_port = mq_connection_params.mq_port
         mq_ssl_enabled = mq_connection_params.mq_ssl_enabled
@@ -51,3 +50,15 @@ class StompInteractor(ABC):
                 queue_port=mq_port,
                 reason=str(e)
             )
+
+    @abstractmethod
+    def _get_mq_connection_params(self) -> MqConnectionParams:
+        """
+        Retrieves the MQ connection params necessary for creating the connection
+        """
+
+    @abstractmethod
+    def _get_queue_name(self) -> str:
+        """
+        Retrieves the name of the queue to be interacted with
+        """
