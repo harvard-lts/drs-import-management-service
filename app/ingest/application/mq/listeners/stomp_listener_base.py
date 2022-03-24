@@ -3,7 +3,7 @@ This module defines a StompListenerBase, which is an abstract class intended
 to define common behavior for stomp-implemented MQ listener components.
 """
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 import stomp
 from stomp.utils import Frame
@@ -11,7 +11,7 @@ from stomp.utils import Frame
 from app.ingest.application.mq.stomp_interactor import StompInteractor
 
 
-class StompListenerBase(stomp.ConnectionListener, StompInteractor):
+class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
 
     def __init__(self) -> None:
         self.__reconnect_on_disconnection = True

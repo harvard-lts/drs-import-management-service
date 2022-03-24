@@ -1,4 +1,5 @@
 import time
+from abc import abstractmethod, ABC
 
 import stomp
 
@@ -6,11 +7,13 @@ from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from test.integration.integration_test_base import IntegrationTestBase
 
 
-class StompIntegrationTestBase(IntegrationTestBase):
+class StompIntegrationTestBase(IntegrationTestBase, ABC):
     __STOMP_CONN_HEARTBEATS_MS = 40000
     __MESSAGE_AWAIT_TIMEOUT_SECONDS = 30
 
-    def _create_mq_connection(self, mq_connection_params: MqConnectionParams) -> stomp.Connection:
+    def _create_mq_connection(self) -> stomp.Connection:
+        mq_connection_params = self._get_mq_connection_params()
+
         mq_host = mq_connection_params.mq_host
         mq_port = mq_connection_params.mq_port
         mq_ssl_enabled = mq_connection_params.mq_ssl_enabled
@@ -33,6 +36,10 @@ class StompIntegrationTestBase(IntegrationTestBase):
         )
 
         return connection
+
+    @abstractmethod
+    def _get_mq_connection_params(self) -> MqConnectionParams:
+        pass
 
     def _get_message_await_timeout(self) -> float:
         return time.time() + self.__MESSAGE_AWAIT_TIMEOUT_SECONDS

@@ -4,8 +4,8 @@ import time
 import stomp
 from stomp.utils import Frame
 
-from app.ingest.application.mq.publishers.transfer_ready_queue_publisher import TransferReadyQueuePublisher
 from app.ingest.application.mq.mq_connection_params import MqConnectionParams
+from app.ingest.application.mq.publishers.transfer_ready_queue_publisher import TransferReadyQueuePublisher
 from test.integration.ingest.application.mq.stomp_integration_test_base import StompIntegrationTestBase
 from test.resources.ingest.ingest_factory import create_ingest
 
@@ -31,16 +31,17 @@ class TestTransferReadyQueuePublisher(StompIntegrationTestBase):
         if not test_message_received:
             self.fail(msg="The queue did not receive the published message")
 
-    def __create_subscribed_mq_connection(self) -> stomp.Connection:
-        connection = self._create_mq_connection(
-            MqConnectionParams(
-                mq_host=os.getenv('MQ_TRANSFER_HOST'),
-                mq_port=os.getenv('MQ_TRANSFER_PORT'),
-                mq_ssl_enabled=os.getenv('MQ_TRANSFER_SSL_ENABLED'),
-                mq_user=os.getenv('MQ_TRANSFER_USER'),
-                mq_password=os.getenv('MQ_TRANSFER_PASSWORD')
-            )
+    def _get_mq_connection_params(self) -> MqConnectionParams:
+        return MqConnectionParams(
+            mq_host=os.getenv('MQ_TRANSFER_HOST'),
+            mq_port=os.getenv('MQ_TRANSFER_PORT'),
+            mq_ssl_enabled=os.getenv('MQ_TRANSFER_SSL_ENABLED'),
+            mq_user=os.getenv('MQ_TRANSFER_USER'),
+            mq_password=os.getenv('MQ_TRANSFER_PASSWORD')
         )
+
+    def __create_subscribed_mq_connection(self) -> stomp.Connection:
+        connection = self._create_mq_connection()
 
         mq_queue_name = os.getenv('MQ_TRANSFER_QUEUE_TRANSFER_READY')
         connection.subscribe(destination=mq_queue_name, id=1)
