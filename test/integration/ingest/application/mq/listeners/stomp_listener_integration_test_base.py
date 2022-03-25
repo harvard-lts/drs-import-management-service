@@ -7,12 +7,12 @@ from test.integration.ingest.application.mq.stomp_integration_test_base import S
 
 class StompListenerIntegrationTestBase(StompIntegrationTestBase, ABC):
 
-    def _send_test_message(self, mq_queue_name: str) -> None:
+    def _send_test_message(self) -> None:
         test_message_json = {}
         test_message_json_str = json.dumps(test_message_json)
 
         connection = self._create_mq_connection()
-        connection.send(mq_queue_name, test_message_json_str)
+        connection.send(self._get_queue_name(), test_message_json_str)
         connection.disconnect()
 
     def _await_until_on_message_has_calls_or_timeout(self, on_message_mock) -> None:

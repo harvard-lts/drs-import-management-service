@@ -17,7 +17,7 @@ class TestProcessStatusQueueListener(StompListenerIntegrationTestBase):
 
     @patch("app.ingest.application.mq.listeners.process_status_queue_listener.ProcessStatusQueueListener.on_message")
     def test_on_message_happy_path(self, on_message_mock) -> None:
-        self._send_test_message(mq_queue_name=os.getenv('MQ_PROCESS_QUEUE_DRS_INGEST_STATUS'))
+        self._send_test_message()
         self._await_until_on_message_has_calls_or_timeout(on_message_mock)
         self._assert_on_message_has_calls(on_message_mock)
 
@@ -29,3 +29,6 @@ class TestProcessStatusQueueListener(StompListenerIntegrationTestBase):
             mq_user=os.getenv('MQ_PROCESS_USER'),
             mq_password=os.getenv('MQ_PROCESS_PASSWORD')
         )
+
+    def _get_queue_name(self) -> str:
+        return os.getenv('MQ_PROCESS_QUEUE_PROCESS_STATUS')

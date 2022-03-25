@@ -13,7 +13,7 @@ from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 class ProcessStatusQueueListener(StompListenerBase):
 
     def _get_queue_name(self) -> str:
-        return os.getenv('MQ_PROCESS_QUEUE_DRS_INGEST_STATUS')
+        return os.getenv('MQ_PROCESS_QUEUE_PROCESS_STATUS')
 
     def _get_mq_connection_params(self) -> MqConnectionParams:
         return MqConnectionParams(

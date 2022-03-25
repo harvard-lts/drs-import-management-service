@@ -41,5 +41,9 @@ class StompIntegrationTestBase(IntegrationTestBase, ABC):
     def _get_mq_connection_params(self) -> MqConnectionParams:
         pass
 
+    @abstractmethod
+    def _get_queue_name(self) -> str:
+        pass
+
     def _get_message_await_timeout(self) -> float:
         return time.time() + self.__MESSAGE_AWAIT_TIMEOUT_SECONDS
