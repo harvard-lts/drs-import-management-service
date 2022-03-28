@@ -19,10 +19,10 @@ class IngestPostController:
                 # TODO: Fake ingest until advanced controller is implemented
                 # https://github.com/harvard-lts/HDC/issues/105
                 Ingest(
-                    package_id="",
-                    s3_path="",
-                    s3_bucket_name="",
-                    dropbox_name="",
+                    package_id="dummy_package_id",
+                    s3_path="dummy_s3_path",
+                    s3_bucket_name="dummy_s3_bucket_name",
+                    dropbox_name="dummy_dropbox_name",
                     destination_path=None,
                     admin_metadata={},
                     # TODO: Initial ingest status
