@@ -17,4 +17,6 @@ class ITransferReadyQueuePublisher(ABC):
 
         :param ingest: Source ingest to compose and publish the transfer ready message
         :type ingest: Ingest
+
+        :raises MqException
         """

@@ -31,6 +31,7 @@ class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBa
 
     def __create_transfer_ready_message(self, ingest: Ingest) -> dict:
         return {
+            'package_id': ingest.package_id,
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
             'dropbox_name': ingest.dropbox_name,

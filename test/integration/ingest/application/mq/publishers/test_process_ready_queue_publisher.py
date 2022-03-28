@@ -4,13 +4,15 @@ from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from app.ingest.application.mq.publishers.process_ready_queue_publisher import ProcessReadyQueuePublisher
 from test.integration.ingest.application.mq.publishers.stomp_publisher_integration_test_base import \
     StompPublisherIntegrationTestBase
+from test.resources.ingest.ingest_factory import create_ingest
 
 
 class TestProcessReadyQueuePublisher(StompPublisherIntegrationTestBase):
 
     def test_publish_message_happy_path(self) -> None:
         sut = ProcessReadyQueuePublisher()
-        sut.publish_message()
+        test_ingest = create_ingest()
+        sut.publish_message(test_ingest)
 
         self._await_until_message_received_or_timeout()
 
