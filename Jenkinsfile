@@ -68,7 +68,7 @@ pipeline {
               }
               echo "$RUNNING_NODE"
               sshagent(credentials : ['hgl_svcupd']) {
-                  sh "ssh -t -t $RUNNING_NODE 'docker exec $(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
+                  sh "ssh -t -t $RUNNING_NODE 'docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
               }
           }
       }
