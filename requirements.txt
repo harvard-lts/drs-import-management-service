@@ -16,6 +16,7 @@ MarkupSafe==2.1.0
 pipenv==2022.1.8
 platformdirs==2.5.1
 pyrsistent==0.18.1
+pytest==3.4.2
 python-dotenv==0.19.2
 PyYAML==5.4.1
 requests==2.27.1
