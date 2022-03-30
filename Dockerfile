@@ -3,7 +3,7 @@ COPY requirements.txt /tmp/
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y vim libpq-dev gcc supervisor python3-pip openssl nginx curl && \
+RUN apt-get update && apt-get install -y vim libpq-dev gcc supervisor python3-pip openssl nginx curl pytest && \
     mkdir -p /etc/nginx/ssl/ && \
     openssl req \
             -x509 \

@@ -58,20 +58,42 @@ pipeline {
       steps {
           echo "Deploying to dev"
           script {
-              if (GIT_TAG != "") {
-                  echo "$GIT_TAG"
-                  sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
-                  }
-              } else {
-                      echo "$GIT_HASH"
-                      sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
-                  }
+              RUNNING_NODE = ""
+              sshagent(credentials : ['hgl_svcupd']) {
+                script{
+                  // Get node the container is running on
+                  RUNNING_NODE = sh (script: "ssh -t -t ${env.DEV_SERVER} 'docker stack ps --format \"{{.Node}}\" -f \"name=${stackName}_${imageName}\" -f \"desired-state=running\" ${stackName}'",
+                  returnStdout: true).trim()
+                }
+              }
+              echo "$RUNNING_NODE"
+              sshagent(credentials : ['hgl_svcupd']) {
+                  sh "ssh -t -t ${RUNNING_NODE} 'docker exec $(docker ps -q -f name="${imageName}*") pytest test/integration'"
               }
           }
       }
     }
+    stage('TrialDevIntegrationTest') {
+          when {
+              branch 'trial'
+            }
+          steps {
+              echo "Running integration tests on dev"
+              script {
+                  if (GIT_TAG != "") {
+                      echo "$GIT_TAG"
+                      sshagent(credentials : ['hgl_svcupd']) {
+                          sh "ssh -t -t ${env.DEV_SERVER} 'docker exec -it ${stackName}_${imageName}'"
+                      }
+                  } else {
+                          echo "$GIT_HASH"
+                          sshagent(credentials : ['hgl_svcupd']) {
+                          sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      }
+                  }
+              }
+          }
+        }
    // test that dev is running, smoke tests
     // test that dev worked
     stage('Publish main dev image') {
