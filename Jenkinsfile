@@ -95,7 +95,7 @@ pipeline {
                   // // Get node the container is running on
                   // TESTS_PASSED = sh (script: "ssh -t -t $RUNNING_NODE 'docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'",
                   // returnStdout: true).trim()
-                  // if (${RUNNING_NODE}.contains("0 failed")){
+                  // if (${TESTS_PASSED}.contains("0 failed")){
                   // error "Dev trial integration tests did not pass"
                   // }
                 // }
