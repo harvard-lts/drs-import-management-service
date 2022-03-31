@@ -9,7 +9,35 @@ from app.ingest.domain.services.ingest_service import IngestService
 
 
 class TestIngestPostController(TestCase):
-    __REQUEST_ENDPOINT = "/ingest"
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.REQUEST_ENDPOINT = "/ingest"
+        cls.CORRECT_REQUEST_JSON = {
+            "depositing_application": "Dataverse",
+            "package_id": "test",
+            "s3_path": "test",
+            "s3_bucket_name": "test",
+            "admin_metadata":
+                {
+                    "accessFlag": "N",
+                    "contentModel": "opaque",
+                    "depositingSystem": "Harvard Dataverse",
+                    "firstGenerationInDrs": "unspecified",
+                    "objectRole": "CG:DATASET",
+                    "usageClass": "LOWUSE",
+                    "storageClass": "AR",
+                    "ownerCode": "123",
+                    "billingCode": "456",
+                    "resourceNamePattern": "pattern",
+                    "urnAuthorityPath": "path",
+                    "depositAgent": "789",
+                    "depositAgentEmail": "someone@mailinator.com",
+                    "successEmail": "winner@mailinator.com",
+                    "failureEmail": "loser@mailinator.com",
+                    "successMethod": "method",
+                    "adminCategory": "root"
+                }
+        }
 
     def setUp(self) -> None:
         self.app = flask.Flask(__name__)
@@ -18,7 +46,7 @@ class TestIngestPostController(TestCase):
         ingest_service_mock = Mock(spect=IngestService)
         sut = IngestPostController(ingest_service_mock)
 
-        with self.app.test_request_context(self.__REQUEST_ENDPOINT):
+        with self.app.test_request_context(self.REQUEST_ENDPOINT, json=self.CORRECT_REQUEST_JSON):
             actual_response_body, actual_response_http_code = sut.__call__()
 
         ingest_service_mock.transfer_ingest.assert_called_once()
@@ -26,7 +54,7 @@ class TestIngestPostController(TestCase):
         expected_response_http_code = 202
         self.assertEqual(actual_response_http_code, expected_response_http_code)
 
-        expected_response_body = {"data": {"ingest_status": "processing_ingest"}, "error": None}
+        expected_response_body = {"message": "Added to Queue", "package_id": "test"}
         self.assertEqual(actual_response_body, expected_response_body)
 
     def test_call_service_raises_transfer_ingest_exception(self) -> None:
@@ -36,7 +64,7 @@ class TestIngestPostController(TestCase):
         test_exception = TransferIngestException("test", "test")
         ingest_service_stub.transfer_ingest.side_effect = test_exception
 
-        with self.app.test_request_context(self.__REQUEST_ENDPOINT):
+        with self.app.test_request_context(self.REQUEST_ENDPOINT, json=self.CORRECT_REQUEST_JSON):
             actual_response_body, actual_response_http_code = sut.__call__()
 
         ingest_service_stub.transfer_ingest.assert_called_once()
@@ -44,5 +72,25 @@ class TestIngestPostController(TestCase):
         expected_response_http_code = 500
         self.assertEqual(actual_response_http_code, expected_response_http_code)
 
-        expected_response_body = {"data": None, "error": test_exception.message}
+        expected_response_body = {"message": test_exception.message}
+        self.assertEqual(actual_response_body, expected_response_body)
+
+    def test_call_unsupported_depositing_application(self) -> None:
+        ingest_service_stub = Mock(spect=IngestService)
+        sut = IngestPostController(ingest_service_stub)
+
+        request_json_copy = self.CORRECT_REQUEST_JSON.copy()
+        test_unsupported_application = "UnsupportedApplication"
+        request_json_copy["depositing_application"] = test_unsupported_application
+        unsupported_depositing_application_request_json = request_json_copy
+
+        with self.app.test_request_context(self.REQUEST_ENDPOINT, json=unsupported_depositing_application_request_json):
+            actual_response_body, actual_response_http_code = sut.__call__()
+
+        ingest_service_stub.transfer_ingest.assert_not_called()
+
+        expected_response_http_code = 400
+        self.assertEqual(actual_response_http_code, expected_response_http_code)
+
+        expected_response_body = {"message": "Unsupported depositing application " + test_unsupported_application}
         self.assertEqual(actual_response_body, expected_response_body)
