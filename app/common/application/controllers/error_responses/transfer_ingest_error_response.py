@@ -3,6 +3,8 @@ from app.common.application.controllers.error_responses.error_response import Er
 
 class TransferIngestErrorResponse(ErrorResponse):
     http_code = 500
+    status_code = "TRANSFER_INGEST_ERROR"
 
-    def __init__(self, message: str):
+    def __init__(self, package_id: str, message: str) -> None:
+        self.package_id = package_id
         self.message = message

@@ -7,12 +7,13 @@ from app.common.application.controllers.error_responses.transfer_ingest_error_re
     TransferIngestErrorResponse
 from app.common.application.controllers.error_responses.unsupported_depositing_application_error_response import \
     UnsupportedDepositingApplicationErrorResponse
+from app.common.application.controllers.response_status import ResponseStatus
 from app.containers import Services, Serializers
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
+from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
 from app.ingest.domain.services.ingest_service import IngestService
-from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 
 
 class IngestPostController:
@@ -36,7 +37,10 @@ class IngestPostController:
             depositing_application = DepositingApplication(depositing_application_value)
         except ValueError:
             return self.__error_response_serializer.serialize(
-                UnsupportedDepositingApplicationErrorResponse(depositing_application=depositing_application_value)
+                UnsupportedDepositingApplicationErrorResponse(
+                    package_id=package_id,
+                    depositing_application=depositing_application_value
+                )
             )
 
         new_ingest = Ingest(
@@ -52,6 +56,12 @@ class IngestPostController:
         try:
             self.__ingest_service.transfer_ingest(new_ingest)
         except TransferIngestException as tie:
-            return self.__error_response_serializer.serialize(TransferIngestErrorResponse(message=str(tie)))
+            return self.__error_response_serializer.serialize(
+                TransferIngestErrorResponse(package_id=package_id, message=str(tie)))
 
-        return {"package_id": new_ingest.package_id, "message": "Added to Queue"}, 202
+        return {
+                   "package_id": new_ingest.package_id,
+                   "status": ResponseStatus.pending.value,
+                   "status_code": None,
+                   "message": "Added to Queue"
+               }, 202
