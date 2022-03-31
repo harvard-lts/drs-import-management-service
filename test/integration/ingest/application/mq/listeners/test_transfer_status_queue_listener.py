@@ -8,6 +8,14 @@ from test.integration.ingest.application.mq.listeners.stomp_listener_integration
 
 
 class TestTransferStatusQueueListener(StompListenerIntegrationTestBase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.TEST_MESSAGE = {
+            "package_id": "test",
+            "destination_path": "test",
+            "transfer_status": "successful"
+        }
+
     def setUp(self) -> None:
         super().setUp()
         self.sut = TransferStatusQueueListener()
@@ -15,9 +23,10 @@ class TestTransferStatusQueueListener(StompListenerIntegrationTestBase):
     def tearDown(self) -> None:
         self.sut.disconnect()
 
-    @patch("app.ingest.application.mq.listeners.transfer_status_queue_listener.TransferStatusQueueListener.on_message")
+    @patch("app.ingest.application.mq.listeners.transfer_status_queue_listener.TransferStatusQueueListener"
+           "._handle_received_message")
     def test_on_message_happy_path(self, on_message_mock) -> None:
-        self._send_test_message()
+        self._send_test_message(self.TEST_MESSAGE)
         self._await_until_on_message_has_calls_or_timeout(on_message_mock)
         self._assert_on_message_has_calls(on_message_mock)
 
