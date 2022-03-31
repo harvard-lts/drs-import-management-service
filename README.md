@@ -36,10 +36,10 @@ docker build --tag dims .
 
 Then, execute Docker run command:
 ````
-docker run -p 13880:5000 -v "$(pwd)"/app/:/home/dimsuser/app dims
+docker run -p 10580:5000 -v "$(pwd)"/app/:/home/dimsuser/app dims
 ````
 
-Remember to add the above run command environment variable and volume mapping to allow automatic updating of code changes in the running container.
+Remember to add the above run command volume mapping to allow automatic updating of code changes in the running container.
 
 ## Test environment setup
 
