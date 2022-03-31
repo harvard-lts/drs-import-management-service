@@ -2,7 +2,7 @@
 This module defines a StompListenerBase, which is an abstract class intended
 to define common behavior for stomp-implemented MQ listener components.
 """
-
+import json
 from abc import abstractmethod, ABC
 
 import stomp
@@ -18,7 +18,13 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
         self.__connection = self.__create_subscribed_mq_connection()
 
     def on_message(self, frame: Frame) -> None:
-        self._handle_received_message(frame)
+        try:
+            message_body = json.loads(frame.body)
+        except json.decoder.JSONDecodeError as e:
+            # TODO Handle exception
+            raise e
+
+        self._handle_received_message(message_body)
 
     def on_error(self, frame: Frame) -> None:
         self._handle_received_error(frame)
@@ -36,12 +42,12 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
         self.__connection.disconnect()
 
     @abstractmethod
-    def _handle_received_message(self, frame: Frame) -> None:
+    def _handle_received_message(self, message_body: dict) -> None:
         """
         Handles the received message by adding child listener specific logic.
 
-        :param frame: received stomp message Frame
-        :type frame: stomp.utils.Frame
+        :param message_body: received message body
+        :type message_body: dict
         """
 
     @abstractmethod

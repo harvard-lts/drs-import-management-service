@@ -2,7 +2,6 @@
 This module defines an ProcessStatusQueueListener, which defines the necessary
 logic to connect to the remote MQ and listen for process status messages.
 """
-import json
 import os
 
 from stomp.utils import Frame
@@ -33,16 +32,10 @@ class ProcessStatusQueueListener(StompListenerBase):
             mq_password=os.getenv('MQ_PROCESS_PASSWORD')
         )
 
-    def _handle_received_message(self, frame: Frame) -> None:
+    def _handle_received_message(self, message_body: dict) -> None:
         # TODO Handle batch_ingest_status: Currently only considered successful
 
-        try:
-            message_body = json.loads(frame.body)
-        except json.decoder.JSONDecodeError as e:
-            # TODO Handle exception
-            raise e
-
-        # TODO: Fake ingest until MongoDB persistence is implemented
+        # TODO Fake ingest until MongoDB persistence is implemented
         # https://github.com/harvard-lts/HDC/issues/104
         try:
             ingest = self.__ingest_service.get_ingest_by_package_id(message_body['package_id'])

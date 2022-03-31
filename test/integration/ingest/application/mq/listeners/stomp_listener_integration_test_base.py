@@ -7,9 +7,8 @@ from test.integration.ingest.application.mq.stomp_integration_test_base import S
 
 class StompListenerIntegrationTestBase(StompIntegrationTestBase, ABC):
 
-    def _send_test_message(self) -> None:
-        test_message_json = {}
-        test_message_json_str = json.dumps(test_message_json)
+    def _send_test_message(self, message_body: dict) -> None:
+        test_message_json_str = json.dumps(message_body)
 
         connection = self._create_mq_connection()
         connection.send(self._get_queue_name(), test_message_json_str)
