@@ -8,7 +8,6 @@ class ErrorResponseSerializer:
 
     def serialize(self, error_response: ErrorResponse) -> Tuple[Dict, int]:
         return {
-                   "package_id": error_response.package_id,
                    "status": ResponseStatus.failure.value,
                    "status_code": error_response.status_code,
                    "message": error_response.message

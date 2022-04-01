@@ -53,14 +53,10 @@ components:
           schema:
             type: object
             required:
-              - package_id
               - status
               - status_code
               - message
             properties:
-              package_id:
-                type: string
-                description: Package id associated with the requested operation
               status:
                 $ref: "#/components/schemas/ResponseStatus"
               status_code:

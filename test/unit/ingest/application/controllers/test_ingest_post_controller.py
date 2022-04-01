@@ -78,7 +78,6 @@ class TestIngestPostController(TestCase):
         self.assertEqual(actual_response_http_code, expected_response_http_code)
 
         expected_response_body = {
-            "package_id": "test",
             "status": ResponseStatus.failure.value,
             "status_code": "TRANSFER_INGEST_ERROR",
             "message": test_exception.message

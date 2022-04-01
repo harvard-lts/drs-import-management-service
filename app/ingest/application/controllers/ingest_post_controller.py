@@ -45,7 +45,7 @@ class IngestPostController:
             self.__ingest_service.transfer_ingest(new_ingest)
         except TransferIngestException as tie:
             return self.__error_response_serializer.serialize(
-                TransferIngestErrorResponse(package_id=package_id, message=str(tie)))
+                TransferIngestErrorResponse(message=str(tie)))
 
         return {
                    "package_id": new_ingest.package_id,
