@@ -91,16 +91,17 @@ pipeline {
               }
               echo "${RUNNING_NODE}"
               sshagent(credentials : ['hgl_svcupd']) {
-                sh "ssh -t -t ${RUNNING_NODE} 'sudo docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
+                // sh "ssh -t -t ${RUNNING_NODE} 'sudo docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
               // Change to:
-                // script{
-                  // // Get node the container is running on
-                  // TESTS_PASSED = sh (script: "ssh -t -t $RUNNING_NODE 'docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'",
-                  // returnStdout: true).trim()
-                  // if (${TESTS_PASSED}.contains("0 failed")){
-                  // error "Dev trial integration tests did not pass"
-                  // }
-                // }
+                script{
+                  // Get node the container is running on
+                  TESTS_PASSED = sh (script: "ssh -t -t ${RUNNING_NODE} 'sudo /home/svcupd/HDC3A_test.sh'",
+                  returnStdout: true).trim()
+                  echo "${TESTS_PASSED}"
+                  if (${TESTS_PASSED}.contains("0 failed")){
+                    error "Dev trial integration tests did not pass"
+                  }
+                }
               }
           }
       }
