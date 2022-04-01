@@ -83,19 +83,21 @@ pipeline {
               sshagent(credentials : ['hgl_svcupd']) {
                 script{
                   // Get node the container is running on
-                  RUNNING_NODE = sh (script: "ssh -t -t ${env.DEV_SERVER} 'sudo docker stack ps --format \"{{.Node}}\" -f \"name=${stackName}_${imageName}\" -f \"desired-state=running\" ${stackName}'",
+                  //RUNNING_NODE = sh (script: "ssh -t -t ${env.DEV_SERVER} 'sudo docker stack ps --format \"{{.Node}}\" -f \"name=${stackName}_${imageName}\" -f \"desired-state=running\" ${stackName}'",
+                  //returnStdout: true).trim()
+                  RUNNING_NODE = sh (script: "ssh -t -t ${env.DEV_SERVER} 'sudo /home/svcupd/HDC3A_status.sh'",
                   returnStdout: true).trim()
                 }
               }
-              echo "$RUNNING_NODE"
+              echo "${RUNNING_NODE}"
               sshagent(credentials : ['hgl_svcupd']) {
-                  sh "ssh -t -t $RUNNING_NODE 'sudo docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
+                sh "ssh -t -t ${RUNNING_NODE} 'sudo docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
               // Change to:
                 // script{
                   // // Get node the container is running on
                   // TESTS_PASSED = sh (script: "ssh -t -t $RUNNING_NODE 'docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'",
                   // returnStdout: true).trim()
-                  // if (${RUNNING_NODE}.contains("0 failed")){
+                  // if (${TESTS_PASSED}.contains("0 failed")){
                   // error "Dev trial integration tests did not pass"
                   // }
                 // }
