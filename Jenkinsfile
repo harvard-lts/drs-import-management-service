@@ -95,7 +95,7 @@ pipeline {
               // Change to:
                 script{
                   // Get node the container is running on
-                  TESTS_PASSED = sh (script: "ssh -t -t ${RUNNING_NODE} 'sudo /home/svcupd/HDC3A_test.sh'",
+                  TESTS_PASSED = sh (script: "ssh -t -t svcupd@${RUNNING_NODE} 'sudo /home/svcupd/HDC3A_test.sh'",
                   returnStdout: true).trim()
                   echo "${TESTS_PASSED}"
                   if (${TESTS_PASSED}.contains("0 failed")){
