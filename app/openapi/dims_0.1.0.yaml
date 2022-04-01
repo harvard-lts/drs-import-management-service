@@ -77,7 +77,6 @@ components:
         - s3_path
         - s3_bucket_name
         - admin_metadata
-        - depositing_application
       properties:
         package_id:
           type: string
@@ -91,10 +90,6 @@ components:
         admin_metadata:
           type: object
           description: Ingest admin metadata
-        depositing_application:
-          type: string
-          enum: [Dataverse, ePADD]
-          description: The name of the application that initiates the ingest
     ResponseStatus:
       type: string
       enum: [success, pending, failure]

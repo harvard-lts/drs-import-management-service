@@ -14,7 +14,6 @@ class TestIngestPostController(TestCase):
     def setUpClass(cls) -> None:
         cls.REQUEST_ENDPOINT = "/ingest"
         cls.CORRECT_REQUEST_JSON = {
-            "depositing_application": "Dataverse",
             "package_id": "test",
             "s3_path": "test",
             "s3_bucket_name": "test",

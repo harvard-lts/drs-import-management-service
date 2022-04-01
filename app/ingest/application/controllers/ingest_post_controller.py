@@ -29,7 +29,6 @@ class IngestPostController:
         s3_path: str = request.json.get("s3_path")
         s3_bucket_name: str = request.json.get("s3_bucket_name")
         admin_metadata: dict = request.json.get("admin_metadata")
-        depositing_application_value: str = request.json.get("depositing_application")
 
         new_ingest = Ingest(
             package_id=package_id,
@@ -38,7 +37,8 @@ class IngestPostController:
             destination_path=None,
             admin_metadata=admin_metadata,
             status=IngestStatus.pending_transfer_to_dropbox,
-            depositing_application=DepositingApplication(depositing_application_value)
+            # TODO: Obtain depositing application name from request data
+            depositing_application=DepositingApplication.Dataverse
         )
 
         try:
