@@ -83,13 +83,13 @@ pipeline {
               sshagent(credentials : ['hgl_svcupd']) {
                 script{
                   // Get node the container is running on
-                  RUNNING_NODE = sh (script: "ssh -t -t ${env.DEV_SERVER} 'docker stack ps --format \"{{.Node}}\" -f \"name=${stackName}_${imageName}\" -f \"desired-state=running\" ${stackName}'",
+                  RUNNING_NODE = sh (script: "ssh -t -t ${env.DEV_SERVER} 'sudo docker stack ps --format \"{{.Node}}\" -f \"name=${stackName}_${imageName}\" -f \"desired-state=running\" ${stackName}'",
                   returnStdout: true).trim()
                 }
               }
               echo "$RUNNING_NODE"
               sshagent(credentials : ['hgl_svcupd']) {
-                  sh "ssh -t -t $RUNNING_NODE 'docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
+                  sh "ssh -t -t $RUNNING_NODE 'sudo docker exec \$(docker ps -q -f name=\"${imageName}*\") pytest test/integration'"
               // Change to:
                 // script{
                   // // Get node the container is running on
