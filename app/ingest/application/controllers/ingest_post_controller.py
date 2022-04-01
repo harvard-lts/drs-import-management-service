@@ -5,8 +5,6 @@ from flask import request
 from app.common.application.controllers.error_responses.error_response_serializer import ErrorResponseSerializer
 from app.common.application.controllers.error_responses.transfer_ingest_error_response import \
     TransferIngestErrorResponse
-from app.common.application.controllers.error_responses.unsupported_depositing_application_error_response import \
-    UnsupportedDepositingApplicationErrorResponse
 from app.common.application.controllers.response_status import ResponseStatus
 from app.containers import Services, Serializers
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
@@ -33,16 +31,6 @@ class IngestPostController:
         admin_metadata: dict = request.json.get("admin_metadata")
         depositing_application_value: str = request.json.get("depositing_application")
 
-        try:
-            depositing_application = DepositingApplication(depositing_application_value)
-        except ValueError:
-            return self.__error_response_serializer.serialize(
-                UnsupportedDepositingApplicationErrorResponse(
-                    package_id=package_id,
-                    depositing_application=depositing_application_value
-                )
-            )
-
         new_ingest = Ingest(
             package_id=package_id,
             s3_path=s3_path,
@@ -50,7 +38,7 @@ class IngestPostController:
             destination_path=None,
             admin_metadata=admin_metadata,
             status=IngestStatus.pending_transfer_to_dropbox,
-            depositing_application=DepositingApplication(depositing_application)
+            depositing_application=DepositingApplication(depositing_application_value)
         )
 
         try:

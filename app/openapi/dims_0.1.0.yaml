@@ -17,8 +17,6 @@ paths:
       responses:
         202:
           $ref: "#/components/responses/IngestConfirmation"
-        400:
-          $ref: "#/components/responses/BadRequest"
         500:
           $ref: "#/components/responses/InternalError"
 
@@ -50,29 +48,6 @@ components:
                 description: A message describing the response
     InternalError:
       description: Internal error
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - package_id
-              - status
-              - status_code
-              - message
-            properties:
-              package_id:
-                type: string
-                description: Package id associated with the requested operation
-              status:
-                $ref: "#/components/schemas/ResponseStatus"
-              status_code:
-                type: string
-                description: Internally defined status code
-              message:
-                type: string
-                description: A message describing the response
-    BadRequest:
-      description: Malformed request due to missing or wrong parameters
       content:
         application/json:
           schema:

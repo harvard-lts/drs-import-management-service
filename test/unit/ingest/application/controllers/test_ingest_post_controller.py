@@ -85,28 +85,3 @@ class TestIngestPostController(TestCase):
             "message": test_exception.message
         }
         self.assertEqual(actual_response_body, expected_response_body)
-
-    def test_call_unsupported_depositing_application(self) -> None:
-        ingest_service_stub = Mock(spect=IngestService)
-        sut = IngestPostController(ingest_service_stub)
-
-        request_json_copy = self.CORRECT_REQUEST_JSON.copy()
-        test_unsupported_application = "UnsupportedApplication"
-        request_json_copy["depositing_application"] = test_unsupported_application
-        unsupported_depositing_application_request_json = request_json_copy
-
-        with self.app.test_request_context(self.REQUEST_ENDPOINT, json=unsupported_depositing_application_request_json):
-            actual_response_body, actual_response_http_code = sut.__call__()
-
-        ingest_service_stub.transfer_ingest.assert_not_called()
-
-        expected_response_http_code = 400
-        self.assertEqual(actual_response_http_code, expected_response_http_code)
-
-        expected_response_body = {
-            "package_id": "test",
-            "status": ResponseStatus.failure.value,
-            "status_code": "UNSUPPORTED_DEPOSITING_APPLICATION",
-            "message": "Unsupported depositing application " + test_unsupported_application
-        }
-        self.assertEqual(actual_response_body, expected_response_body)
