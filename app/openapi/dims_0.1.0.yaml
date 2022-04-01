@@ -8,27 +8,46 @@ paths:
     post:
       operationId: initiateIngest
       summary: Initiates a new ingest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestRequest"
       responses:
         202:
-          description: Ingest accepted and started processing
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - data
-                  - error
-                properties:
-                  data:
-                    $ref: "#/components/schemas/IngestConfirmation"
-                  error:
-                    type: string
-                    nullable: true
+          $ref: "#/components/responses/IngestConfirmation"
+        400:
+          $ref: "#/components/responses/BadRequest"
         500:
           $ref: "#/components/responses/InternalError"
 
 components:
   responses:
+    IngestConfirmation:
+      description: Ingest accepted and started processing
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - package_id
+              - status
+              - status_code
+              - message
+            properties:
+              package_id:
+                type: string
+                description: Package id associated with the ingest operation
+              status:
+                $ref: "#/components/schemas/ResponseStatus"
+              status_code:
+                type: string
+                nullable: true
+                description: Internally defined status code
+              message:
+                type: string
+                description: A message describing the response
     InternalError:
       description: Internal error
       content:
@@ -36,20 +55,71 @@ components:
           schema:
             type: object
             required:
-              - data
-              - error
+              - package_id
+              - status
+              - status_code
+              - message
             properties:
-              error:
+              package_id:
                 type: string
-              data:
-                type: object
-                nullable: true
+                description: Package id associated with the requested operation
+              status:
+                $ref: "#/components/schemas/ResponseStatus"
+              status_code:
+                type: string
+                description: Internally defined status code
+              message:
+                type: string
+                description: A message describing the response
+    BadRequest:
+      description: Malformed request due to missing or wrong parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - package_id
+              - status
+              - status_code
+              - message
+            properties:
+              package_id:
+                type: string
+                description: Package id associated with the requested operation
+              status:
+                $ref: "#/components/schemas/ResponseStatus"
+              status_code:
+                type: string
+                description: Internally defined status code
+              message:
+                type: string
+                description: A message describing the response
   schemas:
-    IngestConfirmation:
+    IngestRequest:
       type: object
       required:
-        - ingest_status
+        - package_id
+        - s3_path
+        - s3_bucket_name
+        - admin_metadata
+        - depositing_application
       properties:
-        ingest_status:
+        package_id:
           type: string
-          description: Ingest status
+          description: Package id to ingest
+        s3_path:
+          type: string
+          description: S3 bucket path of the ingest object
+        s3_bucket_name:
+          type: string
+          description: Name of the S3 bucket containing the ingest object
+        admin_metadata:
+          type: object
+          description: Ingest admin metadata
+        depositing_application:
+          type: string
+          enum: [Dataverse, ePADD]
+          description: The name of the application that initiates the ingest
+    ResponseStatus:
+      type: string
+      enum: [success, pending, failure]
