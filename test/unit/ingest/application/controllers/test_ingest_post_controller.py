@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import flask
 
-from app.common.application.controllers.response_status import ResponseStatus
+from app.common.application.controllers.responses.response_status import ResponseStatus
 from app.ingest.application.controllers.ingest_post_controller import IngestPostController
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
 from app.ingest.domain.services.ingest_service import IngestService
@@ -44,7 +44,7 @@ class TestIngestPostController(TestCase):
 
     def test_call_happy_path(self) -> None:
         ingest_service_mock = Mock(spect=IngestService)
-        sut = IngestPostController(ingest_service_mock)
+        sut = IngestPostController(ingest_service=ingest_service_mock)
 
         with self.app.test_request_context(self.REQUEST_ENDPOINT, json=self.CORRECT_REQUEST_JSON):
             actual_response_body, actual_response_http_code = sut.__call__()
@@ -65,7 +65,7 @@ class TestIngestPostController(TestCase):
 
     def test_call_service_raises_transfer_ingest_exception(self) -> None:
         ingest_service_stub = Mock(spect=IngestService)
-        sut = IngestPostController(ingest_service_stub)
+        sut = IngestPostController(ingest_service=ingest_service_stub)
 
         test_exception = TransferIngestException("test", "test")
         ingest_service_stub.transfer_ingest.side_effect = test_exception

@@ -1,7 +1,7 @@
 from typing import Tuple, Dict
 
-from app.common.application.controllers.error_responses.error_response import ErrorResponse
-from app.common.application.controllers.response_status import ResponseStatus
+from app.common.application.controllers.responses.error_responses.error_response import ErrorResponse
+from app.common.application.controllers.responses.response_status import ResponseStatus
 
 
 class ErrorResponseSerializer:
