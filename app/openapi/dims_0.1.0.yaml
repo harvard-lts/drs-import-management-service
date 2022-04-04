@@ -43,6 +43,9 @@ components:
                 type: string
                 nullable: true
                 description: Internally defined status code
+              object_urn:
+                type: string
+                description: Object URN
               message:
                 type: string
                 description: A message describing the response

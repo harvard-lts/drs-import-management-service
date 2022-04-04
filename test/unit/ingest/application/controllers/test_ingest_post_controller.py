@@ -58,6 +58,7 @@ class TestIngestPostController(TestCase):
             "package_id": "test",
             "status": ResponseStatus.pending.value,
             "status_code": None,
+            "object_urn": "",
             "message": "Added to Queue"
         }
         self.assertEqual(actual_response_body, expected_response_body)
