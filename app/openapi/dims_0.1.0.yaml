@@ -19,6 +19,8 @@ paths:
           $ref: "#/components/responses/IngestConfirmation"
         500:
           $ref: "#/components/responses/InternalError"
+        400:
+          $ref: "#/components/responses/BadRequest"
 
 components:
   responses:
@@ -46,6 +48,26 @@ components:
               object_urn:
                 type: string
                 description: Object URN
+              message:
+                type: string
+                description: A message describing the response
+    BadRequest:
+      description: Malformed request due to incorrect or missing parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - status_code
+              - message
+            properties:
+              status:
+                $ref: "#/components/schemas/ResponseStatus"
+              status_code:
+                type: string
+                nullable: true
+                description: Internally defined status code
               message:
                 type: string
                 description: A message describing the response
