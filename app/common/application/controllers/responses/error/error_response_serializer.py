@@ -1,6 +1,6 @@
 from typing import Tuple, Dict
 
-from app.common.application.controllers.responses.error_responses.error_response import ErrorResponse
+from app.common.application.controllers.responses.error.error_response import ErrorResponse
 from app.common.application.controllers.responses.response_status import ResponseStatus
 
 

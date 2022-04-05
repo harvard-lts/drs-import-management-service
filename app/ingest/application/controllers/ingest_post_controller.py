@@ -2,9 +2,8 @@ from typing import Tuple, Dict
 
 from flask import request
 
-from app.common.application.controllers.responses.error_responses.error_response_serializer import \
-    ErrorResponseSerializer
-from app.common.application.controllers.responses.error_responses.transfer_ingest_error_response import \
+from app.common.application.controllers.responses.error.error_response_serializer import ErrorResponseSerializer
+from app.common.application.controllers.responses.error.transfer_ingest_error_response import \
     TransferIngestErrorResponse
 from app.common.application.controllers.responses.response_status import ResponseStatus
 from app.containers import Services, Controllers
