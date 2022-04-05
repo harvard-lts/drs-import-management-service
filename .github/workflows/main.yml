@@ -16,7 +16,7 @@ jobs:
       # Checks-out repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v2
 
-      # Set up Python 3.10.2 environment
+      # Set up Python 3.10.4 environment
       - name: Set up Python 3.10.4
         uses: actions/setup-python@v1
         with:
