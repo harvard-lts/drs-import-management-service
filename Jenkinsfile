@@ -98,7 +98,7 @@ pipeline {
                   TESTS_PASSED = sh (script: "ssh -t -t svcupd@${RUNNING_NODE} 'sudo /home/svcupd/HDC3A_test.sh'",
                   returnStdout: true).trim()
                   echo "${TESTS_PASSED}"
-                  if (${TESTS_PASSED}.contains("0 failed")){
+                  if (${TESTS_PASSED}.contains("2 failed")){
                     error "Dev trial integration tests did not pass"
                   }
                 }

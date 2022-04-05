@@ -15,14 +15,14 @@ class TestIngestCompletedQueueListener(StompIntegrationTestBase):
     def tearDown(self) -> None:
         self.sut.disconnect()
 
-#     @patch("app.ingest.application.mq.ingest_completed_queue_listener.IngestCompletedQueueListener.on_message")
-#     def test_on_message_happy_path(self, on_message_mock) -> None:
-#         self.__send_test_message()
-#
-#         self.__await_until_on_message_has_calls_or_timeout(on_message_mock)
-#
-#         if on_message_mock.call_count == 0:
-#             self.fail(msg="The listener did not receive the published message")
+    @patch("app.ingest.application.mq.ingest_completed_queue_listener.IngestCompletedQueueListener.on_message")
+    def test_on_message_happy_path(self, on_message_mock) -> None:
+        self.__send_test_message()
+
+        self.__await_until_on_message_has_calls_or_timeout(on_message_mock)
+
+        if on_message_mock.call_count == 0:
+            self.fail(msg="The listener did not receive the published message")
 
     def __send_test_message(self) -> None:
         connection = self._create_mq_connection()
