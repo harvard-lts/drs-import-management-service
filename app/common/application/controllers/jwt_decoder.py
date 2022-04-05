@@ -8,4 +8,12 @@ class JwtDecoder:
         self.__public_jwt_key = public_jwt_key
 
     def decode(self, encoded: str) -> dict:
-        return jwt.decode(encoded, self.__public_jwt_key, algorithm=self.ENCODING_ALGORITHM)
+        return jwt.decode(
+            jwt=encoded,
+            key=self.__public_jwt_key,
+            algorithms=[self.ENCODING_ALGORITHM],
+            headers={
+                "alg": self.ENCODING_ALGORITHM,
+                "typ": "JWT",
+            }
+        )
