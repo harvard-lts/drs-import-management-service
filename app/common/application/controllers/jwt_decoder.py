@@ -11,9 +11,5 @@ class JwtDecoder:
         return jwt.decode(
             jwt=encoded,
             key=self.__public_jwt_key,
-            algorithms=[self.ENCODING_ALGORITHM],
-            headers={
-                "alg": self.ENCODING_ALGORITHM,
-                "typ": "JWT",
-            }
+            algorithms=[self.ENCODING_ALGORITHM]
         )
