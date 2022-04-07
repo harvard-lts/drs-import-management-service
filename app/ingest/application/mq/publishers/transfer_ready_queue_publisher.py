@@ -34,6 +34,6 @@ class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBa
             'package_id': ingest.package_id,
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
-            'dropbox_name': ingest.dropbox_name,
+            'destination_path': ingest.destination_path,
             'admin_metadata': ingest.admin_metadata,
         }

@@ -1,6 +1,12 @@
 from typing import Tuple, Dict
 
-from app.containers import Services
+from flask import request
+
+from app.common.application.controllers.error_responses.error_response_serializer import ErrorResponseSerializer
+from app.common.application.controllers.error_responses.transfer_ingest_error_response import \
+    TransferIngestErrorResponse
+from app.common.application.controllers.response_status import ResponseStatus
+from app.containers import Services, Serializers
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -10,27 +16,40 @@ from app.ingest.domain.services.ingest_service import IngestService
 
 class IngestPostController:
 
-    def __init__(self, ingest_service: IngestService = Services.ingest_service()) -> None:
+    def __init__(
+            self,
+            ingest_service: IngestService = Services.ingest_service(),
+            error_response_serializer: ErrorResponseSerializer = Serializers.error_response_serializer()
+    ) -> None:
         self.__ingest_service = ingest_service
+        self.__error_response_serializer = error_response_serializer
 
     def __call__(self) -> Tuple[Dict, int]:
-        try:
-            self.__ingest_service.transfer_ingest(
-                # TODO: Fake ingest until advanced controller is implemented
-                # https://github.com/harvard-lts/HDC/issues/105
-                Ingest(
-                    package_id="dummy_package_id",
-                    s3_path="dummy_s3_path",
-                    s3_bucket_name="dummy_s3_bucket_name",
-                    dropbox_name="dummy_dropbox_name",
-                    destination_path=None,
-                    admin_metadata={},
-                    # TODO: Initial ingest status
-                    status=IngestStatus.pending_transfer_to_dropbox,
-                    depositing_application=DepositingApplication.Dataverse
-                )
-            )
-        except TransferIngestException as tie:
-            return {"data": None, "error": str(tie)}, 500
+        package_id: str = request.json.get("package_id")
+        s3_path: str = request.json.get("s3_path")
+        s3_bucket_name: str = request.json.get("s3_bucket_name")
+        admin_metadata: dict = request.json.get("admin_metadata")
 
-        return {"data": {"ingest_status": "processing_ingest"}, "error": None}, 202
+        new_ingest = Ingest(
+            package_id=package_id,
+            s3_path=s3_path,
+            s3_bucket_name=s3_bucket_name,
+            destination_path=None,
+            admin_metadata=admin_metadata,
+            status=IngestStatus.pending_transfer_to_dropbox,
+            # TODO: Obtain depositing application name from request data
+            depositing_application=DepositingApplication.Dataverse
+        )
+
+        try:
+            self.__ingest_service.transfer_ingest(new_ingest)
+        except TransferIngestException as tie:
+            return self.__error_response_serializer.serialize(
+                TransferIngestErrorResponse(message=str(tie)))
+
+        return {
+                   "package_id": new_ingest.package_id,
+                   "status": ResponseStatus.pending.value,
+                   "status_code": None,
+                   "message": "Added to Queue"
+               }, 202

@@ -1,9 +1,11 @@
 from connexion import FlaskApp
+from connexion.exceptions import BadRequestProblem
 
-from app.ingest.application.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
-from app.ingest.application.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
+from app.common.application.controllers.error_responses.error_handlers import render_bad_request_problem
 from app.drs_import_management_service_resolver import DrsImportManagementServiceResolver
 from app.health.application.controllers.health_get_controller import HealthGetController
+from app.ingest.application.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
+from app.ingest.application.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
 
 
 class DrsImportManagementServiceApp(FlaskApp):
@@ -26,6 +28,7 @@ class DrsImportManagementServiceApp(FlaskApp):
             specification="openapi/dims_0.1.0.yaml",
             resolver=DrsImportManagementServiceResolver()
         )
+        self.add_error_handler(BadRequestProblem, render_bad_request_problem)
 
     def __setup_queue_listeners(self) -> None:
         TransferStatusQueueListener()
