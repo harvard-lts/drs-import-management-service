@@ -2,6 +2,7 @@ from connexion import FlaskApp
 from connexion.exceptions import BadRequestProblem
 
 from app.common.application.controllers.responses.error.error_handlers import render_bad_request_problem
+from app.common.application.middlewares.authorization_middleware import AuthorizationMiddleware
 from app.drs_import_management_service_resolver import DrsImportManagementServiceResolver
 from app.health.application.controllers.health_get_controller import HealthGetController
 from app.ingest.application.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
@@ -29,6 +30,7 @@ class DrsImportManagementServiceApp(FlaskApp):
             resolver=DrsImportManagementServiceResolver()
         )
         self.add_error_handler(BadRequestProblem, render_bad_request_problem)
+        self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app)
 
     def __setup_queue_listeners(self) -> None:
         TransferStatusQueueListener()
