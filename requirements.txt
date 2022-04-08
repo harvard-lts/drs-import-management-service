@@ -28,3 +28,4 @@ structlog==20.1.0
 dependency-injector==4.38.0
 stomp.py==7.0.0
 PyJWT[crypto]==2.3.0
+jcs==0.2.0

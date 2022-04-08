@@ -6,6 +6,7 @@ from io import BytesIO
 from json.decoder import JSONDecodeError
 from typing import Any, Callable
 
+import jcs
 import jwt
 from flask import Flask, Response, Request
 from jwt import InvalidTokenError
@@ -149,7 +150,7 @@ class AuthorizationMiddleware:
         if jwt_body_hash is None:
             return False
 
-        request_body = json.dumps(request_body, separators=(',', ':'))
+        request_body = jcs.canonicalize(request_body).decode(self.REQUEST_BODY_ENCODING)
         request_body_hash = hashlib.sha256(request_body.encode()).hexdigest()
 
         if jwt_body_hash != request_body_hash:
