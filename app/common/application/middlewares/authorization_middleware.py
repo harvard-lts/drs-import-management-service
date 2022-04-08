@@ -62,7 +62,8 @@ class AuthorizationMiddleware:
         self.__logger.debug("Obtaining JWT token body...")
         try:
             jwt_token_body = self.__decode_jwt_token(jwt_token)
-        except InvalidTokenError:
+        except InvalidTokenError as e:
+            self.__logger.debug(str(e))
             return self.__return_unauthorized_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
                 environ,
@@ -92,31 +93,15 @@ class AuthorizationMiddleware:
 
     def __validate_jwt_headers(self, jwt_token_headers: dict) -> bool:
         alg_header = jwt_token_headers.get('alg')
-        if alg_header is None:
-            return False
-
-        if alg_header != self.JWT_ENCODING_ALGORITHM:
+        if alg_header is None or alg_header != self.JWT_ENCODING_ALGORITHM:
             return False
 
         typ_header = jwt_token_headers.get('typ')
-        if typ_header is None:
-            return False
-
-        if typ_header != "JWT":
-            return False
-
-        iss_header = jwt_token_headers.get('iss')
-        if iss_header is None:
-            return False
-
-        if iss_header != os.getenv('JWT_ISSUER_DATAVERSE'):
+        if typ_header is None or typ_header != "JWT":
             return False
 
         kid_header = jwt_token_headers.get('kid')
-        if kid_header is None:
-            return False
-
-        if kid_header != os.getenv('JWT_KID_DATAVERSE'):
+        if kid_header is None or kid_header != os.getenv('JWT_KID_DATAVERSE'):
             return False
 
         return True
@@ -130,12 +115,17 @@ class AuthorizationMiddleware:
         )
 
     def __validate_jwt_body(self, jwt_token_body: dict, request_body: dict) -> bool:
-        jwt_body_hash = jwt_token_body.get('body')
+        issuer = jwt_token_body.get('iss')
+        if issuer is None or issuer != os.getenv('JWT_ISSUER_DATAVERSE'):
+            return False
+
+        jwt_body_hash = jwt_token_body.get('bodySHA256Hash')
         if jwt_body_hash is None:
             return False
 
         request_body = json.dumps(request_body, separators=(',', ':'))
-        request_body_hash = hashlib.md5(request_body.encode()).hexdigest()
+        request_body_hash = hashlib.sha256(request_body.encode()).hexdigest()
+
         if jwt_body_hash != request_body_hash:
             return False
 
