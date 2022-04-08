@@ -10,6 +10,8 @@ import jwt
 from flask import Flask, Response, Request
 from jwt import InvalidTokenError
 
+from app.common.application.controllers.responses.response_status import ResponseStatus
+
 
 class AuthorizationMiddleware:
     JWT_ENCODING_ALGORITHM = "RS256"
@@ -17,6 +19,7 @@ class AuthorizationMiddleware:
 
     RESPONSE_MESSAGE_MISSING_HEADER = "Missing authorization header in request"
     RESPONSE_MESSAGE_INVALID_TOKEN = "Invalid authorization token"
+    RESPONSE_MESSAGE_INVALID_REQUEST_BODY_JSON = "Request body is not a valid JSON"
 
     def __init__(self, app: Flask) -> None:
         self.__app = app
@@ -33,8 +36,9 @@ class AuthorizationMiddleware:
 
         authorization_header = request.headers.get('Authorization')
         if authorization_header is None:
-            return self.__return_unauthorized_response(
+            return self.__create_error_response(
                 self.RESPONSE_MESSAGE_MISSING_HEADER,
+                401,
                 environ,
                 start_response
             )
@@ -44,17 +48,20 @@ class AuthorizationMiddleware:
         self.__logger.debug("Obtaining JWT token headers...")
         try:
             jwt_token_headers = jwt.get_unverified_header(jwt_token)
-        except InvalidTokenError:
-            return self.__return_unauthorized_response(
+        except InvalidTokenError as ite:
+            self.__logger.debug("JWT token is invalid: " + str(ite))
+            return self.__create_error_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
+                401,
                 environ,
                 start_response
             )
 
         self.__logger.debug("Validating JWT token headers...")
         if not self.__validate_jwt_headers(jwt_token_headers):
-            return self.__return_unauthorized_response(
+            return self.__create_error_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
+                401,
                 environ,
                 start_response
             )
@@ -62,10 +69,11 @@ class AuthorizationMiddleware:
         self.__logger.debug("Obtaining JWT token body...")
         try:
             jwt_token_body = self.__decode_jwt_token(jwt_token)
-        except InvalidTokenError as e:
-            self.__logger.debug(str(e))
-            return self.__return_unauthorized_response(
+        except InvalidTokenError as ite:
+            self.__logger.debug("JWT token is invalid: " + str(ite))
+            return self.__create_error_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
+                401,
                 environ,
                 start_response
             )
@@ -74,21 +82,32 @@ class AuthorizationMiddleware:
         try:
             request_body = json.loads(self.__get_request_body_from_environ(environ))
         except JSONDecodeError:
-            response = Response("Malformed JSON body", status=400)
-            return response(environ, start_response)
+            return self.__create_error_response(
+                self.RESPONSE_MESSAGE_INVALID_REQUEST_BODY_JSON,
+                400,
+                environ,
+                start_response
+            )
 
         self.__logger.debug("Validating JWT token body...")
-        if not self.__validate_jwt_body(jwt_token_body, request_body):
-            return self.__return_unauthorized_response(
+        if not self.__validate_jwt_token_body(jwt_token_body, request_body):
+            return self.__create_error_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
+                401,
                 environ,
                 start_response
             )
 
         return self.__app(environ, start_response)
 
-    def __return_unauthorized_response(self, message: str, environ: dict, start_response: Callable) -> Any:
-        response = Response(message, status=401)
+    def __create_error_response(self, message: str, code: int, environ: dict, start_response: Callable) -> Any:
+        response = Response(json.dumps(
+            {
+                "status": ResponseStatus.failure.value,
+                "status_code": None,
+                "message": message
+            }
+        ), status=code, mimetype='application/json')
         return response(environ, start_response)
 
     def __validate_jwt_headers(self, jwt_token_headers: dict) -> bool:
@@ -114,7 +133,14 @@ class AuthorizationMiddleware:
             algorithms=[self.JWT_ENCODING_ALGORITHM]
         )
 
-    def __validate_jwt_body(self, jwt_token_body: dict, request_body: dict) -> bool:
+    def __get_request_body_from_environ(self, environ: dict) -> str:
+        length = int(environ.get('CONTENT_LENGTH', '0'))
+        body = environ['wsgi.input'].read(length)
+        environ['wsgi.input'] = BytesIO(body)
+        request_body = body.decode(self.REQUEST_BODY_ENCODING)
+        return request_body
+
+    def __validate_jwt_token_body(self, jwt_token_body: dict, request_body: dict) -> bool:
         issuer = jwt_token_body.get('iss')
         if issuer is None or issuer != os.getenv('JWT_ISSUER_DATAVERSE'):
             return False
@@ -130,10 +156,3 @@ class AuthorizationMiddleware:
             return False
 
         return True
-
-    def __get_request_body_from_environ(self, environ: dict) -> str:
-        length = int(environ.get('CONTENT_LENGTH', '0'))
-        body = environ['wsgi.input'].read(length)
-        environ['wsgi.input'] = BytesIO(body)
-        request_body = body.decode(self.REQUEST_BODY_ENCODING)
-        return request_body
