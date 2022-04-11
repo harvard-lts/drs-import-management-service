@@ -44,6 +44,7 @@ class AuthorizationMiddleware:
                 start_response
             )
 
+        # Removing "Bearer " prefix from the header value
         jwt_token = authorization_header[7:]
 
         self.__logger.debug("Obtaining JWT token headers...")
