@@ -16,7 +16,7 @@ class TestFlaskApp(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.TEST_REQUEST_BODY = {
+        cls.TEST_INGEST_REQUEST_BODY = {
             "package_id": "test_package_id",
             "s3_path": "test",
             "s3_bucket_name": "test",
@@ -40,7 +40,7 @@ class TestFlaskApp(TestCase):
                 "adminCategory": "root"
             }
         }
-        cls.TEST_REQUEST_BODY_CANONICAL_HASH = "698dff27ee8e13447841a3564175e0e7909f96798b8f67b4ba2462f5f107568b"
+        cls.TEST_INGEST_REQUEST_BODY_CANONICAL_HASH = "698dff27ee8e13447841a3564175e0e7909f96798b8f67b4ba2462f5f107568b"
         cls.INVALID_AUTHORIZATION_TOKEN_RESPONSE_BODY = {
             "message": "Invalid authorization token",
             "status": "failure",
@@ -62,7 +62,7 @@ class TestFlaskApp(TestCase):
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_authorization_header()
+                authorization_header=self.__create_ingest_authorization_header()
             )
 
             actual_response_status_code = response.status_code
@@ -83,7 +83,7 @@ class TestFlaskApp(TestCase):
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_authorization_header(),
+                authorization_header=self.__create_ingest_authorization_header(),
                 request_body="{invalid request body}"
             )
 
@@ -121,7 +121,7 @@ class TestFlaskApp(TestCase):
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_authorization_header(
+                authorization_header=self.__create_ingest_authorization_header(
                     expiration_date_time=datetime.utcnow() - timedelta(hours=1)
                 )
             )
@@ -131,7 +131,7 @@ class TestFlaskApp(TestCase):
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_authorization_header(
+                authorization_header=self.__create_ingest_authorization_header(
                     issuer="Invalid Issuer"
                 )
             )
@@ -141,7 +141,7 @@ class TestFlaskApp(TestCase):
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_authorization_header(
+                authorization_header=self.__create_ingest_authorization_header(
                     kid="Invalid Kid"
                 )
             )
@@ -151,7 +151,7 @@ class TestFlaskApp(TestCase):
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_authorization_header(),
+                authorization_header=self.__create_ingest_authorization_header(),
                 request_body=json.dumps({"test": "test"})
             )
             self.__assert_invalid_authorization_token_response(response)
@@ -169,7 +169,7 @@ class TestFlaskApp(TestCase):
             headers["Authorization"] = authorization_header
 
         if request_body is None:
-            request_body = json.dumps(self.TEST_REQUEST_BODY)
+            request_body = json.dumps(self.TEST_INGEST_REQUEST_BODY)
 
         response = test_client.post(
             "/ingest",
@@ -178,7 +178,7 @@ class TestFlaskApp(TestCase):
         )
         return response
 
-    def __create_authorization_header(
+    def __create_ingest_authorization_header(
             self,
             issuer: str = None,
             kid: str = None,
@@ -194,7 +194,7 @@ class TestFlaskApp(TestCase):
             key=os.getenv('JWT_PRIVATE_KEY'),
             payload={
                 "iss": issuer,
-                "bodySHA256Hash": self.TEST_REQUEST_BODY_CANONICAL_HASH,
+                "bodySHA256Hash": self.TEST_INGEST_REQUEST_BODY_CANONICAL_HASH,
                 "iat": datetime.timestamp(datetime.utcnow()),
                 "exp": datetime.timestamp(expiration_date_time)
             },
