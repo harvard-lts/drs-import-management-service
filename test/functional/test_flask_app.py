@@ -72,7 +72,6 @@ class TestFlaskApp(TestCase):
             actual_response_body = response.get_json()
             expected_response_body = {
                 "message": "Added to Queue",
-                "object_urn": "",
                 "package_id": "test_package_id",
                 "status": "pending",
                 "status_code": None

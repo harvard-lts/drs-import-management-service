@@ -51,7 +51,5 @@ class IngestPostController:
                    "package_id": new_ingest.package_id,
                    "status": ResponseStatus.pending.value,
                    "status_code": None,
-                   # TODO: Obtain object URN
-                   "object_urn": "",
                    "message": "Added to Queue"
                }, 202
