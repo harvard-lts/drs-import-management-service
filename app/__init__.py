@@ -14,7 +14,8 @@ LOG_FILE_BACKUP_COUNT = 1
 
 
 def create_app(config_name: str = 'default') -> Flask:
-    configure_logger()
+    if config_name != 'testing':
+        configure_logger()
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
