@@ -1,6 +1,6 @@
 from enum import auto
 
-from app.common.domain.auto_name_enum import AutoNameEnum
+from app.common.auto_name_enum import AutoNameEnum
 
 
 class ResponseStatus(AutoNameEnum):

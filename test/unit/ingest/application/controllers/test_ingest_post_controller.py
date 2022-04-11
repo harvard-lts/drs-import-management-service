@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import flask
 
-from app.common.application.controllers.responses.response_status import ResponseStatus
+from app.common.application.response_status import ResponseStatus
 from app.ingest.application.controllers.ingest_post_controller import IngestPostController
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
 from app.ingest.domain.services.ingest_service import IngestService

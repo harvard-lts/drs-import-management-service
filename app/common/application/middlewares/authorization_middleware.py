@@ -11,7 +11,7 @@ import jwt
 from flask import Flask, Response, Request
 from jwt import InvalidTokenError
 
-from app.common.application.controllers.responses.response_status import ResponseStatus
+from app.common.application.response_status import ResponseStatus
 
 
 class AuthorizationMiddleware:
