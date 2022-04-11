@@ -35,6 +35,20 @@ class AuthorizationMiddleware:
             self.__logger.debug("Authorization skipped for endpoint " + request.path)
             return self.__app(environ, start_response)
 
+        self.__logger.debug("Obtaining request body...")
+        request_body_str = self.__get_request_body_from_environ(environ)
+        self.__logger.debug("Request body: " + request_body_str)
+
+        try:
+            request_body = json.loads(request_body_str)
+        except JSONDecodeError:
+            return self.__create_error_response(
+                self.RESPONSE_MESSAGE_INVALID_REQUEST_BODY_JSON,
+                400,
+                environ,
+                start_response
+            )
+
         authorization_header = request.headers.get('Authorization')
         if authorization_header is None:
             return self.__create_error_response(
@@ -43,6 +57,7 @@ class AuthorizationMiddleware:
                 environ,
                 start_response
             )
+        self.__logger.debug("Authorization header: " + authorization_header)
 
         # Removing "Bearer " prefix from the header value
         jwt_token = authorization_header[7:]
@@ -76,17 +91,6 @@ class AuthorizationMiddleware:
             return self.__create_error_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
                 401,
-                environ,
-                start_response
-            )
-
-        self.__logger.debug("Obtaining request body...")
-        try:
-            request_body = json.loads(self.__get_request_body_from_environ(environ))
-        except JSONDecodeError:
-            return self.__create_error_response(
-                self.RESPONSE_MESSAGE_INVALID_REQUEST_BODY_JSON,
-                400,
                 environ,
                 start_response
             )
