@@ -15,6 +15,7 @@ class DrsImportManagementServiceApp(FlaskApp):
         super().__init__(import_name, **kwargs)
 
         self.__setup_controllers()
+        self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app)
         self.__setup_queue_listeners()
 
     def __setup_controllers(self):
@@ -30,7 +31,6 @@ class DrsImportManagementServiceApp(FlaskApp):
             resolver=DrsImportManagementServiceResolver()
         )
         self.add_error_handler(BadRequestProblem, render_bad_request_problem)
-        self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app)
 
     def __setup_queue_listeners(self) -> None:
         TransferStatusQueueListener()
