@@ -5,10 +5,10 @@ which includes the necessary logic to connect to the remote MQ and publish a pro
 
 import os
 
-from app.ingest.application.mq.mq_connection_params import MqConnectionParams
-from app.ingest.application.mq.publishers.stomp_publisher_base import StompPublisherBase
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.mq.process_ready_queue_publisher import IProcessReadyQueuePublisher
+from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
+from app.ingest.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
 
 
 class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase):

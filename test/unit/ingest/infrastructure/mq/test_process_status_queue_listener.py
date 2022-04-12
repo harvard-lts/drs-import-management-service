@@ -1,8 +1,8 @@
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
-from app.ingest.application.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.infrastructure.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
 from test.resources.ingest.ingest_factory import create_ingest
 
 
@@ -19,7 +19,7 @@ class TestProcessStatusQueueListener(TestCase):
         }
 
     @patch(
-        "app.ingest.application.mq.listeners.stomp_listener_base.StompListenerBase"
+        "app.ingest.infrastructure.mq.listeners.stomp_listener_base.StompListenerBase"
         "._StompListenerBase__create_subscribed_mq_connection"
     )
     def test_handle_received_message_happy_path(self, create_subscribed_mq_connection_mock) -> None:

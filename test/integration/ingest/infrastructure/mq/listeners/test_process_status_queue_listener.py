@@ -1,9 +1,9 @@
 import os
 from unittest.mock import patch
 
-from app.ingest.application.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
-from app.ingest.application.mq.mq_connection_params import MqConnectionParams
-from test.integration.ingest.application.mq.listeners.stomp_listener_integration_test_base import \
+from app.ingest.infrastructure.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
+from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
+from test.integration.ingest.infrastructure.mq.listeners.stomp_listener_integration_test_base import \
     StompListenerIntegrationTestBase
 
 
@@ -24,7 +24,7 @@ class TestProcessStatusQueueListener(StompListenerIntegrationTestBase):
     def tearDown(self) -> None:
         self.sut.disconnect()
 
-    @patch("app.ingest.application.mq.listeners.process_status_queue_listener.ProcessStatusQueueListener"
+    @patch("app.ingest.infrastructure.mq.listeners.process_status_queue_listener.ProcessStatusQueueListener"
            "._handle_received_message")
     def test_on_message_happy_path(self, on_message_mock) -> None:
         self._send_test_message(self.TEST_MESSAGE)

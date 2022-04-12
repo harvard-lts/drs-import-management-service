@@ -7,12 +7,12 @@ import os
 from stomp.utils import Frame
 
 from app.containers import Services
-from app.ingest.application.mq.listeners.stomp_listener_base import StompListenerBase
-from app.ingest.application.mq.mq_connection_params import MqConnectionParams
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_ingest_exception import ProcessIngestException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
+from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
 
 
 class TransferStatusQueueListener(StompListenerBase):

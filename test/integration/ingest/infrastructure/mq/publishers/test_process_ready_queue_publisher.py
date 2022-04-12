@@ -1,8 +1,8 @@
 import os
 
-from app.ingest.application.mq.mq_connection_params import MqConnectionParams
-from app.ingest.application.mq.publishers.process_ready_queue_publisher import ProcessReadyQueuePublisher
-from test.integration.ingest.application.mq.publishers.stomp_publisher_integration_test_base import \
+from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
+from app.ingest.infrastructure.mq.publishers.process_ready_queue_publisher import ProcessReadyQueuePublisher
+from test.integration.ingest.infrastructure.mq.publishers.stomp_publisher_integration_test_base import \
     StompPublisherIntegrationTestBase
 from test.resources.ingest.ingest_factory import create_ingest
 

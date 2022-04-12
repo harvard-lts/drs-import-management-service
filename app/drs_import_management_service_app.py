@@ -5,8 +5,8 @@ from app.common.application.controllers.responses.error_handlers import render_b
 from app.common.application.middlewares.authorization_middleware import AuthorizationMiddleware
 from app.drs_import_management_service_resolver import DrsImportManagementServiceResolver
 from app.health.application.controllers.health_get_controller import HealthGetController
-from app.ingest.application.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
-from app.ingest.application.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
+from app.ingest.infrastructure.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
+from app.ingest.infrastructure.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
 
 
 class DrsImportManagementServiceApp(FlaskApp):

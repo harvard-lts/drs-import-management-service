@@ -5,8 +5,8 @@ to define common behavior for stomp-implemented MQ publisher components.
 import json
 from abc import ABC
 
-from app.ingest.application.mq.stomp_interactor import StompInteractor
 from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
+from app.ingest.infrastructure.mq.stomp_interactor import StompInteractor
 
 
 class StompPublisherBase(StompInteractor, ABC):

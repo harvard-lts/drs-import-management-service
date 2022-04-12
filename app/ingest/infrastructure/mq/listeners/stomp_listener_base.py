@@ -8,7 +8,7 @@ from abc import abstractmethod, ABC
 import stomp
 from stomp.utils import Frame
 
-from app.ingest.application.mq.stomp_interactor import StompInteractor
+from app.ingest.infrastructure.mq.stomp_interactor import StompInteractor
 
 
 class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
