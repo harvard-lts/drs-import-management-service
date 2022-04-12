@@ -3,8 +3,8 @@ from dependency_injector import containers, providers
 from app.common.application.controllers.responses.error_response_serializer import ErrorResponseSerializer
 from app.ingest.application.mq.publishers.process_ready_queue_publisher import ProcessReadyQueuePublisher
 from app.ingest.application.mq.publishers.transfer_ready_queue_publisher import TransferReadyQueuePublisher
-from app.ingest.data.repositories.ingest_repository import IngestRepository
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.infrastructure.data.repositories.ingest_repository import IngestRepository
 
 
 class Controllers(containers.DeclarativeContainer):
