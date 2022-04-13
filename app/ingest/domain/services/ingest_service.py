@@ -2,6 +2,8 @@
 This module defines an IngestService, which is a domain service that defines ingesting operations.
 """
 
+from app.ingest.domain.api.exceptions.report_status_api_client_exception import ReportStatusApiClientException
+from app.ingest.domain.api.ingest_status_api_client import IIngestStatusApiClient
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.domain.mq.exceptions.mq_exception import MqException
@@ -23,7 +25,8 @@ class IngestService:
             self,
             ingest_repository: IIngestRepository,
             transfer_ready_queue_publisher: ITransferReadyQueuePublisher,
-            process_ready_queue_publisher: IProcessReadyQueuePublisher
+            process_ready_queue_publisher: IProcessReadyQueuePublisher,
+            ingest_status_api_client: IIngestStatusApiClient
     ) -> None:
         """
         :param ingest_repository: an implementation of IIngestRepository
@@ -32,10 +35,13 @@ class IngestService:
         :type transfer_ready_queue_publisher: ITransferReadyQueuePublisher
         :param process_ready_queue_publisher: an implementation of IProcessReadyQueuePublisher
         :type process_ready_queue_publisher: IProcessReadyQueuePublisher
+        :param ingest_status_api_client: an implementation of IIngestStatusApiClient
+        :type ingest_status_api_client: IIngestStatusApiClient
         """
         self.__ingest_repository = ingest_repository
         self.__transfer_ready_queue_publisher = transfer_ready_queue_publisher
         self.__process_ready_queue_publisher = process_ready_queue_publisher
+        self.__ingest_status_api_client = ingest_status_api_client
 
     def get_ingest_by_package_id(self, ingest_package_id: str) -> Ingest:
         """
@@ -100,24 +106,25 @@ class IngestService:
 
         :raises ProcessIngestException
         """
+        ingest.status = IngestStatus.processing_batch_ingest
         try:
             self.__process_ready_queue_publisher.publish_message(ingest)
-            ingest.status = IngestStatus.processing_batch_ingest
             self.__ingest_repository.save(ingest)
         except (MqException, IngestSaveException) as e:
             raise ProcessIngestException(ingest.package_id, str(e))
 
     def set_ingest_as_processed(self, ingest: Ingest) -> None:
         """
-        Sets an ingest as processed by updating its status.
+        Sets an ingest as processed by reporting and updating its status.
 
-        :param ingest: Ingest to set as processed
+        :param ingest: Ingest to report and update as processed
         :type ingest: Ingest
 
         :raises SetIngestAsProcessedException
         """
+        ingest.status = IngestStatus.batch_ingest_successful
         try:
-            ingest.status = IngestStatus.batch_ingest_successful
+            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
             self.__ingest_repository.save(ingest)
-        except IngestSaveException as ise:
-            raise SetIngestAsProcessedException(ingest.package_id, str(ise))
+        except (ReportStatusApiClientException, IngestSaveException) as e:
+            raise SetIngestAsProcessedException(ingest.package_id, str(e))
