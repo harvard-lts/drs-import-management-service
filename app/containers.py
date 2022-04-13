@@ -6,6 +6,7 @@ from app.ingest.infrastructure.api.dataverse_ingest_status_api_client import Dat
 from app.ingest.infrastructure.data.repositories.ingest_repository import IngestRepository
 from app.ingest.infrastructure.mq.publishers.process_ready_queue_publisher import ProcessReadyQueuePublisher
 from app.ingest.infrastructure.mq.publishers.transfer_ready_queue_publisher import TransferReadyQueuePublisher
+from app.ingest.infrastructure.api.dataverse_params_transformer import DataverseParamsTransformer
 
 
 class Controllers(containers.DeclarativeContainer):
@@ -20,5 +21,7 @@ class Services(containers.DeclarativeContainer):
         ingest_repository=IngestRepository(),
         transfer_ready_queue_publisher=TransferReadyQueuePublisher(),
         process_ready_queue_publisher=ProcessReadyQueuePublisher(),
-        ingest_status_api_client=DataverseIngestStatusApiClient()
+        ingest_status_api_client=DataverseIngestStatusApiClient(
+            dataverse_params_transformer=DataverseParamsTransformer()
+        )
     )

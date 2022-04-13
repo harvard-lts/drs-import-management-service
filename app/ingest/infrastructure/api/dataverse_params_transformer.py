@@ -1,11 +1,28 @@
+"""
+This module defines a DataverseParamsTransformer, which includes the
+operations to transform parameters to match Dataverse API specification.
+"""
+
 from typing import Tuple
 
+from app.common.application.response_status import ResponseStatus
+from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.infrastructure.api.exceptions.transform_package_id_exception import TransformPackageIdException
 
 
 class DataverseParamsTransformer:
 
     def transform_package_id_to_dataverse_params(self, package_id: str) -> Tuple[str, str]:
+        """
+        Transforms a package id to a tuple of Dataverse 'doi' and 'version' parameters.
+
+        E.g., the package id 'doi-10-5072-fk2-e6cmkr.v1.18' will result in a tuple of '10.5072/FK2/E6CMKR' and '1.18'
+
+        :param package_id: Source package id to generate Dataverse parameters
+        :type package_id: str
+
+        :raises TransformPackageIdException
+        """
         try:
             # Removing "doi-" prefix from the package_id
             formatted_package_id = package_id[4:]
@@ -26,3 +43,17 @@ class DataverseParamsTransformer:
 
         except IndexError as ie:
             raise TransformPackageIdException(package_id, str(ie))
+
+    def transform_ingest_status_to_response_status(self, ingest_status: IngestStatus) -> str:
+        """
+        Transforms an ingest status to a Dataverse response status.
+
+        :param ingest_status: Source ingest status
+        :type ingest_status: IngestStatus
+        """
+        if ingest_status == IngestStatus.batch_ingest_successful:
+            return ResponseStatus.success.value
+        elif ingest_status == IngestStatus.transferred_to_dropbox_failed \
+                or ingest_status == IngestStatus.batch_ingest_failed:
+            return ResponseStatus.failure.value
+        return ResponseStatus.pending.value

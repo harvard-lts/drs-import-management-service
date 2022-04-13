@@ -269,21 +269,26 @@ class TestIngestService(TestCase):
     def test_set_ingest_as_processed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
         ingest_repository_stub.save.side_effect = IngestSaveException("test", "test")
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         with self.assertRaises(SetIngestAsProcessedException):
             sut.set_ingest_as_processed(self.TEST_INGEST)
 
+        ingest_status_api_client_mock.report_status.assert_called_once_with(
+            self.TEST_INGEST.package_id,
+            IngestStatus.batch_ingest_successful
+        )
+
     def test_set_ingest_as_processed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
         ingest_status_api_client_stub = Mock(spec=IIngestStatusApiClient)
-
         ingest_status_api_client_stub.report_status.side_effect = ReportStatusApiClientException("test")
 
         sut = IngestService(
