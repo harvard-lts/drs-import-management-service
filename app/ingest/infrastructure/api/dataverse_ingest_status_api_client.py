@@ -14,8 +14,9 @@ from app.ingest.infrastructure.api.dataverse_params_transformer import Dataverse
 from app.ingest.infrastructure.api.exceptions.transform_package_id_exception import TransformPackageIdException
 
 
+# TODO: Integration test
 class DataverseIngestStatusApiClient(IIngestStatusApiClient):
-    API_ENDPOINT = "/api/admin/submitDataVersionToArchive/:persistentId/{version}/status?persistentId=doi:{doi}"
+    API_ENDPOINT = "/api/datasets/submitDataVersionToArchive/:persistentId/{version}/status?persistentId=doi:{doi}"
 
     def __init__(self, dataverse_params_transformer: DataverseParamsTransformer) -> None:
         self.__dataverse_params_transformer = dataverse_params_transformer
@@ -32,12 +33,12 @@ class DataverseIngestStatusApiClient(IIngestStatusApiClient):
         except (TransformPackageIdException, exceptions.ConnectionError) as e:
             raise ReportStatusApiClientException(str(e))
 
-    def __create_request_headers(self) -> dict:
-        return {"Content-Type": "application/json", "X-Dataverse-key": os.getenv('DATAVERSE_API_KEY')}
-
     def __create_request_body(self, ingest_status: IngestStatus) -> dict:
         return {
             "status": self.__dataverse_params_transformer.transform_ingest_status_to_response_status(ingest_status),
-            # TODO: Send actual URL
+            # TODO: Send actual URL (success) or message (pending, error)
             "message": os.getenv('DATAVERSE_BASE_URL')
         }
+
+    def __create_request_headers(self) -> dict:
+        return {"Content-Type": "application/json", "X-Dataverse-key": os.getenv('DATAVERSE_API_KEY')}
