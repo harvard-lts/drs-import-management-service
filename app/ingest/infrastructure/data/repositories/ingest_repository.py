@@ -13,7 +13,7 @@ class IngestRepository(IIngestRepository):
         # TODO: Fake ingest until MongoDB persistence is implemented
         # https://github.com/harvard-lts/HDC/issues/104
         return Ingest(
-            package_id="dummy_package_id",
+            package_id=package_id,
             s3_path="dummy_s3_path",
             s3_bucket_name="dummy_s3_bucket_name",
             destination_path=None,
