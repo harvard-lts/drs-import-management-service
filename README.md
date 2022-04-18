@@ -43,13 +43,17 @@ Remember to add the above run command volume mapping to allow automatic updating
 
 ## Test environment setup
 
-### Create .env file
+### Create integration .env file
 
-First, a .test.env file must be created inside /test/integration by copying the existing test.env.example file which can be found in the same folder.
+A .test.env file must be created inside /test/integration by copying the existing test.env.example file which can be found in the same folder.
+
+### Create functional .env file
+
+Similar to integration tests, a .test.env file must be created inside /test/functional, by copying the existing test.env.file.
 
 ### Run test environment
 
-Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and an ActiveMQ container (for integration tests).
+Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and an ActiveMQ container (for integration and functional tests).
 
 Before running tests locally, the environment must be up and running:
 ````
@@ -75,7 +79,12 @@ Running integration tests:
 docker exec -it test_runner pytest test/integration
 ````
 
-If you want to use a remote test environment for integration testing, you will need to update the environment variables in the .test.env file to access the desired environment.
+Running functional tests:
+````
+docker exec -it test_runner pytest test/functional
+````
+
+If you want to use a remote test environment for integration or functional testing, you will need to update the environment variables in the corresponding .test.env file to access the desired environment.
 
 ## Versioning
 

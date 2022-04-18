@@ -21,6 +21,8 @@ paths:
           $ref: "#/components/responses/InternalError"
         400:
           $ref: "#/components/responses/BadRequest"
+        401:
+          $ref: "#/components/responses/Unauthorized"
 
 components:
   responses:
@@ -50,6 +52,26 @@ components:
                 description: A message describing the response
     BadRequest:
       description: Malformed request due to incorrect or missing parameters
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - status
+              - status_code
+              - message
+            properties:
+              status:
+                $ref: "#/components/schemas/ResponseStatus"
+              status_code:
+                type: string
+                nullable: true
+                description: Internally defined status code
+              message:
+                type: string
+                description: A message describing the response
+    Unauthorized:
+      description: Unauthorized request
       content:
         application/json:
           schema:

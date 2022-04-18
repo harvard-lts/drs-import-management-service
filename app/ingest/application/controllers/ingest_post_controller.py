@@ -2,11 +2,11 @@ from typing import Tuple, Dict
 
 from flask import request
 
-from app.common.application.controllers.error_responses.error_response_serializer import ErrorResponseSerializer
-from app.common.application.controllers.error_responses.transfer_ingest_error_response import \
+from app.common.application.controllers.responses.error_response_serializer import ErrorResponseSerializer
+from app.common.application.controllers.responses.transfer_ingest_error_response import \
     TransferIngestErrorResponse
-from app.common.application.controllers.response_status import ResponseStatus
-from app.containers import Services, Serializers
+from app.common.application.response_status import ResponseStatus
+from app.containers import Services, Controllers
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -18,11 +18,11 @@ class IngestPostController:
 
     def __init__(
             self,
-            ingest_service: IngestService = Services.ingest_service(),
-            error_response_serializer: ErrorResponseSerializer = Serializers.error_response_serializer()
+            error_response_serializer: ErrorResponseSerializer = Controllers.error_response_serializer(),
+            ingest_service: IngestService = Services.ingest_service()
     ) -> None:
-        self.__ingest_service = ingest_service
         self.__error_response_serializer = error_response_serializer
+        self.__ingest_service = ingest_service
 
     def __call__(self) -> Tuple[Dict, int]:
         package_id: str = request.json.get("package_id")
