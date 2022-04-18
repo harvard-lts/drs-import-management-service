@@ -5,7 +5,7 @@ includes the necessary logic to connect to a remote Dataverse instance API and r
 
 import os
 
-from requests import post, exceptions
+from requests import exceptions, put
 
 from app.ingest.domain.api.exceptions.report_status_api_client_exception import ReportStatusApiClientException
 from app.ingest.domain.api.ingest_status_api_client import IIngestStatusApiClient
@@ -25,7 +25,7 @@ class DataverseIngestStatusApiClient(IIngestStatusApiClient):
         try:
             doi, version = self.__dataverse_params_transformer.transform_package_id_to_dataverse_params(package_id)
             dataverse_base_url = os.getenv('DATAVERSE_BASE_URL')
-            post(
+            put(
                 url=f"{dataverse_base_url}{self.API_ENDPOINT.format(version=version, doi=doi)}",
                 data=self.__create_request_body(ingest_status),
                 headers=self.__create_request_headers()
