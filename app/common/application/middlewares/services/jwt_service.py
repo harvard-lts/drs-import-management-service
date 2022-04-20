@@ -48,13 +48,13 @@ class JwtService:
             return False
 
         kid_header = jwt_token_headers.get('kid')
-        if kid_header is None or kid_header != os.getenv('JWT_KID_DATAVERSE'):
+        if kid_header is None or kid_header != os.getenv('DATAVERSE_JWT_KID'):
             return False
 
         return True
 
     def __decode_jwt_token(self, jwt_token: str) -> dict:
-        jwt_public_key = os.getenv('JWT_PUBLIC_KEY')
+        jwt_public_key = os.getenv('DATAVERSE_JWT_PUBLIC_KEY')
         return jwt.decode(
             jwt=jwt_token,
             key=jwt_public_key,
@@ -63,7 +63,7 @@ class JwtService:
 
     def __validate_jwt_token_body(self, jwt_token_body: dict, request_body: dict, request_body_encoding: str) -> bool:
         issuer = jwt_token_body.get('iss')
-        if issuer is None or issuer != os.getenv('JWT_ISSUER_DATAVERSE'):
+        if issuer is None or issuer != os.getenv('DATAVERSE_JWT_ISSUER'):
             return False
 
         jwt_body_hash = jwt_token_body.get('bodySHA256Hash')

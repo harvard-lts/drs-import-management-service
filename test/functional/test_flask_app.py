@@ -184,13 +184,13 @@ class TestFlaskApp(TestCase):
             expiration_date_time: datetime = datetime.utcnow() + timedelta(seconds=30)
     ) -> str:
         if issuer is None:
-            issuer = os.getenv('JWT_ISSUER_DATAVERSE')
+            issuer = os.getenv('DATAVERSE_JWT_ISSUER')
 
         if kid is None:
-            kid = os.getenv('JWT_KID_DATAVERSE')
+            kid = os.getenv('DATAVERSE_JWT_KID')
 
         return "Bearer " + jwt.encode(
-            key=os.getenv('JWT_PRIVATE_KEY'),
+            key=os.getenv('DATAVERSE_JWT_PRIVATE_KEY'),
             payload={
                 "iss": issuer,
                 "bodySHA256Hash": self.TEST_INGEST_REQUEST_BODY_CANONICAL_HASH,
