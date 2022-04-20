@@ -49,7 +49,7 @@ class DataverseIngestStatusApiClient(IIngestStatusApiClient):
     def __create_request_body(self, ingest_status: IngestStatus) -> str:
         # TODO: Send actual URL (for success) or message (for pending or error)
         return '{"status":"' \
-               + self.__dataverse_params_transformer.transform_ingest_status_to_response_status(ingest_status) \
+               + self.__dataverse_params_transformer.transform_ingest_status_to_dataverse_ingest_status(ingest_status) \
                + '","message":"https://dataverse.harvard.edu/"}'
 
     def __create_request_headers(self) -> dict:

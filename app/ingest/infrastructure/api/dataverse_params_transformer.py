@@ -5,8 +5,8 @@ operations to transform parameters to match Dataverse API specification.
 
 from typing import Tuple
 
-from app.common.application.response_status import ResponseStatus
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
+from app.ingest.infrastructure.api.dataverse_ingest_status import DataverseIngestStatus
 from app.ingest.infrastructure.api.exceptions.transform_package_id_exception import TransformPackageIdException
 
 
@@ -44,16 +44,16 @@ class DataverseParamsTransformer:
         except IndexError as ie:
             raise TransformPackageIdException(package_id, str(ie))
 
-    def transform_ingest_status_to_response_status(self, ingest_status: IngestStatus) -> str:
+    def transform_ingest_status_to_dataverse_ingest_status(self, ingest_status: IngestStatus) -> str:
         """
-        Transforms an ingest status to a Dataverse response status.
+        Transforms an ingest status to a Dataverse ingest status.
 
         :param ingest_status: Source ingest status
         :type ingest_status: IngestStatus
         """
         if ingest_status == IngestStatus.batch_ingest_successful:
-            return ResponseStatus.success.value
+            return DataverseIngestStatus.success.value
         elif ingest_status == IngestStatus.transferred_to_dropbox_failed \
                 or ingest_status == IngestStatus.batch_ingest_failed:
-            return ResponseStatus.failure.value
-        return ResponseStatus.pending.value
+            return DataverseIngestStatus.failure.value
+        return DataverseIngestStatus.pending.value

@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from app.common.application.response_status import ResponseStatus
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.infrastructure.api.dataverse_params_transformer import DataverseParamsTransformer
 from app.ingest.infrastructure.api.exceptions.transform_package_id_exception import TransformPackageIdException
+from app.ingest.infrastructure.api.dataverse_ingest_status import DataverseIngestStatus
 
 
 class TestDataverseParamsTransformer(TestCase):
@@ -31,27 +31,39 @@ class TestDataverseParamsTransformer(TestCase):
         with self.assertRaises(TransformPackageIdException):
             self.sut.transform_package_id_to_dataverse_params(test_package_id)
 
-    def test_transform_ingest_status_to_response_status_happy_path(self) -> None:
-        actual_status = self.sut.transform_ingest_status_to_response_status(IngestStatus.batch_ingest_successful)
-        expected_status = ResponseStatus.success.value
+    def test_transform_ingest_status_to_dataverse_ingest_status_happy_path(self) -> None:
+        actual_status = self.sut.transform_ingest_status_to_dataverse_ingest_status(
+            ingest_status=IngestStatus.batch_ingest_successful
+        )
+        expected_status = DataverseIngestStatus.success.value
         self.assertEqual(actual_status, expected_status)
 
-        actual_status = self.sut.transform_ingest_status_to_response_status(IngestStatus.batch_ingest_failed)
-        expected_status = ResponseStatus.failure.value
+        actual_status = self.sut.transform_ingest_status_to_dataverse_ingest_status(
+            ingest_status=IngestStatus.batch_ingest_failed
+        )
+        expected_status = DataverseIngestStatus.failure.value
         self.assertEqual(actual_status, expected_status)
 
-        actual_status = self.sut.transform_ingest_status_to_response_status(IngestStatus.transferred_to_dropbox_failed)
-        expected_status = ResponseStatus.failure.value
+        actual_status = self.sut.transform_ingest_status_to_dataverse_ingest_status(
+            ingest_status=IngestStatus.transferred_to_dropbox_failed
+        )
+        expected_status = DataverseIngestStatus.failure.value
         self.assertEqual(actual_status, expected_status)
 
-        actual_status = self.sut.transform_ingest_status_to_response_status(IngestStatus.batch_ingest_failed)
-        expected_status = ResponseStatus.failure.value
+        actual_status = self.sut.transform_ingest_status_to_dataverse_ingest_status(
+            ingest_status=IngestStatus.batch_ingest_failed
+        )
+        expected_status = DataverseIngestStatus.failure.value
         self.assertEqual(actual_status, expected_status)
 
-        actual_status = self.sut.transform_ingest_status_to_response_status(IngestStatus.pending_transfer_to_dropbox)
-        expected_status = ResponseStatus.pending.value
+        actual_status = self.sut.transform_ingest_status_to_dataverse_ingest_status(
+            ingest_status=IngestStatus.pending_transfer_to_dropbox
+        )
+        expected_status = DataverseIngestStatus.pending.value
         self.assertEqual(actual_status, expected_status)
 
-        actual_status = self.sut.transform_ingest_status_to_response_status(IngestStatus.processing_batch_ingest)
-        expected_status = ResponseStatus.pending.value
+        actual_status = self.sut.transform_ingest_status_to_dataverse_ingest_status(
+            ingest_status=IngestStatus.processing_batch_ingest
+        )
+        expected_status = DataverseIngestStatus.pending.value
         self.assertEqual(actual_status, expected_status)
