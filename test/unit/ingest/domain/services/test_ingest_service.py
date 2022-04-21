@@ -154,8 +154,7 @@ class TestIngestService(TestCase):
         ingest_repository_mock.save.assert_called_once_with(
             replace(
                 self.TEST_INGEST,
-                status=IngestStatus.transferred_to_dropbox_successful,
-                destination_path=test_destination_path
+                status=IngestStatus.transferred_to_dropbox_successful
             )
         )
 

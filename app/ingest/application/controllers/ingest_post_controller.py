@@ -34,7 +34,6 @@ class IngestPostController:
             package_id=package_id,
             s3_path=s3_path,
             s3_bucket_name=s3_bucket_name,
-            destination_path=None,
             admin_metadata=admin_metadata,
             status=IngestStatus.pending_transfer_to_dropbox,
             # TODO: Obtain depositing application name from request data

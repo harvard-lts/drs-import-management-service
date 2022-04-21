@@ -16,7 +16,6 @@ class IngestRepository(IIngestRepository):
             package_id=package_id,
             s3_path="dummy_s3_path",
             s3_bucket_name="dummy_s3_bucket_name",
-            destination_path=None,
             admin_metadata={},
             status=IngestStatus.pending_transfer_to_dropbox,
             depositing_application=DepositingApplication.Dataverse

@@ -32,6 +32,6 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
     def __create_process_ready_message(self, ingest: Ingest) -> dict:
         return {
             'package_id': ingest.package_id,
-            'destination_path': ingest.destination_path,
+            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
             'application_name': ingest.depositing_application.value
         }
