@@ -13,6 +13,13 @@ services:
       - ./app:/home/dimsuser/app
       - ./test:/home/dimsuser/test
 
+  test_mongodb:
+    container_name: "test_mongodb"
+    image: "mongo:4.0.28"
+    restart: on-failure
+    volumes:
+      - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
   test_activemq:
     container_name: "test_activemq"
     build:
