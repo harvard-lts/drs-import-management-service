@@ -2,8 +2,8 @@ import os
 from unittest.mock import patch
 
 from app.ingest.infrastructure.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
-from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
-from test.integration.ingest.infrastructure.mq.listeners.stomp_listener_integration_test_base import \
+from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
+from test.integration.common.infrastructure.mq.listeners.stomp_listener_integration_test_base import \
     StompListenerIntegrationTestBase
 
 

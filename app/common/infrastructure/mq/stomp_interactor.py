@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 import stomp
 
 from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnectionException
-from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
+from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 
 
 class StompInteractor(ABC):
@@ -34,7 +34,7 @@ class StompInteractor(ABC):
             )
 
             #if mq_ssl_enabled == 'True':
-            connection.set_ssl([(mq_host, mq_port)])
+            #connection.set_ssl([(mq_host, mq_port)])
 
             connection.connect(
                 mq_user,

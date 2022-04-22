@@ -26,7 +26,7 @@ class TestIngestRepository(MongoIntegrationTestBase):
 
         self.assertEqual(actual_package_id, expected_package_id)
 
-    def test_get_by_package_id_ingest_exist_happy_path(self) -> None:
+    def test_get_by_package_id_ingest_exists_happy_path(self) -> None:
         self.__insert_test_ingest()
 
         sut = IngestRepository()
