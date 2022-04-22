@@ -1,25 +1,41 @@
+import logging
 import os
 from typing import Optional
+
+from pymongo.errors import PyMongoError
 
 from app.common.infrastructure.data.repositories.mongo_repository_base import MongoRepositoryBase
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
+from app.ingest.domain.repositories.exceptions.ingest_query_exception import IngestQueryException
+from app.ingest.domain.repositories.exceptions.ingest_save_exception import IngestSaveException
 from app.ingest.domain.repositories.ingest_repository import IIngestRepository
 from app.ingest.infrastructure.data.repositories.db_connection_params import DbConnectionParams
 
 
 class IngestRepository(IIngestRepository, MongoRepositoryBase):
+    def __init__(self) -> None:
+        self.__logger = logging.getLogger()
+
     def save(self, ingest: Ingest) -> None:
-        db = self._get_database()
-        db.ingests.insert_one(self.__transform_ingest_to_mongo_dict(ingest))
+        try:
+            db = self._get_database()
+            db.ingests.insert_one(self.__transform_ingest_to_mongo_dict(ingest))
+        except PyMongoError as pme:
+            self.__logger.error(str(pme))
+            raise IngestSaveException(ingest.package_id, str(pme))
 
     def get_by_package_id(self, package_id: str) -> Optional[Ingest]:
-        db = self._get_database()
-        ingest_mongo_dict = db.ingests.find_one({"package_id": package_id})
-        if ingest_mongo_dict is None:
-            return None
-        return self.__transform_mongo_dict_to_ingest(ingest_mongo_dict)
+        try:
+            db = self._get_database()
+            ingest_mongo_dict = db.ingests.find_one({"package_id": package_id})
+            if ingest_mongo_dict is None:
+                return None
+            return self.__transform_mongo_dict_to_ingest(ingest_mongo_dict)
+        except PyMongoError as pme:
+            self.__logger.error(str(pme))
+            raise IngestQueryException(package_id, str(pme))
 
     def _get_db_connection_params(self) -> DbConnectionParams:
         return DbConnectionParams(

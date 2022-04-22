@@ -13,6 +13,8 @@ class IIngestRepository(ABC):
 
         :param ingest: Ingest to save
         :type ingest: Ingest
+
+        :raises IngestSaveException
         """
 
     @abstractmethod
@@ -23,4 +25,6 @@ class IIngestRepository(ABC):
 
         :param package_id: Ingest package id
         :type package_id: str
+
+        :raises IngestQueryException
         """

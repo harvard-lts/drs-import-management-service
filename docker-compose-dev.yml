@@ -21,7 +21,7 @@ services:
     image: "mongo:4.0.28"
     restart: on-failure
     ports:
-      - "27072:27017"
+      - "27017:27017"
     volumes:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - ./mongodb/data:/data/db
