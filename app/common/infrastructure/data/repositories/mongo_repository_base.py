@@ -20,7 +20,7 @@ class MongoRepositoryBase(ABC):
         db_connection_params = self._get_db_connection_params()
         db_name = db_connection_params.db_name
         client = MongoClient(
-            host=db_connection_params.db_host,
+            host=db_connection_params.db_hosts,
             port=db_connection_params.db_port,
             username=db_connection_params.db_user,
             password=db_connection_params.db_password,

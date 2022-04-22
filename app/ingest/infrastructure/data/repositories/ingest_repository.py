@@ -23,7 +23,7 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
 
     def _get_db_connection_params(self) -> DbConnectionParams:
         return DbConnectionParams(
-            db_host=os.getenv('MONGODB_HOST'),
+            db_hosts=[os.getenv('MONGODB_HOST_1'), os.getenv('MONGODB_HOST_2'), os.getenv('MONGODB_HOST_3')],
             db_port=int(os.getenv('MONGODB_PORT')),
             db_name=os.getenv('MONGODB_DB_NAME'),
             db_user=os.getenv('MONGODB_USER'),
