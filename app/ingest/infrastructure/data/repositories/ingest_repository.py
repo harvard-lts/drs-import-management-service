@@ -20,18 +20,23 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
 
     def save(self, ingest: Ingest) -> None:
         try:
+            self.__logger.debug("Saving ingest with package id " + ingest.package_id + " to MongoDB...")
             db = self._get_database()
             db.ingests.insert_one(self.__transform_ingest_to_mongo_dict(ingest))
+            self.__logger.debug("Ingest saved")
         except PyMongoError as pme:
             self.__logger.error(str(pme))
             raise IngestSaveException(ingest.package_id, str(pme))
 
     def get_by_package_id(self, package_id: str) -> Optional[Ingest]:
         try:
+            self.__logger.debug("Getting ingest with package id " + package_id + " from MongoDB...")
             db = self._get_database()
             ingest_mongo_dict = db.ingests.find_one({"package_id": package_id})
             if ingest_mongo_dict is None:
+                self.__logger.debug("Ingest not found")
                 return None
+            self.__logger.debug("Ingest found")
             return self.__transform_mongo_dict_to_ingest(ingest_mongo_dict)
         except PyMongoError as pme:
             self.__logger.error(str(pme))
