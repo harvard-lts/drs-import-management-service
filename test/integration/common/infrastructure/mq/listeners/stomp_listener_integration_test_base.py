@@ -2,7 +2,7 @@ import json
 import time
 from abc import ABC
 
-from test.integration.ingest.infrastructure.mq.stomp_integration_test_base import StompIntegrationTestBase
+from test.integration.common.infrastructure.mq.stomp_integration_test_base import StompIntegrationTestBase
 
 
 class StompListenerIntegrationTestBase(StompIntegrationTestBase, ABC):

@@ -7,8 +7,8 @@ import os
 
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
-from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
-from app.ingest.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
+from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
+from app.common.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
 
 
 class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBase):
@@ -34,6 +34,6 @@ class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBa
             'package_id': ingest.package_id,
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
-            'destination_path': ingest.destination_path,
+            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
             'admin_metadata': ingest.admin_metadata,
         }

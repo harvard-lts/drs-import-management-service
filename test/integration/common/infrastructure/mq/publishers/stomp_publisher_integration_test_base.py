@@ -4,7 +4,7 @@ from abc import ABC
 import stomp
 from stomp.utils import Frame
 
-from test.integration.ingest.infrastructure.mq.stomp_integration_test_base import StompIntegrationTestBase
+from test.integration.common.infrastructure.mq.stomp_integration_test_base import StompIntegrationTestBase
 
 test_message_received = False
 

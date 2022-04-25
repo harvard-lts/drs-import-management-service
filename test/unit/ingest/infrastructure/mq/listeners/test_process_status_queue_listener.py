@@ -19,7 +19,7 @@ class TestProcessStatusQueueListener(TestCase):
         }
 
     @patch(
-        "app.ingest.infrastructure.mq.listeners.stomp_listener_base.StompListenerBase"
+        "app.common.infrastructure.mq.listeners.stomp_listener_base.StompListenerBase"
         "._StompListenerBase__create_subscribed_mq_connection"
     )
     def test_handle_received_message_happy_path(self, create_subscribed_mq_connection_mock) -> None:

@@ -6,7 +6,7 @@ import json
 from abc import ABC
 
 from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
-from app.ingest.infrastructure.mq.stomp_interactor import StompInteractor
+from app.common.infrastructure.mq.stomp_interactor import StompInteractor
 
 
 class StompPublisherBase(StompInteractor, ABC):

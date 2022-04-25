@@ -7,8 +7,8 @@ import os
 
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.mq.process_ready_queue_publisher import IProcessReadyQueuePublisher
-from app.ingest.infrastructure.mq.mq_connection_params import MqConnectionParams
-from app.ingest.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
+from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
+from app.common.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
 
 
 class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase):
@@ -32,6 +32,6 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
     def __create_process_ready_message(self, ingest: Ingest) -> dict:
         return {
             'package_id': ingest.package_id,
-            'destination_path': ingest.destination_path,
+            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
             'application_name': ingest.depositing_application.value
         }
