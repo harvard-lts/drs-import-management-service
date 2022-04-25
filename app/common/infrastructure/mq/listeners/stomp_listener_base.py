@@ -14,6 +14,7 @@ from app.common.infrastructure.mq.stomp_interactor import StompInteractor
 class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
 
     def __init__(self) -> None:
+        super().__init__()
         self.__reconnect_on_disconnection = True
         self.__connection = self.__create_subscribed_mq_connection()
 

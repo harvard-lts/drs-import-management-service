@@ -5,16 +5,17 @@ which includes the necessary logic to connect to the remote MQ and publish a tra
 
 import os
 
-from app.ingest.domain.models.ingest.ingest import Ingest
-from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.common.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
+from app.ingest.domain.models.ingest.ingest import Ingest
+from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
 
 
 class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBase):
 
     def publish_message(self, ingest: Ingest) -> None:
         message = self.__create_transfer_ready_message(ingest)
+        self._logger.debug("Publishing transfer ready message... Message body: " + str(message))
         self._publish_message(message)
 
     def _get_queue_name(self) -> str:

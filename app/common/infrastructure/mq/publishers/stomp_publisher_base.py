@@ -5,8 +5,8 @@ to define common behavior for stomp-implemented MQ publisher components.
 import json
 from abc import ABC
 
-from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
 from app.common.infrastructure.mq.stomp_interactor import StompInteractor
+from app.ingest.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
 
 
 class StompPublisherBase(StompInteractor, ABC):
@@ -23,6 +23,7 @@ class StompPublisherBase(StompInteractor, ABC):
             message_json_str = json.dumps(message)
             connection.send(self._get_queue_name(), message_json_str)
         except Exception as e:
+            self._logger.error(str(e))
             mq_connection_params = self._get_mq_connection_params()
             raise MqMessagePublishException(
                 queue_name=self._get_queue_name(),

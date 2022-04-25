@@ -6,13 +6,13 @@ import os
 
 from stomp.utils import Frame
 
+from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
+from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_ingest_exception import ProcessIngestException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
 from app.ingest.domain.services.ingest_service import IngestService
-from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
-from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 
 
 class TransferStatusQueueListener(StompListenerBase):
@@ -34,26 +34,29 @@ class TransferStatusQueueListener(StompListenerBase):
         )
 
     def _handle_received_message(self, message_body: dict) -> None:
+        self._logger.debug("Received message from Transfer Queue. Message body: " + str(message_body))
         # TODO Handle transfer_status: Currently only considered successful
 
-        # TODO Fake ingest until MongoDB persistence is implemented
-        # https://github.com/harvard-lts/HDC/issues/104
+        package_id = message_body['package_id']
+        self._logger.debug("Obtaining ingest by the package id of the received message " + package_id + "...")
         try:
-            ingest = self.__ingest_service.get_ingest_by_package_id(message_body['package_id'])
+            ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
         except GetIngestByPackageIdException as e:
-            # TODO Handle exception
+            self._logger.error(str(e))
             raise e
 
+        self._logger.debug("Setting ingest as transferred...")
         try:
             self.__ingest_service.set_ingest_as_transferred(ingest, message_body['destination_path'])
         except SetIngestAsTransferredException as e:
-            # TODO Handle exception
+            self._logger.error(str(e))
             raise e
 
+        self._logger.debug("Starting ingest processing...")
         try:
             self.__ingest_service.process_ingest(ingest)
         except ProcessIngestException as e:
-            # TODO Handle exception
+            self._logger.error(str(e))
             raise e
 
     def _handle_received_error(self, frame: Frame) -> None:

@@ -6,12 +6,12 @@ import os
 
 from stomp.utils import Frame
 
+from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
+from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
 from app.ingest.domain.services.ingest_service import IngestService
-from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
-from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 
 
 class ProcessStatusQueueListener(StompListenerBase):
@@ -33,20 +33,22 @@ class ProcessStatusQueueListener(StompListenerBase):
         )
 
     def _handle_received_message(self, message_body: dict) -> None:
+        self._logger.debug("Received message from Process Queue. Message body: " + str(message_body))
         # TODO Handle batch_ingest_status: Currently only considered successful
 
-        # TODO Fake ingest until MongoDB persistence is implemented
-        # https://github.com/harvard-lts/HDC/issues/104
+        package_id = message_body['package_id']
+        self._logger.debug("Obtaining ingest by the package id of the received message " + package_id + "...")
         try:
-            ingest = self.__ingest_service.get_ingest_by_package_id(message_body['package_id'])
+            ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
         except GetIngestByPackageIdException as e:
-            # TODO Handle exception
+            self._logger.error(str(e))
             raise e
 
+        self._logger.debug("Setting ingest as processed...")
         try:
             self.__ingest_service.set_ingest_as_processed(ingest)
         except SetIngestAsProcessedException as e:
-            # TODO Handle exception
+            self._logger.error(str(e))
             raise e
 
     def _handle_received_error(self, frame: Frame) -> None:
