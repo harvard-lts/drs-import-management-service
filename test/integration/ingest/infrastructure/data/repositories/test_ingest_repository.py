@@ -1,4 +1,5 @@
 import os
+from dataclasses import replace
 
 from app.ingest.infrastructure.data.repositories.db_connection_params import DbConnectionParams
 from app.ingest.infrastructure.data.repositories.ingest_repository import IngestRepository
@@ -14,7 +15,7 @@ class TestIngestRepository(MongoIntegrationTestBase):
         cls.TEST_INGEST = create_ingest()
         cls.COLLECTION_NAME = "ingests"
 
-    def test_save_happy_path(self) -> None:
+    def test_save_new_ingest_happy_path(self) -> None:
         sut = IngestRepository()
         sut.save(self.TEST_INGEST)
 
@@ -25,6 +26,32 @@ class TestIngestRepository(MongoIntegrationTestBase):
         expected_package_id = self.TEST_INGEST.package_id
 
         self.assertEqual(actual_package_id, expected_package_id)
+
+    def test_save_existing_ingest_happy_path(self) -> None:
+        self.__insert_test_ingest()
+
+        sut = IngestRepository()
+        new_test_s3_bucket_name = "new_test_s3_bucket_name"
+        sut.save(replace(self.TEST_INGEST, s3_bucket_name=new_test_s3_bucket_name))
+
+        ingest_collection = self._get_database()[self.COLLECTION_NAME]
+
+        actual_saved_ingests_count = ingest_collection.count_documents({})
+        expected_saved_ingests_count = 1
+
+        self.assertEqual(actual_saved_ingests_count, expected_saved_ingests_count)
+
+        actual_saved_ingest_dict = ingest_collection.find_one({"package_id": self.TEST_INGEST.package_id})
+
+        actual_package_id = actual_saved_ingest_dict["package_id"]
+        expected_package_id = self.TEST_INGEST.package_id
+
+        self.assertEqual(actual_package_id, expected_package_id)
+
+        actual_s3_bucket_name = actual_saved_ingest_dict["s3_bucket_name"]
+        expected_s3_bucket_name = new_test_s3_bucket_name
+
+        self.assertEqual(actual_s3_bucket_name, expected_s3_bucket_name)
 
     def test_get_by_package_id_ingest_exists_happy_path(self) -> None:
         self.__insert_test_ingest()

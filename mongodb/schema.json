@@ -12,6 +12,10 @@
     "_id": {
       "bsonType": "objectId"
     },
+    "package_id": {
+      "bsonType": "string",
+      "description": "Package id of the object being ingested"
+    },
     "s3_path": {
       "bsonType": "string",
       "description": "S3 path of the object being ingested"

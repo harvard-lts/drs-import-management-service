@@ -22,7 +22,11 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
         try:
             self.__logger.debug("Saving ingest with package id " + ingest.package_id + " to MongoDB...")
             db = self._get_database()
-            db.ingests.insert_one(self.__transform_ingest_to_mongo_dict(ingest))
+            db.ingests.replace_one(
+                {"package_id": ingest.package_id},
+                self.__transform_ingest_to_mongo_dict(ingest),
+                upsert=True
+            )
             self.__logger.debug("Ingest saved")
         except PyMongoError as pme:
             self.__logger.error(str(pme))
