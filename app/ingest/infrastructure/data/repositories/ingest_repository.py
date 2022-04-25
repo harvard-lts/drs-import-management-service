@@ -27,7 +27,7 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
                 self.__transform_ingest_to_mongo_dict(ingest),
                 upsert=True
             )
-            self.__logger.debug("Ingest saved")
+            self.__logger.debug("Ingest with package id " + ingest.package_id + " saved")
         except PyMongoError as pme:
             self.__logger.error(str(pme))
             raise IngestSaveException(ingest.package_id, str(pme))
@@ -38,9 +38,9 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
             db = self._get_database()
             ingest_mongo_dict = db.ingests.find_one({"package_id": package_id})
             if ingest_mongo_dict is None:
-                self.__logger.debug("Ingest not found")
+                self.__logger.debug("Ingest with package id " + package_id + " not found")
                 return None
-            self.__logger.debug("Ingest found")
+            self.__logger.debug("Ingest with package id " + package_id + " found")
             return self.__transform_mongo_dict_to_ingest(ingest_mongo_dict)
         except PyMongoError as pme:
             self.__logger.error(str(pme))
