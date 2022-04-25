@@ -34,7 +34,7 @@ class StompInteractor(ABC):
             )
 
             #if mq_ssl_enabled == 'True':
-            #connection.set_ssl([(mq_host, mq_port)])
+            connection.set_ssl([(mq_host, mq_port)])
 
             connection.connect(
                 mq_user,
