@@ -1,49 +1,50 @@
 {
-  "type": "object",
+  "bsonType": "object",
   "required": [
-    "depositing_application",
-    "ingest_provenance"
+    "package_id",
+    "s3_path",
+    "s3_bucket_name",
+    "admin_metadata",
+    "status",
+    "depositing_application"
   ],
   "properties": {
-    "_id": { "type": "objectId" },
+    "_id": {
+      "bsonType": "objectId"
+    },
+    "s3_path": {
+      "bsonType": "string",
+      "description": "S3 path of the object being ingested"
+    },
+    "s3_bucket_name": {
+      "bsonType": "string",
+      "description": "S3 bucket name of the object being ingested"
+    },
+    "admin_metadata": {
+      "bsonType": "object",
+      "description": "The admin metadata of the object being ingested"
+    },
+    "status": {
+      "enum": [
+        "ready_for_s3_transfer",
+        "pending_transfer_to_s3",
+        "transferred_to_s3_successful",
+        "transferred_to_s3_failed",
+        "pending_transfer_to_dropbox",
+        "transferred_to_dropbox_successful",
+        "transferred_to_dropbox_failed",
+        "processing_batch_ingest",
+        "batch_ingest_successful",
+        "batch_ingest_failed"
+      ],
+      "description": "The status of the object being ingested"
+    },
     "depositing_application": {
       "enum": [
         "Dataverse",
         "ePADD"
       ],
-      "description": "The name of the application making the deposit."
-    },
-    "ingest_provenance" : {
-      "type": "object",
-      "properties": {
-        "ingest_status": {
-          "description": "The status of the object being ingested",
-          "enum": [
-            "ready_for_s3_transfer",
-            "pending_transfer_to_s3",
-            "transferred_to_s3_successful",
-            "transferred_to_s3_failed",
-            "pending_transfer_to_dropbox",
-            "transferred_to_dropbox_successful",
-            "transferred_to_dropbox_failed",
-            "processing_batch_ingest",
-            "batch_ingest_successful",
-            "batch_ingest_failed"
-          ]
-        },
-        "date": {
-          "type": "datetime"
-        },
-        "notes": {
-          "description": "Optional details about this particular ingest status.",
-          "type": "string"
-        },
-        "required": [
-            "ingest_status",
-            "date"
-        ],
-       "additionalProperties": false
-      }
+      "description": "The name of the application making the deposit"
     }
   }
 }
