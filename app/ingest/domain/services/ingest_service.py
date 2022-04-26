@@ -15,6 +15,8 @@ from app.ingest.domain.repositories.ingest_repository import IIngestRepository
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_ingest_exception import ProcessIngestException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
+from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception import \
+    SetIngestAsProcessedFailedException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
     SetIngestAsTransferredFailedException
@@ -146,3 +148,19 @@ class IngestService:
             self.__ingest_repository.save(ingest)
         except (ReportStatusApiClientException, IngestSaveException) as e:
             raise SetIngestAsProcessedException(ingest.package_id, str(e))
+
+    def set_ingest_as_processed_failed(self, ingest: Ingest) -> None:
+        """
+        Sets an ingest as processed failed by reporting and updating its status.
+
+        :param ingest: Ingest to report and update as processed failed
+        :type ingest: Ingest
+
+        :raises SetIngestAsProcessedFailedException
+        """
+        ingest.status = IngestStatus.batch_ingest_failed
+        try:
+            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
+            self.__ingest_repository.save(ingest)
+        except (ReportStatusApiClientException, IngestSaveException) as e:
+            raise SetIngestAsProcessedFailedException(ingest.package_id, str(e))
