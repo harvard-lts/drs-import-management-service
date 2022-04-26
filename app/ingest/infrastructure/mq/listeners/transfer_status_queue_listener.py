@@ -35,7 +35,6 @@ class TransferStatusQueueListener(StompListenerBase):
 
     def _handle_received_message(self, message_body: dict) -> None:
         self._logger.debug("Received message from Transfer Queue. Message body: " + str(message_body))
-        # TODO Handle transfer_status: Currently only considered successful
 
         package_id = message_body['package_id']
         self._logger.debug("Obtaining ingest by the package id of the received message " + package_id + "...")
@@ -44,6 +43,12 @@ class TransferStatusQueueListener(StompListenerBase):
         except GetIngestByPackageIdException as e:
             self._logger.error(str(e))
             raise e
+
+        transfer_status = message_body['transfer_status']
+        if transfer_status == "failure":
+            self._logger.debug("Setting ingest as transferred failed...")
+            self.__ingest_service.set_ingest_as_transferred_failed(ingest)
+            return
 
         self._logger.debug("Setting ingest as transferred...")
         try:
