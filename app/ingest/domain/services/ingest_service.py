@@ -82,19 +82,16 @@ class IngestService:
         except (MqException, IngestSaveException) as e:
             raise TransferIngestException(ingest.package_id, str(e))
 
-    def set_ingest_as_transferred(self, ingest: Ingest, ingest_destination_path: str) -> None:
+    def set_ingest_as_transferred(self, ingest: Ingest) -> None:
         """
-        Sets an ingest as transferred by updating its status and by setting its destination path.
+        Sets an ingest as transferred by updating its status.
 
         :param ingest: Ingest to set as transferred
         :type ingest: Ingest
-        :param ingest_destination_path: Ingest destination path
-        :type ingest_destination_path: str
 
         :raises SetIngestAsTransferredException
         """
         ingest.status = IngestStatus.transferred_to_dropbox_successful
-        ingest.destination_path = ingest_destination_path
         try:
             self.__ingest_repository.save(ingest)
         except IngestSaveException as ise:

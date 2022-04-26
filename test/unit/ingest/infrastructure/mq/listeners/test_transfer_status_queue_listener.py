@@ -21,18 +21,14 @@ class TestTransferStatusQueueListener(TestCase):
         cls.TEST_INGEST = create_ingest()
         cls.TEST_PACKAGE_ID = cls.TEST_INGEST.package_id
 
-        cls.TEST_DESTINATION_PATH = "test_destination_path"
-
         cls.TEST_TRANSFER_STATUS_RECEIVED_MESSAGE_SUCCESSFUL = {
             "package_id": cls.TEST_PACKAGE_ID,
-            "transfer_status": "successful",
-            "destination_path": cls.TEST_DESTINATION_PATH
+            "transfer_status": "successful"
         }
 
         cls.TEST_TRANSFER_STATUS_RECEIVED_MESSAGE_FAILURE = {
             "package_id": cls.TEST_PACKAGE_ID,
-            "transfer_status": "failure",
-            "destination_path": cls.TEST_DESTINATION_PATH
+            "transfer_status": "failure"
         }
 
     def test_handle_received_message_successful_happy_path(self, create_subscribed_mq_connection_mock) -> None:
@@ -44,10 +40,7 @@ class TestTransferStatusQueueListener(TestCase):
 
         ingest_service_stub.get_ingest_by_package_id.assert_called_once_with(self.TEST_PACKAGE_ID)
         ingest_service_stub.set_ingest_as_transferred_failed.assert_not_called()
-        ingest_service_stub.set_ingest_as_transferred.assert_called_once_with(
-            self.TEST_INGEST,
-            self.TEST_DESTINATION_PATH
-        )
+        ingest_service_stub.set_ingest_as_transferred.assert_called_once_with(self.TEST_INGEST)
         ingest_service_stub.process_ingest.assert_called_once_with(self.TEST_INGEST)
 
     def test_handle_received_message_successful_service_raises_get_ingest_by_package_id_exception(
@@ -83,10 +76,7 @@ class TestTransferStatusQueueListener(TestCase):
 
         ingest_service_stub.get_ingest_by_package_id.assert_called_once_with(self.TEST_PACKAGE_ID)
         ingest_service_stub.set_ingest_as_transferred_failed.assert_not_called()
-        ingest_service_stub.set_ingest_as_transferred.assert_called_once_with(
-            self.TEST_INGEST,
-            self.TEST_DESTINATION_PATH
-        )
+        ingest_service_stub.set_ingest_as_transferred.assert_called_once_with(self.TEST_INGEST)
         ingest_service_stub.process_ingest.assert_not_called()
 
     def test_handle_received_message_successful_service_raises_process_ingest_exception(
@@ -103,10 +93,7 @@ class TestTransferStatusQueueListener(TestCase):
 
         ingest_service_stub.get_ingest_by_package_id.assert_called_once_with(self.TEST_PACKAGE_ID)
         ingest_service_stub.set_ingest_as_transferred_failed.assert_not_called()
-        ingest_service_stub.set_ingest_as_transferred.assert_called_once_with(
-            self.TEST_INGEST,
-            self.TEST_DESTINATION_PATH
-        )
+        ingest_service_stub.set_ingest_as_transferred.assert_called_once_with(self.TEST_INGEST)
         ingest_service_stub.process_ingest.assert_called_once_with(self.TEST_INGEST)
 
     def test_handle_received_message_failure_happy_path(self, create_subscribed_mq_connection_mock) -> None:

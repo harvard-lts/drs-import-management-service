@@ -152,8 +152,7 @@ class TestIngestService(TestCase):
             ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
         )
 
-        test_destination_path = "test_destination_path"
-        sut.set_ingest_as_transferred(self.TEST_INGEST, test_destination_path)
+        sut.set_ingest_as_transferred(self.TEST_INGEST)
 
         ingest_repository_mock.save.assert_called_once_with(
             replace(
@@ -174,7 +173,7 @@ class TestIngestService(TestCase):
         )
 
         with self.assertRaises(SetIngestAsTransferredException):
-            sut.set_ingest_as_transferred(self.TEST_INGEST, "test_destination_path")
+            sut.set_ingest_as_transferred(self.TEST_INGEST)
 
     def test_set_ingest_as_transferred_failed_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)

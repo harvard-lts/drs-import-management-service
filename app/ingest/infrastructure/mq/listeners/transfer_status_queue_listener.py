@@ -50,7 +50,7 @@ class TransferStatusQueueListener(StompListenerBase):
 
         self._logger.debug("Setting ingest as transferred...")
         try:
-            self.__ingest_service.set_ingest_as_transferred(ingest, message_body['destination_path'])
+            self.__ingest_service.set_ingest_as_transferred(ingest)
         except SetIngestAsTransferredException as e:
             self._logger.error(str(e))
             raise e
