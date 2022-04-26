@@ -22,16 +22,18 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
         try:
             message_body = json.loads(frame.body)
         except json.decoder.JSONDecodeError as e:
-            # TODO Handle exception
+            self._logger.error(str(e))
             raise e
 
         self._handle_received_message(message_body)
 
     def on_error(self, frame: Frame) -> None:
-        self._handle_received_error(frame)
+        self._logger.debug("MQ error received: " + frame.body)
 
     def on_disconnected(self) -> None:
+        self._logger.debug("Disconnected from MQ")
         if self.__reconnect_on_disconnection:
+            self._logger.debug("Reconnecting to MQ...")
             self.reconnect()
 
     def reconnect(self) -> None:
@@ -49,15 +51,6 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
 
         :param message_body: received message body
         :type message_body: dict
-        """
-
-    @abstractmethod
-    def _handle_received_error(self, frame: Frame) -> None:
-        """
-        Handles the received error by adding child listener specific logic.
-
-        :param frame: received stomp error Frame
-        :type frame: stomp.utils.Frame
         """
 
     def __create_subscribed_mq_connection(self) -> stomp.Connection:

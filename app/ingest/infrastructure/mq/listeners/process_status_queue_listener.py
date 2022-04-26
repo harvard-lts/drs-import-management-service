@@ -4,8 +4,6 @@ logic to connect to the remote MQ and listen for process status messages.
 """
 import os
 
-from stomp.utils import Frame
-
 from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
@@ -55,7 +53,3 @@ class ProcessStatusQueueListener(StompListenerBase):
         except SetIngestAsProcessedException as e:
             self._logger.error(str(e))
             raise e
-
-    def _handle_received_error(self, frame: Frame) -> None:
-        # TODO
-        pass
