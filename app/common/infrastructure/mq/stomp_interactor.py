@@ -6,6 +6,7 @@ import logging
 from abc import ABC, abstractmethod
 
 import stomp
+from tenacity import stop_after_attempt, retry_if_exception_type, retry
 
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnectionException
@@ -13,10 +14,16 @@ from app.ingest.domain.mq.exceptions.mq_connection_exception import MqConnection
 
 class StompInteractor(ABC):
     __STOMP_CONN_HEARTBEATS_MS = 40000
+    __STOMP_CONN_MAX_RETRIES = 3
 
     def __init__(self) -> None:
         self._logger = logging.getLogger()
 
+    @retry(
+        stop=stop_after_attempt(__STOMP_CONN_MAX_RETRIES),
+        retry=retry_if_exception_type(MqConnectionException),
+        reraise=True
+    )
     def _create_mq_connection(self) -> stomp.Connection:
         """
         Creates a stomp.Connection to MQ.
