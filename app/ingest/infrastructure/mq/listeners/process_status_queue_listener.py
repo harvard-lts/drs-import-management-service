@@ -7,10 +7,7 @@ import os
 from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
-from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
-from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
-from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception import \
-    SetIngestAsProcessedFailedException
+from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
 from app.ingest.domain.services.ingest_service import IngestService
 
 
@@ -34,28 +31,20 @@ class ProcessStatusQueueListener(StompListenerBase):
 
     def _handle_received_message(self, message_body: dict) -> None:
         self._logger.debug("Received message from Process Queue. Message body: " + str(message_body))
-
         package_id = message_body['package_id']
-        self._logger.debug("Obtaining ingest by the package id of the received message " + package_id + "...")
         try:
+            self._logger.debug("Obtaining ingest by the package id of the received message " + package_id + "...")
             ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
-        except GetIngestByPackageIdException as e:
-            self._logger.error(str(e))
-            raise e
 
-        transfer_status = message_body['batch_ingest_status']
-        if transfer_status == "failure":
-            self._logger.debug("Setting ingest as processed failed...")
-            try:
+            transfer_status = message_body['batch_ingest_status']
+            if transfer_status == "failure":
+                self._logger.debug("Setting ingest as processed failed...")
                 self.__ingest_service.set_ingest_as_processed_failed(ingest)
                 return
-            except SetIngestAsProcessedFailedException as e:
-                self._logger.error(str(e))
-                raise e
 
-        self._logger.debug("Setting ingest as processed...")
-        try:
+            self._logger.debug("Setting ingest as processed...")
             self.__ingest_service.set_ingest_as_processed(ingest)
-        except SetIngestAsProcessedException as e:
+
+        except IngestServiceException as e:
             self._logger.error(str(e))
             raise e
