@@ -13,7 +13,7 @@ from app.ingest.infrastructure.data.repositories.db_connection_params import DbC
 
 class MongoRepositoryBase(ABC):
     _MONGO_OPERATION_MAX_RETRIES = 2
-    __MONGO_CONN_TIMEOUT_MS = 3000
+    __MONGO_CONN_TIMEOUT_MS = 5000
 
     def __init__(self) -> None:
         self._logger = logging.getLogger()
