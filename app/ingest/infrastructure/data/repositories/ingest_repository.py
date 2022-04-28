@@ -1,8 +1,9 @@
+import logging
 import os
 from typing import Optional
 
 from pymongo.errors import PyMongoError
-from tenacity import retry, stop_after_attempt, retry_if_exception_type
+from tenacity import retry, stop_after_attempt, retry_if_exception_type, before_log
 
 from app.common.infrastructure.data.repositories.mongo_repository_base import MongoRepositoryBase
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
@@ -19,7 +20,8 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
     @retry(
         stop=stop_after_attempt(MongoRepositoryBase._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestSaveException),
-        reraise=True
+        reraise=True,
+        before=before_log(logging.getLogger(), logging.DEBUG)
     )
     def save(self, ingest: Ingest) -> None:
         try:
@@ -38,7 +40,8 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
     @retry(
         stop=stop_after_attempt(MongoRepositoryBase._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestQueryException),
-        reraise=True
+        reraise=True,
+        before=before_log(logging.getLogger(), logging.DEBUG)
     )
     def get_by_package_id(self, package_id: str) -> Optional[Ingest]:
         try:
