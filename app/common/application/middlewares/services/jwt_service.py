@@ -45,14 +45,14 @@ class JwtService:
         alg_header = jwt_token_headers.get('alg')
         if alg_header is None or alg_header != self.JWT_ENCODING_ALGORITHM:
             self.__logger.debug(
-                "Received 'alg' header: " + str(alg_header) + ". Expected: " + self.JWT_ENCODING_ALGORITHM
+                "Received 'alg' header: '" + str(alg_header) + "'. Expected: '" + self.JWT_ENCODING_ALGORITHM + "'"
             )
             return False
 
         typ_header = jwt_token_headers.get('typ')
         if typ_header is None or typ_header != self.JWT_HEADER_TYP_VALUE:
             self.__logger.debug(
-                "Received 'typ' header: " + str(typ_header) + ". Expected: " + self.JWT_HEADER_TYP_VALUE
+                "Received 'typ' header: '" + str(typ_header) + "'. Expected: '" + self.JWT_HEADER_TYP_VALUE + "'"
             )
             return False
 
@@ -60,7 +60,7 @@ class JwtService:
         jwt_header_kid_value = os.getenv('DATAVERSE_JWT_KID')
         if kid_header is None or kid_header != jwt_header_kid_value:
             self.__logger.debug(
-                "Received 'kid' header: " + str(kid_header) + ". Expected: " + jwt_header_kid_value
+                "Received 'kid' header: '" + str(kid_header) + "'. Expected: '" + jwt_header_kid_value + "'"
             )
             return False
 
