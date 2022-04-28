@@ -9,7 +9,8 @@ from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_ingest_exception import ProcessIngestException
-from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
+from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
+    SetIngestAsTransferredFailedException
 from app.ingest.domain.services.ingest_service import IngestService
 
 
@@ -45,13 +46,17 @@ class TransferStatusQueueListener(StompListenerBase):
         transfer_status = message_body['transfer_status']
         if transfer_status == "failure":
             self._logger.debug("Setting ingest as transferred failed...")
-            self.__ingest_service.set_ingest_as_transferred_failed(ingest)
-            return
+            try:
+                self.__ingest_service.set_ingest_as_transferred_failed(ingest)
+                return
+            except SetIngestAsTransferredFailedException as e:
+                self._logger.error(str(e))
+                raise e
 
         self._logger.debug("Setting ingest as transferred...")
         try:
             self.__ingest_service.set_ingest_as_transferred(ingest)
-        except SetIngestAsTransferredException as e:
+        except SetIngestAsTransferredFailedException as e:
             self._logger.error(str(e))
             raise e
 

@@ -9,6 +9,8 @@ from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
+from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception import \
+    SetIngestAsProcessedFailedException
 from app.ingest.domain.services.ingest_service import IngestService
 
 
@@ -44,8 +46,12 @@ class ProcessStatusQueueListener(StompListenerBase):
         transfer_status = message_body['batch_ingest_status']
         if transfer_status == "failure":
             self._logger.debug("Setting ingest as processed failed...")
-            self.__ingest_service.set_ingest_as_processed_failed(ingest)
-            return
+            try:
+                self.__ingest_service.set_ingest_as_processed_failed(ingest)
+                return
+            except SetIngestAsProcessedFailedException as e:
+                self._logger.error(str(e))
+                raise e
 
         self._logger.debug("Setting ingest as processed...")
         try:
