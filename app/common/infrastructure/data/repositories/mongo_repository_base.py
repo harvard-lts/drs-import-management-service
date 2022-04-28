@@ -2,7 +2,7 @@
 This module defines a MongoRepositoryBase, which is an abstract class intended
 to define common behavior for MongoDB-implemented repositories.
 """
-
+import logging
 from abc import ABC, abstractmethod
 
 from pymongo import MongoClient
@@ -12,22 +12,28 @@ from app.ingest.infrastructure.data.repositories.db_connection_params import DbC
 
 
 class MongoRepositoryBase(ABC):
+    _MONGO_OPERATION_MAX_RETRIES = 2
+    __MONGO_CONN_TIMEOUT_MS = 3000
+
+    def __init__(self) -> None:
+        self._logger = logging.getLogger()
 
     def _get_database(self) -> Database:
         """
         Retrieves a Database object by connecting to MongoDB via MongoClient
         """
         db_connection_params = self._get_db_connection_params()
+        self._logger.debug("Obtaining MongoDB client...")
         db_name = db_connection_params.db_name
         client = MongoClient(
             host=db_connection_params.db_hosts,
             port=db_connection_params.db_port,
             username=db_connection_params.db_user,
             password=db_connection_params.db_password,
-            authSource=db_name
+            authSource=db_name,
+            serverSelectionTimeoutMS=self.__MONGO_CONN_TIMEOUT_MS
         )
-        db = client[db_name]
-        return db
+        return client[db_name]
 
     @abstractmethod
     def _get_db_connection_params(self) -> DbConnectionParams:
