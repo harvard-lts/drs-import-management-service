@@ -28,7 +28,7 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
         self._handle_received_message(message_body)
 
     def on_error(self, frame: Frame) -> None:
-        self._logger.debug("MQ error received: " + frame.body)
+        self._logger.info("MQ error received: " + frame.body)
 
     def on_disconnected(self) -> None:
         self._logger.debug("Disconnected from MQ")

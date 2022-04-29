@@ -15,7 +15,7 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
 
     def publish_message(self, ingest: Ingest) -> None:
         message = self.__create_process_ready_message(ingest)
-        self._logger.debug("Publishing process ready message... Message body: " + str(message))
+        self._logger.info("Publishing process ready message... Message body: " + str(message))
         self._publish_message(message)
 
     def _get_queue_name(self) -> str:

@@ -21,18 +21,18 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
         stop=stop_after_attempt(MongoRepositoryBase._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestSaveException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.DEBUG)
+        before=before_log(logging.getLogger(), logging.INFO)
     )
     def save(self, ingest: Ingest) -> None:
         try:
-            self._logger.debug("Saving ingest with package id " + ingest.package_id + " to MongoDB...")
+            self._logger.info("Saving ingest with package id " + ingest.package_id + " to MongoDB...")
             db = self._get_database()
             db.ingests.replace_one(
                 {"package_id": ingest.package_id},
                 self.__transform_ingest_to_mongo_dict(ingest),
                 upsert=True
             )
-            self._logger.debug("Ingest with package id " + ingest.package_id + " saved")
+            self._logger.info("Ingest with package id " + ingest.package_id + " saved")
         except PyMongoError as pme:
             self._logger.error(str(pme))
             raise IngestSaveException(ingest.package_id, str(pme))
@@ -41,17 +41,17 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
         stop=stop_after_attempt(MongoRepositoryBase._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestQueryException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.DEBUG)
+        before=before_log(logging.getLogger(), logging.INFO)
     )
     def get_by_package_id(self, package_id: str) -> Optional[Ingest]:
         try:
-            self._logger.debug("Getting ingest with package id " + package_id + " from MongoDB...")
+            self._logger.info("Getting ingest with package id " + package_id + " from MongoDB...")
             db = self._get_database()
             ingest_mongo_dict = db.ingests.find_one({"package_id": package_id})
             if ingest_mongo_dict is None:
-                self._logger.debug("Ingest with package id " + package_id + " not found")
+                self._logger.info("Ingest with package id " + package_id + " not found")
                 return None
-            self._logger.debug("Ingest with package id " + package_id + " found")
+            self._logger.info("Ingest with package id " + package_id + " found")
             return self.__transform_mongo_dict_to_ingest(ingest_mongo_dict)
         except PyMongoError as pme:
             self._logger.error(str(pme))

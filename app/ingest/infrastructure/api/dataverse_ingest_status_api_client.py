@@ -28,11 +28,11 @@ class DataverseIngestStatusApiClient(IIngestStatusApiClient):
         stop=stop_after_attempt(__API_REQUEST_MAX_RETRIES),
         retry=retry_if_exception_type(ReportStatusApiClientException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.DEBUG)
+        before=before_log(logging.getLogger(), logging.INFO)
     )
     def report_status(self, package_id: str, ingest_status: IngestStatus) -> None:
         logger = logging.getLogger()
-        logger.debug("Reporting status " + ingest_status.value + " for package id " + package_id + " to Dataverse...")
+        logger.info("Reporting status " + ingest_status.value + " for package id " + package_id + " to Dataverse...")
         try:
             dataverse_base_url = os.getenv('DATAVERSE_BASE_URL')
             logger.debug("Dataverse base url: " + dataverse_base_url)

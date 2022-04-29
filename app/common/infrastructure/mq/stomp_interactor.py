@@ -24,7 +24,7 @@ class StompInteractor(ABC):
         stop=stop_after_attempt(__STOMP_CONN_MAX_RETRIES),
         retry=retry_if_exception_type(MqConnectionException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.DEBUG)
+        before=before_log(logging.getLogger(), logging.INFO)
     )
     def _create_mq_connection(self) -> stomp.Connection:
         """

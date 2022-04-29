@@ -15,7 +15,7 @@ class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBa
 
     def publish_message(self, ingest: Ingest) -> None:
         message = self.__create_transfer_ready_message(ingest)
-        self._logger.debug("Publishing transfer ready message... Message body: " + str(message))
+        self._logger.info("Publishing transfer ready message... Message body: " + str(message))
         self._publish_message(message)
 
     def _get_queue_name(self) -> str:

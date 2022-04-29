@@ -30,19 +30,19 @@ class ProcessStatusQueueListener(StompListenerBase):
         )
 
     def _handle_received_message(self, message_body: dict) -> None:
-        self._logger.debug("Received message from Process Queue. Message body: " + str(message_body))
+        self._logger.info("Received message from Process Queue. Message body: " + str(message_body))
         package_id = message_body['package_id']
         try:
-            self._logger.debug("Obtaining ingest by the package id of the received message " + package_id + "...")
+            self._logger.info("Obtaining ingest by the package id of the received message " + package_id + "...")
             ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
 
             transfer_status = message_body['batch_ingest_status']
             if transfer_status == "failure":
-                self._logger.debug("Setting ingest as processed failed...")
+                self._logger.info("Setting ingest as processed failed...")
                 self.__ingest_service.set_ingest_as_processed_failed(ingest)
                 return
 
-            self._logger.debug("Setting ingest as processed...")
+            self._logger.info("Setting ingest as processed...")
             self.__ingest_service.set_ingest_as_processed(ingest)
 
         except IngestServiceException as e:
