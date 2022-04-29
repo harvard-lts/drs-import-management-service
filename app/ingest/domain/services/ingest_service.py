@@ -15,7 +15,11 @@ from app.ingest.domain.repositories.ingest_repository import IIngestRepository
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_ingest_exception import ProcessIngestException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
+from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception import \
+    SetIngestAsProcessedFailedException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
+from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
+    SetIngestAsTransferredFailedException
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
 
 
@@ -78,23 +82,36 @@ class IngestService:
         except (MqException, IngestSaveException) as e:
             raise TransferIngestException(ingest.package_id, str(e))
 
-    def set_ingest_as_transferred(self, ingest: Ingest, ingest_destination_path: str) -> None:
+    def set_ingest_as_transferred(self, ingest: Ingest) -> None:
         """
-        Sets an ingest as transferred by updating its status and by setting its destination path.
+        Sets an ingest as transferred by updating its status.
 
         :param ingest: Ingest to set as transferred
         :type ingest: Ingest
-        :param ingest_destination_path: Ingest destination path
-        :type ingest_destination_path: str
 
         :raises SetIngestAsTransferredException
         """
+        ingest.status = IngestStatus.transferred_to_dropbox_successful
         try:
-            ingest.status = IngestStatus.transferred_to_dropbox_successful
-            ingest.destination_path = ingest_destination_path
             self.__ingest_repository.save(ingest)
         except IngestSaveException as ise:
             raise SetIngestAsTransferredException(ingest.package_id, str(ise))
+
+    def set_ingest_as_transferred_failed(self, ingest: Ingest) -> None:
+        """
+        Sets an ingest as transferred failed by reporting and updating its status.
+
+        :param ingest: Ingest to report and update as transferred failed
+        :type ingest: Ingest
+
+        :raises SetIngestAsTransferredFailedException
+        """
+        ingest.status = IngestStatus.transferred_to_dropbox_failed
+        try:
+            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
+            self.__ingest_repository.save(ingest)
+        except (ReportStatusApiClientException, IngestSaveException) as e:
+            raise SetIngestAsTransferredFailedException(ingest.package_id, str(e))
 
     def process_ingest(self, ingest: Ingest) -> None:
         """
@@ -128,3 +145,19 @@ class IngestService:
             self.__ingest_repository.save(ingest)
         except (ReportStatusApiClientException, IngestSaveException) as e:
             raise SetIngestAsProcessedException(ingest.package_id, str(e))
+
+    def set_ingest_as_processed_failed(self, ingest: Ingest) -> None:
+        """
+        Sets an ingest as processed failed by reporting and updating its status.
+
+        :param ingest: Ingest to report and update as processed failed
+        :type ingest: Ingest
+
+        :raises SetIngestAsProcessedFailedException
+        """
+        ingest.status = IngestStatus.batch_ingest_failed
+        try:
+            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
+            self.__ingest_repository.save(ingest)
+        except (ReportStatusApiClientException, IngestSaveException) as e:
+            raise SetIngestAsProcessedFailedException(ingest.package_id, str(e))

@@ -4,14 +4,11 @@ logic to connect to the remote MQ and listen for process status messages.
 """
 import os
 
-from stomp.utils import Frame
-
-from app.containers import Services
-from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
-from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
-from app.ingest.domain.services.ingest_service import IngestService
 from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
+from app.containers import Services
+from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
+from app.ingest.domain.services.ingest_service import IngestService
 
 
 class ProcessStatusQueueListener(StompListenerBase):
@@ -33,22 +30,21 @@ class ProcessStatusQueueListener(StompListenerBase):
         )
 
     def _handle_received_message(self, message_body: dict) -> None:
-        # TODO Handle batch_ingest_status: Currently only considered successful
-
-        # TODO Fake ingest until MongoDB persistence is implemented
-        # https://github.com/harvard-lts/HDC/issues/104
+        self._logger.info("Received message from Process Queue. Message body: " + str(message_body))
+        package_id = message_body['package_id']
         try:
-            ingest = self.__ingest_service.get_ingest_by_package_id(message_body['package_id'])
-        except GetIngestByPackageIdException as e:
-            # TODO Handle exception
-            raise e
+            self._logger.info("Obtaining ingest by the package id of the received message " + package_id + "...")
+            ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
 
-        try:
+            transfer_status = message_body['batch_ingest_status']
+            if transfer_status == "failure":
+                self._logger.info("Setting ingest as processed failed...")
+                self.__ingest_service.set_ingest_as_processed_failed(ingest)
+                return
+
+            self._logger.info("Setting ingest as processed...")
             self.__ingest_service.set_ingest_as_processed(ingest)
-        except SetIngestAsProcessedException as e:
-            # TODO Handle exception
-            raise e
 
-    def _handle_received_error(self, frame: Frame) -> None:
-        # TODO
-        pass
+        except IngestServiceException as e:
+            self._logger.error(str(e))
+            raise e

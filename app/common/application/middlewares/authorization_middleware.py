@@ -6,8 +6,8 @@ from typing import Any, Callable
 
 from flask import Flask, Response, Request
 
-from app.common.application.response_status import ResponseStatus
 from app.common.application.middlewares.services.jwt_service import JwtService
+from app.common.application.response_status import ResponseStatus
 
 
 class AuthorizationMiddleware:
@@ -22,17 +22,17 @@ class AuthorizationMiddleware:
 
     def __call__(self, environ: dict, start_response: Callable) -> Any:
         logger = logging.getLogger()
-        logger.debug("Request entered in authorization middleware")
+        logger.info("Request entered in authorization middleware")
 
         request = Request(environ)
 
         if request.path == "/health":
-            logger.debug("Authorization skipped for endpoint " + request.path)
+            logger.info("Authorization skipped for endpoint " + request.path)
             return self.__app(environ, start_response)
 
-        logger.debug("Obtaining request body...")
+        logger.info("Obtaining request body...")
         request_body_str = self.__get_request_body_from_environ(environ)
-        logger.debug("Request body: " + request_body_str)
+        logger.info("Request body: " + request_body_str)
 
         try:
             request_body = json.loads(request_body_str)
@@ -52,12 +52,12 @@ class AuthorizationMiddleware:
                 environ,
                 start_response
             )
-        logger.debug("Authorization header: " + authorization_header)
+        logger.info("Authorization header: " + authorization_header)
 
         # Obtaining JWT token by removing "Bearer " prefix from the header value
         jwt_token = authorization_header[7:]
 
-        logger.debug("Validating JWT token...")
+        logger.info("Validating JWT token...")
         jwt_service = JwtService()
         if not jwt_service.validate_jwt_token(
                 jwt_token=jwt_token,

@@ -3,10 +3,11 @@ This module defines a DataverseIngestStatusApiClient, an implementation of IInge
 includes the necessary logic to connect to a remote Dataverse instance API and report an ingest status.
 """
 
+import logging
 import os
-from logging import getLogger
 
 from requests import exceptions, put, HTTPError
+from tenacity import retry_if_exception_type, stop_after_attempt, retry, before_log
 
 from app.ingest.domain.api.exceptions.report_status_api_client_exception import ReportStatusApiClientException
 from app.ingest.domain.api.ingest_status_api_client import IIngestStatusApiClient
@@ -17,26 +18,33 @@ from app.ingest.infrastructure.api.exceptions.transform_package_id_exception imp
 
 # TODO: Integration tests
 class DataverseIngestStatusApiClient(IIngestStatusApiClient):
-    API_ENDPOINT = "/api/datasets/submitDatasetVersionToArchive/:persistentId/{version}/status?persistentId=doi:{doi}"
+    __API_ENDPOINT = "/api/datasets/submitDatasetVersionToArchive/:persistentId/{version}/status?persistentId=doi:{doi}"
+    __API_REQUEST_MAX_RETRIES = 2
 
     def __init__(self, dataverse_params_transformer: DataverseParamsTransformer) -> None:
         self.__dataverse_params_transformer = dataverse_params_transformer
 
+    @retry(
+        stop=stop_after_attempt(__API_REQUEST_MAX_RETRIES),
+        retry=retry_if_exception_type(ReportStatusApiClientException),
+        reraise=True,
+        before=before_log(logging.getLogger(), logging.INFO)
+    )
     def report_status(self, package_id: str, ingest_status: IngestStatus) -> None:
-        logging = getLogger()
-        logging.debug("Reporting status " + ingest_status.value + " for package id " + package_id + " to Dataverse...")
+        logger = logging.getLogger()
+        logger.info("Reporting status " + ingest_status.value + " for package id " + package_id + " to Dataverse...")
         try:
             dataverse_base_url = os.getenv('DATAVERSE_BASE_URL')
-            logging.debug("Dataverse base url: " + dataverse_base_url)
+            logger.debug("Dataverse base url: " + dataverse_base_url)
 
             doi, version = self.__dataverse_params_transformer.transform_package_id_to_dataverse_params(package_id)
-            formatted_api_endpoint = self.API_ENDPOINT.format(version=version, doi=doi)
-            logging.debug("API endpoint: " + formatted_api_endpoint)
+            formatted_api_endpoint = self.__API_ENDPOINT.format(version=version, doi=doi)
+            logger.debug("API endpoint: " + formatted_api_endpoint)
 
             request_body = self.__create_request_body(ingest_status)
-            logging.debug("Request body: " + request_body)
+            logger.debug("Request body: " + request_body)
 
-            logging.debug("Executing PUT operation...")
+            logger.debug("Executing PUT operation...")
             response = put(
                 url=f"{dataverse_base_url}{formatted_api_endpoint}",
                 data=request_body,
