@@ -30,8 +30,8 @@ class JwtService:
         self.__logger.debug("Obtaining JWT token body...")
         try:
             jwt_token_body = self.__decode_jwt_token(jwt_token)
-        except InvalidTokenError as ite:
-            self.__logger.debug("JWT token is invalid: " + str(ite))
+        except (InvalidTokenError, OSError, ValueError) as e:
+            self.__logger.debug("JWT token is invalid: " + str(e))
             return False
 
         self.__logger.debug("Validating JWT token body...")
@@ -67,7 +67,9 @@ class JwtService:
         return True
 
     def __decode_jwt_token(self, jwt_token: str) -> dict:
-        jwt_public_key = os.getenv('DATAVERSE_JWT_PUBLIC_KEY')
+        with open(os.getenv('DATAVERSE_JWT_PUBLIC_KEY_FILE_PATH')) as f:
+            jwt_public_key = f.read()
+
         return jwt.decode(
             jwt=jwt_token,
             key=jwt_public_key,
