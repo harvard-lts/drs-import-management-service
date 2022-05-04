@@ -33,7 +33,7 @@ class JwtService:
         try:
             jwt_token_body = self.__decode_jwt_token(jwt_token)
         except Exception as e:
-            self.__logger.debug("JWT token is invalid: " + str(e))
+            self.__logger.debug("Error while obtaining JWT token body: " + str(e))
             return False
 
         self.__logger.debug("Validating JWT token body...")
