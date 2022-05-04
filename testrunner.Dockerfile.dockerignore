@@ -1,8 +1,9 @@
 # Ignore everything
 **
 
-# ... except for dependencies, .env file, source and tests
+# ... except for dependencies, .env file, .git, source and tests
 !.env
+!.git
 !requirements.txt
 !app/
 !test/

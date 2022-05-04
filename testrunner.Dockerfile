@@ -9,3 +9,5 @@ USER dimsuser
 
 COPY . /home/dimsuser/
 RUN pip install -r requirements.txt
+
+ENV GIT_PYTHON_REFRESH=quiet
