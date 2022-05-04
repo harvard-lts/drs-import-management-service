@@ -5,6 +5,9 @@ from os.path import join, dirname
 from unittest import TestCase
 
 import jwt
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric.types import PRIVATE_KEY_TYPES
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from dotenv import load_dotenv
 from flask import Response
 from flask.testing import FlaskClient
@@ -189,8 +192,9 @@ class TestFlaskApp(TestCase):
         if kid is None:
             kid = os.getenv('DATAVERSE_JWT_KID')
 
+        jwt_private_key = self.__get_test_jwt_private_key()
         return "Bearer " + jwt.encode(
-            key=os.getenv('DATAVERSE_JWT_PRIVATE_KEY'),
+            key=jwt_private_key,
             payload={
                 "iss": issuer,
                 "bodySHA256Hash": self.TEST_INGEST_REQUEST_BODY_CANONICAL_HASH,
@@ -204,6 +208,12 @@ class TestFlaskApp(TestCase):
                 "kid": kid
             }
         )
+
+    def __get_test_jwt_private_key(self) -> PRIVATE_KEY_TYPES:
+        with open(os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH'), "rb") as key_file:
+            key = key_file.read()
+        jwt_private_key = load_pem_private_key(key, None, default_backend())
+        return jwt_private_key
 
     def __assert_invalid_authorization_token_response(self, response: Response) -> None:
         actual_response_status_code = response.status_code
