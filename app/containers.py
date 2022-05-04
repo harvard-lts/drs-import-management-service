@@ -7,11 +7,15 @@ from app.ingest.infrastructure.api.dataverse_params_transformer import Dataverse
 from app.ingest.infrastructure.data.repositories.ingest_repository import IngestRepository
 from app.ingest.infrastructure.mq.publishers.process_ready_queue_publisher import ProcessReadyQueuePublisher
 from app.ingest.infrastructure.mq.publishers.transfer_ready_queue_publisher import TransferReadyQueuePublisher
+from app.ingest.application.controllers.services.git_service import GitService
 
 
 class Controllers(containers.DeclarativeContainer):
     error_response_serializer = providers.Factory(
         ErrorResponseSerializer
+    )
+    git_service = providers.Factory(
+        GitService
     )
 
 

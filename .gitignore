@@ -18,8 +18,9 @@ __pycache__/
 # for Nginx
 webapp.conf
 
-# JWT Keys just in case they happen later
+# JWT Keys
 jwtkeys.py
+*.key
 
 # Editor configs
 *.editorconfig
