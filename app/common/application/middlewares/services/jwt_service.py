@@ -4,6 +4,8 @@ import os
 
 import jcs
 import jwt
+from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from jwt import InvalidTokenError
 
 
@@ -30,7 +32,7 @@ class JwtService:
         self.__logger.debug("Obtaining JWT token body...")
         try:
             jwt_token_body = self.__decode_jwt_token(jwt_token)
-        except (InvalidTokenError, OSError, ValueError) as e:
+        except Exception as e:
             self.__logger.debug("JWT token is invalid: " + str(e))
             return False
 
@@ -67,14 +69,22 @@ class JwtService:
         return True
 
     def __decode_jwt_token(self, jwt_token: str) -> dict:
-        with open(os.getenv('DATAVERSE_JWT_PUBLIC_KEY_FILE_PATH')) as f:
-            jwt_public_key = f.read()
-
+        jwt_public_key = self.__get_jwt_public_key()
         return jwt.decode(
             jwt=jwt_token,
             key=jwt_public_key,
             algorithms=[self.JWT_ENCODING_ALGORITHM]
         )
+
+    def __get_jwt_public_key(self) -> PUBLIC_KEY_TYPES:
+        self.__logger.debug("Obtaining JWT public key from file...")
+        with open(os.getenv('DATAVERSE_JWT_PUBLIC_KEY_FILE_PATH'), "rb") as key_file:
+            key = key_file.read()
+
+        self.__logger.debug("Loading JWT public key...")
+        jwt_public_key = load_pem_public_key(key)
+
+        return jwt_public_key
 
     def __validate_jwt_token_body(self, jwt_token_body: dict, request_body: dict, request_body_encoding: str) -> bool:
         issuer = jwt_token_body.get('iss')
