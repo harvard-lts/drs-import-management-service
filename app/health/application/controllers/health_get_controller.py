@@ -13,4 +13,4 @@ class HealthGetController:
         self.__git_service = git_service
 
     def __call__(self) -> Tuple[str, int]:
-        return "OK!" + " " + GitService().get_commit_hash(), 200
+        return "OK!" + " " + self.__git_service.get_commit_hash(), 200
