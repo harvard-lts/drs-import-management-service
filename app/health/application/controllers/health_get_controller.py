@@ -1,7 +1,9 @@
 from typing import Tuple
 
-from app.ingest.application.controllers.services.git_service import GitService
 from app.containers import Controllers
+from app.health.application.controllers.services.exceptions.get_current_commit_hash_exception import \
+    GetCurrentCommitHashException
+from app.health.application.controllers.services.git_service import GitService
 
 
 class HealthGetController:
@@ -13,4 +15,8 @@ class HealthGetController:
         self.__git_service = git_service
 
     def __call__(self) -> Tuple[str, int]:
-        return "OK!" + " " + self.__git_service.get_commit_hash(), 200
+        try:
+            return "OK!" + " " + self.__git_service.get_current_commit_hash(), 200
+        except GetCurrentCommitHashException as e:
+            # TODO: Actual response
+            return "NO OK!" + " " + str(e), 500
