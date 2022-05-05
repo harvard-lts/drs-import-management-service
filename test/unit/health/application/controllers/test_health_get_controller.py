@@ -11,6 +11,10 @@ from app.health.application.controllers.services.git_service import GitService
 
 class TestHealthGetController(TestCase):
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.REQUEST_ENDPOINT = "/health"
+
     def setUp(self) -> None:
         self.app = flask.Flask(__name__)
 
@@ -19,7 +23,7 @@ class TestHealthGetController(TestCase):
         git_service_stub.get_current_commit_hash.return_value = "test"
         sut = HealthGetController(git_service=git_service_stub)
 
-        with self.app.test_request_context("/health"):
+        with self.app.test_request_context(self.REQUEST_ENDPOINT):
             actual_response_body, actual_response_http_code = sut.__call__()
 
         git_service_stub.get_current_commit_hash.assert_called_once()
@@ -35,7 +39,7 @@ class TestHealthGetController(TestCase):
         git_service_stub.get_current_commit_hash.side_effect = GetCurrentCommitHashException("test")
         sut = HealthGetController(git_service=git_service_stub)
 
-        with self.app.test_request_context("/health"):
+        with self.app.test_request_context(self.REQUEST_ENDPOINT):
             actual_response_body, actual_response_http_code = sut.__call__()
 
         git_service_stub.get_current_commit_hash.assert_called_once()
