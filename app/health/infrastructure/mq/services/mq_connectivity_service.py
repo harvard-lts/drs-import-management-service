@@ -2,7 +2,7 @@ from typing import Tuple
 
 from healthcheck import HealthCheck
 
-from app.health.application.controllers.services.connectivity_service import ConnectivityService
+from app.health.infrastructure.connectivity_service import ConnectivityService
 
 
 class MqConnectivityService(ConnectivityService):

@@ -3,10 +3,10 @@ from typing import Tuple
 from healthcheck import HealthCheck
 
 from app.containers import Controllers
-from app.health.application.controllers.services.compound_connectivity_service import CompoundConnectivityService
 from app.health.application.controllers.services.exceptions.get_current_commit_hash_exception import \
     GetCurrentCommitHashException
 from app.health.application.controllers.services.git_service import GitService
+from app.health.infrastructure.compound_connectivity_service import CompoundConnectivityService
 
 
 class HealthGetController:

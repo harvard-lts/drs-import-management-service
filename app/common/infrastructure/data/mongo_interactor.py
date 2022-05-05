@@ -1,17 +1,18 @@
 """
-This module defines a MongoRepositoryBase, which is an abstract class intended
-to define common behavior for MongoDB-implemented repositories.
+This module defines a MongoInteractor, which is an abstract class intended
+to define common behavior for MongoDB-implemented components.
 """
 import logging
-from abc import ABC, abstractmethod
+import os
+from abc import ABC
 
 from pymongo import MongoClient
 from pymongo.database import Database
 
-from app.ingest.infrastructure.data.repositories.db_connection_params import DbConnectionParams
+from app.common.infrastructure.data.repositories.db_connection_params import DbConnectionParams
 
 
-class MongoRepositoryBase(ABC):
+class MongoInteractor(ABC):
     _MONGO_OPERATION_MAX_RETRIES = 2
     __MONGO_CONN_TIMEOUT_MS = 5000
 
@@ -22,7 +23,7 @@ class MongoRepositoryBase(ABC):
         """
         Retrieves a Database object by connecting to MongoDB via MongoClient
         """
-        db_connection_params = self._get_db_connection_params()
+        db_connection_params = self.__get_db_connection_params()
         self._logger.debug("Obtaining MongoDB client...")
         db_name = db_connection_params.db_name
         client = MongoClient(
@@ -35,8 +36,14 @@ class MongoRepositoryBase(ABC):
         )
         return client[db_name]
 
-    @abstractmethod
-    def _get_db_connection_params(self) -> DbConnectionParams:
+    def __get_db_connection_params(self) -> DbConnectionParams:
         """
         Retrieves the DB connection params necessary for creating the connection
         """
+        return DbConnectionParams(
+            db_hosts=[os.getenv('MONGODB_HOST_1'), os.getenv('MONGODB_HOST_2'), os.getenv('MONGODB_HOST_3')],
+            db_port=int(os.getenv('MONGODB_PORT')),
+            db_name=os.getenv('MONGODB_DB_NAME'),
+            db_user=os.getenv('MONGODB_USER'),
+            db_password=os.getenv('MONGODB_PASSWORD'),
+        )

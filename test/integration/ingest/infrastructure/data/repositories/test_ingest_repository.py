@@ -1,7 +1,7 @@
 import os
 from dataclasses import replace
 
-from app.ingest.infrastructure.data.repositories.db_connection_params import DbConnectionParams
+from common.infrastructure.data.repositories.db_connection_params import DbConnectionParams
 from app.ingest.infrastructure.data.repositories.ingest_repository import IngestRepository
 from test.integration.common.infrastructure.data.repositories.mongo_integration_test_base import \
     MongoIntegrationTestBase

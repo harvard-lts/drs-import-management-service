@@ -1,9 +1,9 @@
 from healthcheck import HealthCheck
 
-from app.health.application.controllers.services.connectivity_service import ConnectivityService
-from app.health.application.controllers.services.dataverse_connectivity_service import DataverseConnectivityService
-from app.health.application.controllers.services.db_connectivity_service import DbConnectivityService
-from app.health.application.controllers.services.mq_connectivity_service import MqConnectivityService
+from app.health.infrastructure.connectivity_service import ConnectivityService
+from app.health.infrastructure.data.services.db_connectivity_service import DbConnectivityService
+from app.health.infrastructure.dataverse.services.dataverse_connectivity_service import DataverseConnectivityService
+from app.health.infrastructure.mq.services.mq_connectivity_service import MqConnectivityService
 
 
 class CompoundConnectivityService(ConnectivityService):
