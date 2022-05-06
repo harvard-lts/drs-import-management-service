@@ -14,19 +14,18 @@ class MqTransferConnectivityService(ConnectivityService, StompInteractor):
     __MQ_TRANSFER_CONN_KO_MESSAGE = "MQ Transfer connection KO"
 
     def create_connectivity_check(self, health_check: HealthCheck) -> None:
+        health_check.add_check(self.check_mq_transfer_connection)
+
+    def check_mq_transfer_connection(self) -> Tuple[bool, str]:
         self._logger.info("Checking MQ Transfer connectivity...")
-
-        def check_mq_transfer_connection() -> Tuple[bool, str]:
-            try:
-                mq_connection = self._create_mq_connection()
-                mq_connection.disconnect()
-                self._logger.info(self.__MQ_TRANSFER_CONN_OK_MESSAGE)
-                return True, self.__MQ_TRANSFER_CONN_OK_MESSAGE
-            except MqConnectionException:
-                self._logger.info(self.__MQ_TRANSFER_CONN_KO_MESSAGE)
-                return False, self.__MQ_TRANSFER_CONN_OK_MESSAGE
-
-        health_check.add_check(check_mq_transfer_connection)
+        try:
+            mq_connection = self._create_mq_connection()
+            mq_connection.disconnect()
+            self._logger.info(self.__MQ_TRANSFER_CONN_OK_MESSAGE)
+            return True, self.__MQ_TRANSFER_CONN_OK_MESSAGE
+        except MqConnectionException:
+            self._logger.info(self.__MQ_TRANSFER_CONN_KO_MESSAGE)
+            return False, self.__MQ_TRANSFER_CONN_OK_MESSAGE
 
     def _get_mq_connection_params(self) -> MqConnectionParams:
         return MqConnectionParams(
