@@ -3,10 +3,10 @@ from typing import Tuple, Dict
 from flask import request
 
 from app.common.application.controllers.responses.error_response_serializer import ErrorResponseSerializer
-from app.common.application.controllers.responses.transfer_ingest_error_response import \
-    TransferIngestErrorResponse
 from app.common.application.response_status import ResponseStatus
 from app.containers import Services, Controllers
+from app.ingest.application.controllers.responses.transfer_ingest_error_response import \
+    TransferIngestErrorResponse
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -44,7 +44,8 @@ class IngestPostController:
             self.__ingest_service.transfer_ingest(new_ingest)
         except TransferIngestException as tie:
             return self.__error_response_serializer.serialize(
-                TransferIngestErrorResponse(message=str(tie)))
+                TransferIngestErrorResponse(message=str(tie))
+            )
 
         return {
                    "package_id": new_ingest.package_id,

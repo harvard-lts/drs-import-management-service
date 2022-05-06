@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pymongo import MongoClient
 from pymongo.database import Database
 
-from common.infrastructure.data.repositories.db_connection_params import DbConnectionParams
+from app.common.infrastructure.data.repositories.db_connection_params import DbConnectionParams
 from test.integration.integration_test_base import IntegrationTestBase
 
 
