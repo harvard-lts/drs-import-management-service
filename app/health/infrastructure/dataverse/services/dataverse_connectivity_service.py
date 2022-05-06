@@ -22,7 +22,7 @@ class DataverseConnectivityService(ConnectivityService):
             dataverse_base_url = os.getenv('DATAVERSE_BASE_URL')
             logger.debug("Dataverse base url: " + dataverse_base_url)
             logger.debug("Executing GET operation...")
-            get(url=f"{dataverse_base_url}")
+            get(url=dataverse_base_url)
             logger.info(self.__DATAVERSE_CONN_OK_MESSAGE)
             return True, self.__DATAVERSE_CONN_OK_MESSAGE
         except (exceptions.ConnectionError, HTTPError) as e:

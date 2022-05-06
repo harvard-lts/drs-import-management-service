@@ -24,7 +24,7 @@ class TestHealthGetController(TestCase):
         "app.health.application.controllers.health_get_controller.HealthGetController."
         "_HealthGetController__execute_health_check"
     )
-    def test_call_happy_path(self, execute_health_check_mock) -> None:
+    def test_call_happy_path(self, execute_health_check_stub) -> None:
         git_service_stub = Mock(spec=GitService)
         git_service_stub.get_current_commit_hash.return_value = "test"
 
@@ -36,7 +36,7 @@ class TestHealthGetController(TestCase):
         test_response_message = "test"
         test_response_code = 200
         test_response_headers = {}
-        execute_health_check_mock.return_value = test_response_message, test_response_code, test_response_headers
+        execute_health_check_stub.return_value = test_response_message, test_response_code, test_response_headers
 
         with self.app.test_request_context(self.REQUEST_ENDPOINT):
             actual_response_message, actual_response_status, actual_response_headers = sut.__call__()
