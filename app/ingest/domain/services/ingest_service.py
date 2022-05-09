@@ -2,11 +2,11 @@
 This module defines an IngestService, which is a domain service that defines ingesting operations.
 """
 
+from app.common.domain.mq.exceptions.mq_exception import MqException
 from app.ingest.domain.api.exceptions.report_status_api_client_exception import ReportStatusApiClientException
 from app.ingest.domain.api.ingest_status_api_client import IIngestStatusApiClient
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
-from app.ingest.domain.mq.exceptions.mq_exception import MqException
 from app.ingest.domain.mq.process_ready_queue_publisher import IProcessReadyQueuePublisher
 from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
 from app.ingest.domain.repositories.exceptions.ingest_query_exception import IngestQueryException
