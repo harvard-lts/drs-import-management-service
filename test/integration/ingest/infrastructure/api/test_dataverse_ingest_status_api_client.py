@@ -26,6 +26,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.__dataverse_base_url = os.getenv('DATAVERSE_BASE_URL')
         self.__persistent_id = None
         self.__dataset_id = None
         self.__create_test_resources()
@@ -55,7 +56,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         )
 
         response = get(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{get_dataset_status_api_endpoint}",
+            url=f"{self.__dataverse_base_url}{get_dataset_status_api_endpoint}",
             headers=self.__create_request_headers(),
         )
 
@@ -73,7 +74,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
             request_body = file.read()
 
         post(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{self.API_DATAVERSE_CREATE_ENDPOINT}",
+            url=f"{self.__dataverse_base_url}{self.API_DATAVERSE_CREATE_ENDPOINT}",
             data=request_body,
             headers=self.__create_request_headers(),
         )
@@ -84,7 +85,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         )
 
         post(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{publish_dataverse_api_endpoint}",
+            url=f"{self.__dataverse_base_url}{publish_dataverse_api_endpoint}",
             headers=self.__create_request_headers(),
         )
 
@@ -97,7 +98,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
             request_body = file.read()
 
         response = post(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{create_dataset_api_endpoint}",
+            url=f"{self.__dataverse_base_url}{create_dataset_api_endpoint}",
             data=request_body,
             headers=self.__create_request_headers(),
         )
@@ -112,7 +113,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         )
 
         post(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{publish_dataset_api_endpoint}",
+            url=f"{self.__dataverse_base_url}{publish_dataset_api_endpoint}",
             headers=self.__create_request_headers(),
         )
 
@@ -126,7 +127,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         )
 
         delete(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{delete_dataset_api_endpoint}",
+            url=f"{self.__dataverse_base_url}{delete_dataset_api_endpoint}",
             headers=self.__create_request_headers(),
         )
 
@@ -136,7 +137,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         )
 
         delete(
-            url=f"{os.getenv('DATAVERSE_BASE_URL')}{delete_dataverse_api_endpoint}",
+            url=f"{self.__dataverse_base_url}{delete_dataverse_api_endpoint}",
             headers=self.__create_request_headers(),
         )
 
