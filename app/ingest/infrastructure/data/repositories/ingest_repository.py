@@ -1,24 +1,22 @@
 import logging
-import os
 from typing import Optional
 
 from pymongo.errors import PyMongoError
 from tenacity import retry, stop_after_attempt, retry_if_exception_type, before_log
 
-from app.common.infrastructure.data.repositories.mongo_repository_base import MongoRepositoryBase
+from app.common.infrastructure.data.mongo_interactor import MongoInteractor
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.domain.repositories.exceptions.ingest_query_exception import IngestQueryException
 from app.ingest.domain.repositories.exceptions.ingest_save_exception import IngestSaveException
 from app.ingest.domain.repositories.ingest_repository import IIngestRepository
-from app.ingest.infrastructure.data.repositories.db_connection_params import DbConnectionParams
 
 
-class IngestRepository(IIngestRepository, MongoRepositoryBase):
+class IngestRepository(IIngestRepository, MongoInteractor):
 
     @retry(
-        stop=stop_after_attempt(MongoRepositoryBase._MONGO_OPERATION_MAX_RETRIES),
+        stop=stop_after_attempt(MongoInteractor._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestSaveException),
         reraise=True,
         before=before_log(logging.getLogger(), logging.INFO)
@@ -38,7 +36,7 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
             raise IngestSaveException(ingest.package_id, str(pme))
 
     @retry(
-        stop=stop_after_attempt(MongoRepositoryBase._MONGO_OPERATION_MAX_RETRIES),
+        stop=stop_after_attempt(MongoInteractor._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestQueryException),
         reraise=True,
         before=before_log(logging.getLogger(), logging.INFO)
@@ -56,15 +54,6 @@ class IngestRepository(IIngestRepository, MongoRepositoryBase):
         except PyMongoError as pme:
             self._logger.error(str(pme))
             raise IngestQueryException(package_id, str(pme))
-
-    def _get_db_connection_params(self) -> DbConnectionParams:
-        return DbConnectionParams(
-            db_hosts=[os.getenv('MONGODB_HOST_1'), os.getenv('MONGODB_HOST_2'), os.getenv('MONGODB_HOST_3')],
-            db_port=int(os.getenv('MONGODB_PORT')),
-            db_name=os.getenv('MONGODB_DB_NAME'),
-            db_user=os.getenv('MONGODB_USER'),
-            db_password=os.getenv('MONGODB_PASSWORD'),
-        )
 
     def __transform_ingest_to_mongo_dict(self, ingest: Ingest) -> dict:
         return {

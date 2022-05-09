@@ -3,6 +3,7 @@ import os
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask
+from requests import Response
 
 from app.drs_import_management_service_app import DrsImportManagementServiceApp
 from config import config
@@ -20,7 +21,20 @@ def create_app(config_name: str = 'default') -> Flask:
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    return DrsImportManagementServiceApp(__name__).app
+    app = DrsImportManagementServiceApp(__name__).app
+    disable_cached_responses(app)
+
+    return app
+
+
+def disable_cached_responses(app: Flask) -> None:
+    @app.after_request
+    def add_response_headers(response: Response) -> Response:
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        response.headers['Cache-Control'] = 'public, max-age=0'
+        return response
 
 
 def configure_logger() -> None:
