@@ -13,5 +13,6 @@ def create_ingest() -> Ingest:
             "test_admin_metadata_field_2": "test"
         },
         status=IngestStatus.pending_transfer_to_dropbox,
-        depositing_application=DepositingApplication.Dataverse
+        depositing_application=DepositingApplication.Dataverse,
+        drs_url=None
     )

@@ -62,7 +62,8 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             "s3_bucket_name": ingest.s3_bucket_name,
             "admin_metadata": ingest.admin_metadata,
             "status": ingest.status.value,
-            "depositing_application": ingest.depositing_application.value
+            "depositing_application": ingest.depositing_application.value,
+            "drs_url": ingest.drs_url
         }
 
     def __transform_mongo_dict_to_ingest(self, mongo_dict: dict) -> Ingest:
@@ -72,5 +73,6 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             s3_bucket_name=mongo_dict["s3_bucket_name"],
             admin_metadata=mongo_dict["admin_metadata"],
             status=IngestStatus[mongo_dict["status"]],
-            depositing_application=DepositingApplication[mongo_dict["depositing_application"]]
+            depositing_application=DepositingApplication[mongo_dict["depositing_application"]],
+            drs_url=mongo_dict.get("drs_url", None)
         )

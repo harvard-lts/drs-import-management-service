@@ -36,8 +36,8 @@ class IngestPostController:
             s3_bucket_name=s3_bucket_name,
             admin_metadata=admin_metadata,
             status=IngestStatus.pending_transfer_to_dropbox,
-            # TODO: Obtain depositing application name from request data
-            depositing_application=DepositingApplication.Dataverse
+            depositing_application=DepositingApplication.Dataverse,
+            drs_url=None
         )
 
         try:

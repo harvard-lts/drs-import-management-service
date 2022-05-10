@@ -49,6 +49,10 @@
         "ePADD"
       ],
       "description": "The name of the application making the deposit"
+    },
+    "drs_url": {
+      "bsonType": "string",
+      "description": "DRS URL of the corresponding ingested object"
     }
   }
 }
