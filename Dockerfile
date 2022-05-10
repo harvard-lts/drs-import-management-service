@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y vim libpq-dev gcc supervisor python3-pi
     groupadd -r -g 55020 dimsuser && \
     useradd -u 55020 -g 55020 --create-home dimsuser
 
+# Install git, required for GitPython
+RUN apt-get install -y git
+
 WORKDIR /home/dimsuser
 
 # Copy code into the image

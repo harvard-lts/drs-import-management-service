@@ -43,7 +43,7 @@ class TestIngestPostController(TestCase):
         self.app = flask.Flask(__name__)
 
     def test_call_happy_path(self) -> None:
-        ingest_service_mock = Mock(spect=IngestService)
+        ingest_service_mock = Mock(spec=IngestService)
         sut = IngestPostController(ingest_service=ingest_service_mock)
 
         with self.app.test_request_context(self.REQUEST_ENDPOINT, json=self.CORRECT_REQUEST_JSON):
@@ -63,7 +63,7 @@ class TestIngestPostController(TestCase):
         self.assertEqual(actual_response_body, expected_response_body)
 
     def test_call_service_raises_transfer_ingest_exception(self) -> None:
-        ingest_service_stub = Mock(spect=IngestService)
+        ingest_service_stub = Mock(spec=IngestService)
         sut = IngestPostController(ingest_service=ingest_service_stub)
 
         test_exception = TransferIngestException("test", "test")
