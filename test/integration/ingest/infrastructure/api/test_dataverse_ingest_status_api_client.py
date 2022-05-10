@@ -7,6 +7,7 @@ from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.infrastructure.api.dataverse_ingest_status_api_client import DataverseIngestStatusApiClient
 from app.ingest.infrastructure.api.dataverse_params_transformer import DataverseParamsTransformer
 from test.integration.integration_test_base import IntegrationTestBase
+from test.resources.ingest.ingest_factory import create_ingest
 
 
 class TestDataverseIngestStatusApiClient(IntegrationTestBase):
@@ -36,9 +37,15 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
 
     def test_report_status_happy_path(self) -> None:
         test_package_id = self.__transform_persistent_id_to_dims_package_id()
+        test_drs_url = "https://dataverse.org/"
+        test_ingest = create_ingest(
+            package_id=test_package_id,
+            status=IngestStatus.batch_ingest_successful,
+            drs_url=test_drs_url
+        )
 
         sut = DataverseIngestStatusApiClient(DataverseParamsTransformer())
-        sut.report_status(package_id=test_package_id, ingest_status=IngestStatus.batch_ingest_successful)
+        sut.report_status(test_ingest)
 
         actual_status = self.__get_actual_dataset_status()
         expected_status = "success"

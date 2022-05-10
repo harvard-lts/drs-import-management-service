@@ -326,18 +326,16 @@ class TestIngestService(TestCase):
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
-        sut.set_ingest_as_processed(self.TEST_INGEST)
+        test_drs_url = "test"
+        sut.set_ingest_as_processed(self.TEST_INGEST, test_drs_url)
 
-        ingest_status_api_client_mock.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.batch_ingest_successful
+        expected_ingest_parameter = replace(
+            self.TEST_INGEST,
+            drs_url=test_drs_url,
+            status=IngestStatus.batch_ingest_successful
         )
-        ingest_repository_mock.save.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                status=IngestStatus.batch_ingest_successful,
-            )
-        )
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
@@ -351,12 +349,16 @@ class TestIngestService(TestCase):
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
+        test_drs_url = "test"
         with self.assertRaises(SetIngestAsProcessedException):
-            sut.set_ingest_as_processed(self.TEST_INGEST)
+            sut.set_ingest_as_processed(self.TEST_INGEST, test_drs_url)
 
         ingest_status_api_client_mock.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.batch_ingest_successful
+            replace(
+                self.TEST_INGEST,
+                drs_url=test_drs_url,
+                status=IngestStatus.batch_ingest_successful
+            )
         )
 
     def test_set_ingest_as_processed_api_client_raises_report_status_api_client_exception(self) -> None:
@@ -372,7 +374,7 @@ class TestIngestService(TestCase):
         )
 
         with self.assertRaises(SetIngestAsProcessedException):
-            sut.set_ingest_as_processed(self.TEST_INGEST)
+            sut.set_ingest_as_processed(self.TEST_INGEST, "test")
 
         ingest_repository_mock.save.assert_not_called()
 

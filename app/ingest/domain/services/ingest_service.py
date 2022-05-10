@@ -130,18 +130,21 @@ class IngestService:
         except (MqException, IngestSaveException) as e:
             raise ProcessIngestException(ingest.package_id, str(e))
 
-    def set_ingest_as_processed(self, ingest: Ingest) -> None:
+    def set_ingest_as_processed(self, ingest: Ingest, drs_url: str) -> None:
         """
         Sets an ingest as processed by reporting and updating its status.
 
         :param ingest: Ingest to report and update as processed
         :type ingest: Ingest
+        :param drs_url: DRS URL of the processed object
+        :type drs_url: str
 
         :raises SetIngestAsProcessedException
         """
         ingest.status = IngestStatus.batch_ingest_successful
+        ingest.drs_url = drs_url
         try:
-            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
+            self.__ingest_status_api_client.report_status(ingest)
             self.__ingest_repository.save(ingest)
         except (ReportStatusApiClientException, IngestSaveException) as e:
             raise SetIngestAsProcessedException(ingest.package_id, str(e))
