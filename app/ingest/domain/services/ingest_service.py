@@ -75,16 +75,16 @@ class IngestService:
 
         :raises TransferIngestException
         """
+        ingest.status = IngestStatus.pending_transfer_to_dropbox
         try:
             self.__transfer_ready_queue_publisher.publish_message(ingest)
-            ingest.status = IngestStatus.pending_transfer_to_dropbox
             self.__ingest_repository.save(ingest)
         except (MqException, IngestSaveException) as e:
             raise TransferIngestException(ingest.package_id, str(e))
 
     def set_ingest_as_transferred(self, ingest: Ingest) -> None:
         """
-        Sets an ingest as transferred by updating its status.
+        Sets an ingest as transferred by updating and reporting its status.
 
         :param ingest: Ingest to set as transferred
         :type ingest: Ingest
@@ -94,12 +94,13 @@ class IngestService:
         ingest.status = IngestStatus.transferred_to_dropbox_successful
         try:
             self.__ingest_repository.save(ingest)
-        except IngestSaveException as ise:
-            raise SetIngestAsTransferredException(ingest.package_id, str(ise))
+            self.__ingest_status_api_client.report_status(ingest)
+        except (IngestSaveException, ReportStatusApiClientException) as e:
+            raise SetIngestAsTransferredException(ingest.package_id, str(e))
 
     def set_ingest_as_transferred_failed(self, ingest: Ingest) -> None:
         """
-        Sets an ingest as transferred failed by reporting and updating its status.
+        Sets an ingest as transferred failed by updating and reporting its status.
 
         :param ingest: Ingest to report and update as transferred failed
         :type ingest: Ingest
@@ -108,15 +109,15 @@ class IngestService:
         """
         ingest.status = IngestStatus.transferred_to_dropbox_failed
         try:
-            self.__ingest_status_api_client.report_status(ingest)
             self.__ingest_repository.save(ingest)
-        except (ReportStatusApiClientException, IngestSaveException) as e:
+            self.__ingest_status_api_client.report_status(ingest)
+        except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsTransferredFailedException(ingest.package_id, str(e))
 
     def process_ingest(self, ingest: Ingest) -> None:
         """
         Initiates an ingest process by calling process ready queue publisher and by updating
-        its status.
+        and reporting its status.
 
         :param ingest: Ingest to process
         :type ingest: Ingest
@@ -127,12 +128,13 @@ class IngestService:
         try:
             self.__process_ready_queue_publisher.publish_message(ingest)
             self.__ingest_repository.save(ingest)
-        except (MqException, IngestSaveException) as e:
+            self.__ingest_status_api_client.report_status(ingest)
+        except (MqException, IngestSaveException, ReportStatusApiClientException) as e:
             raise ProcessIngestException(ingest.package_id, str(e))
 
     def set_ingest_as_processed(self, ingest: Ingest, drs_url: str) -> None:
         """
-        Sets an ingest as processed by reporting and updating its status.
+        Sets an ingest as processed by updating its DRS URL and by updating and reporting its status.
 
         :param ingest: Ingest to report and update as processed
         :type ingest: Ingest
@@ -144,14 +146,14 @@ class IngestService:
         ingest.status = IngestStatus.batch_ingest_successful
         ingest.drs_url = drs_url
         try:
-            self.__ingest_status_api_client.report_status(ingest)
             self.__ingest_repository.save(ingest)
-        except (ReportStatusApiClientException, IngestSaveException) as e:
+            self.__ingest_status_api_client.report_status(ingest)
+        except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsProcessedException(ingest.package_id, str(e))
 
     def set_ingest_as_processed_failed(self, ingest: Ingest) -> None:
         """
-        Sets an ingest as processed failed by reporting and updating its status.
+        Sets an ingest as processed failed by updating and reporting its status.
 
         :param ingest: Ingest to report and update as processed failed
         :type ingest: Ingest
@@ -160,7 +162,7 @@ class IngestService:
         """
         ingest.status = IngestStatus.batch_ingest_failed
         try:
-            self.__ingest_status_api_client.report_status(ingest)
             self.__ingest_repository.save(ingest)
-        except (ReportStatusApiClientException, IngestSaveException) as e:
+            self.__ingest_status_api_client.report_status(ingest)
+        except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsProcessedFailedException(ingest.package_id, str(e))

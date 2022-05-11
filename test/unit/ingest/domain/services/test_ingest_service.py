@@ -144,36 +144,37 @@ class TestIngestService(TestCase):
 
     def test_set_ingest_as_transferred_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         sut.set_ingest_as_transferred(self.TEST_INGEST)
 
-        ingest_repository_mock.save.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                status=IngestStatus.transferred_to_dropbox_successful
-            )
-        )
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_successful)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_transferred_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
         ingest_repository_stub.save.side_effect = IngestSaveException("test", "test")
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         with self.assertRaises(SetIngestAsTransferredException):
             sut.set_ingest_as_transferred(self.TEST_INGEST)
+
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_transferred_failed_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -189,8 +190,8 @@ class TestIngestService(TestCase):
         sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
         expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_failed)
-        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
         ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_transferred_failed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
@@ -208,8 +209,7 @@ class TestIngestService(TestCase):
             sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
         expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_failed)
-        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
-        ingest_repository_stub.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_transferred_failed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -226,77 +226,86 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsTransferredFailedException):
             sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_stub.report_status.assert_called_once_with(self.TEST_INGEST)
-        ingest_repository_mock.save.assert_not_called()
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_failed)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_process_ingest_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
         process_ready_queue_publisher_mock = Mock(spec=IProcessReadyQueuePublisher)
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=process_ready_queue_publisher_mock,
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         sut.process_ingest(self.TEST_INGEST)
 
-        process_ready_queue_publisher_mock.publish_message.assert_called_once()
-        ingest_repository_mock.save.assert_called_once_with(
-            replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest))
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest)
+        process_ready_queue_publisher_mock.publish_message.assert_called_once_with(expected_ingest_parameter)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
     def test_process_ingest_publisher_raises_mq_connection_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
         process_ready_queue_publisher_stub = Mock(spec=IProcessReadyQueuePublisher)
         process_ready_queue_publisher_stub.publish_message.side_effect = MqConnectionException("test", "test", "test")
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=process_ready_queue_publisher_stub,
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         with self.assertRaises(ProcessIngestException):
             sut.process_ingest(self.TEST_INGEST)
 
         ingest_repository_mock.save.assert_not_called()
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_process_ingest_publisher_raises_mq_message_publish_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
         process_ready_queue_publisher_stub = Mock(spec=IProcessReadyQueuePublisher)
         process_ready_queue_publisher_stub.publish_message.side_effect = MqMessagePublishException("test", "test",
                                                                                                    "test", "test")
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=process_ready_queue_publisher_stub,
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         with self.assertRaises(ProcessIngestException):
             sut.process_ingest(self.TEST_INGEST)
 
         ingest_repository_mock.save.assert_not_called()
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_process_ingest_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
         process_ready_queue_publisher_mock = Mock(spec=IProcessReadyQueuePublisher)
         ingest_repository_stub.save.side_effect = IngestSaveException("test", "test")
+        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
             transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
             process_ready_queue_publisher=process_ready_queue_publisher_mock,
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
+            ingest_status_api_client=ingest_status_api_client_mock
         )
 
         with self.assertRaises(ProcessIngestException):
             sut.process_ingest(self.TEST_INGEST)
 
-        process_ready_queue_publisher_mock.publish_message.assert_called_once()
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest)
+        process_ready_queue_publisher_mock.publish_message.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_processed_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -317,8 +326,8 @@ class TestIngestService(TestCase):
             drs_url=test_drs_url,
             status=IngestStatus.batch_ingest_successful
         )
-        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
         ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
@@ -332,16 +341,10 @@ class TestIngestService(TestCase):
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
-        test_drs_url = "test"
         with self.assertRaises(SetIngestAsProcessedException):
-            sut.set_ingest_as_processed(self.TEST_INGEST, test_drs_url)
+            sut.set_ingest_as_processed(self.TEST_INGEST, "test")
 
-        expected_ingest_parameter = replace(
-            self.TEST_INGEST,
-            drs_url=test_drs_url,
-            status=IngestStatus.batch_ingest_successful
-        )
-        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_processed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -355,10 +358,16 @@ class TestIngestService(TestCase):
             ingest_status_api_client=ingest_status_api_client_stub
         )
 
+        test_drs_url = "test"
         with self.assertRaises(SetIngestAsProcessedException):
-            sut.set_ingest_as_processed(self.TEST_INGEST, "test")
+            sut.set_ingest_as_processed(self.TEST_INGEST, test_drs_url)
 
-        ingest_repository_mock.save.assert_not_called()
+        expected_ingest_parameter = replace(
+            self.TEST_INGEST,
+            drs_url=test_drs_url,
+            status=IngestStatus.batch_ingest_successful
+        )
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_failed_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -374,8 +383,8 @@ class TestIngestService(TestCase):
         sut.set_ingest_as_processed_failed(self.TEST_INGEST)
 
         expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.batch_ingest_failed)
-        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
         ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_failed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
@@ -392,9 +401,7 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsProcessedFailedException):
             sut.set_ingest_as_processed_failed(self.TEST_INGEST)
 
-        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.batch_ingest_failed)
-        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
-        ingest_repository_stub.save.assert_called_once_with(expected_ingest_parameter)
+        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_processed_failed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -411,5 +418,5 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsProcessedFailedException):
             sut.set_ingest_as_processed_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_stub.report_status.assert_called_once_with(self.TEST_INGEST)
-        ingest_repository_mock.save.assert_not_called()
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.batch_ingest_failed)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
