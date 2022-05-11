@@ -108,7 +108,7 @@ class IngestService:
         """
         ingest.status = IngestStatus.transferred_to_dropbox_failed
         try:
-            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
+            self.__ingest_status_api_client.report_status(ingest)
             self.__ingest_repository.save(ingest)
         except (ReportStatusApiClientException, IngestSaveException) as e:
             raise SetIngestAsTransferredFailedException(ingest.package_id, str(e))
@@ -160,7 +160,7 @@ class IngestService:
         """
         ingest.status = IngestStatus.batch_ingest_failed
         try:
-            self.__ingest_status_api_client.report_status(ingest.package_id, ingest.status)
+            self.__ingest_status_api_client.report_status(ingest)
             self.__ingest_repository.save(ingest)
         except (ReportStatusApiClientException, IngestSaveException) as e:
             raise SetIngestAsProcessedFailedException(ingest.package_id, str(e))

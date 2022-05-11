@@ -188,16 +188,9 @@ class TestIngestService(TestCase):
 
         sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_mock.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.transferred_to_dropbox_failed
-        )
-        ingest_repository_mock.save.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                status=IngestStatus.transferred_to_dropbox_failed
-            )
-        )
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_failed)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_transferred_failed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
@@ -214,16 +207,9 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsTransferredFailedException):
             sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_mock.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.transferred_to_dropbox_failed
-        )
-        ingest_repository_stub.save.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                status=IngestStatus.transferred_to_dropbox_failed
-            )
-        )
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_failed)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
+        ingest_repository_stub.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_transferred_failed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -240,10 +226,7 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsTransferredFailedException):
             sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_stub.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.transferred_to_dropbox_failed
-        )
+        ingest_status_api_client_stub.report_status.assert_called_once_with(self.TEST_INGEST)
         ingest_repository_mock.save.assert_not_called()
 
     def test_process_ingest_happy_path(self) -> None:
@@ -353,13 +336,12 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsProcessedException):
             sut.set_ingest_as_processed(self.TEST_INGEST, test_drs_url)
 
-        ingest_status_api_client_mock.report_status.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                drs_url=test_drs_url,
-                status=IngestStatus.batch_ingest_successful
-            )
+        expected_ingest_parameter = replace(
+            self.TEST_INGEST,
+            drs_url=test_drs_url,
+            status=IngestStatus.batch_ingest_successful
         )
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -391,16 +373,9 @@ class TestIngestService(TestCase):
 
         sut.set_ingest_as_processed_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_mock.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.batch_ingest_failed
-        )
-        ingest_repository_mock.save.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                status=IngestStatus.batch_ingest_failed
-            )
-        )
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.batch_ingest_failed)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
+        ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_failed_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
@@ -417,16 +392,9 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsProcessedFailedException):
             sut.set_ingest_as_processed_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_mock.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.batch_ingest_failed
-        )
-        ingest_repository_stub.save.assert_called_once_with(
-            replace(
-                self.TEST_INGEST,
-                status=IngestStatus.batch_ingest_failed
-            )
-        )
+        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.batch_ingest_failed)
+        ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
+        ingest_repository_stub.save.assert_called_once_with(expected_ingest_parameter)
 
     def test_set_ingest_as_processed_failed_api_client_raises_report_status_api_client_exception(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -443,8 +411,5 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsProcessedFailedException):
             sut.set_ingest_as_processed_failed(self.TEST_INGEST)
 
-        ingest_status_api_client_stub.report_status.assert_called_once_with(
-            self.TEST_INGEST.package_id,
-            IngestStatus.batch_ingest_failed
-        )
+        ingest_status_api_client_stub.report_status.assert_called_once_with(self.TEST_INGEST)
         ingest_repository_mock.save.assert_not_called()
