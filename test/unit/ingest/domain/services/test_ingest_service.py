@@ -208,7 +208,6 @@ class TestIngestService(TestCase):
         with self.assertRaises(SetIngestAsTransferredFailedException):
             sut.set_ingest_as_transferred_failed(self.TEST_INGEST)
 
-        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.transferred_to_dropbox_failed)
         ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_transferred_failed_api_client_raises_report_status_api_client_exception(self) -> None:
