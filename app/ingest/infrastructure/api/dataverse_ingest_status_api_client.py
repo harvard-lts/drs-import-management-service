@@ -12,7 +12,7 @@ from tenacity import retry_if_exception_type, stop_after_attempt, retry, before_
 from app.ingest.domain.api.exceptions.report_status_api_client_exception import ReportStatusApiClientException
 from app.ingest.domain.api.ingest_status_api_client import IIngestStatusApiClient
 from app.ingest.domain.models.ingest.ingest import Ingest
-from app.ingest.domain.models.ingest.ingest_status import IngestStatus
+from app.ingest.infrastructure.api.dataverse_ingest_message_factory import DataverseIngestMessageFactory
 from app.ingest.infrastructure.api.dataverse_params_transformer import DataverseParamsTransformer
 from app.ingest.infrastructure.api.exceptions.transform_package_id_exception import TransformPackageIdException
 
@@ -20,12 +20,6 @@ from app.ingest.infrastructure.api.exceptions.transform_package_id_exception imp
 class DataverseIngestStatusApiClient(IIngestStatusApiClient):
     __API_ENDPOINT = "/api/datasets/submitDatasetVersionToArchive/:persistentId/{version}/status?persistentId=doi:{doi}"
     __API_REQUEST_MAX_RETRIES = 2
-
-    __DATAVERSE_MESSAGE_PENDING_TRANSFER_TO_DROPBOX = "Pending transfer to Dropbox"
-    __DATAVERSE_MESSAGE_TRANSFERED_TO_DROPBOX_SUCCESSFUL = "Successfully transferred to Dropbox"
-    __DATAVERSE_MESSAGE_TRANSFERED_TO_DROPBOX_FAILED = "Dropbox transfer failed"
-    __DATAVERSE_MESSAGE_PROCESSING_BATCH_INGEST = "Processing batch ingest"
-    __DATAVERSE_MESSAGE_BATCH_INGEST_FAILED = "Batch ingest failed"
 
     def __init__(self, dataverse_params_transformer: DataverseParamsTransformer) -> None:
         self.__dataverse_params_transformer = dataverse_params_transformer
@@ -68,18 +62,9 @@ class DataverseIngestStatusApiClient(IIngestStatusApiClient):
     def __create_request_body(self, ingest: Ingest) -> str:
         dataverse_ingest_status = \
             self.__dataverse_params_transformer.transform_ingest_status_to_dataverse_ingest_status(ingest.status)
-        dataverse_ingest_message = self.__create_dataverse_ingest_message(ingest)
+        dataverse_ingest_message_factory = DataverseIngestMessageFactory()
+        dataverse_ingest_message = dataverse_ingest_message_factory.get_dataverse_ingest_message(ingest)
         return '{"status":"' + dataverse_ingest_status + '","message":"' + dataverse_ingest_message + '"}'
-
-    def __create_dataverse_ingest_message(self, ingest: Ingest) -> str:
-        return {
-            IngestStatus.pending_transfer_to_dropbox: self.__DATAVERSE_MESSAGE_PENDING_TRANSFER_TO_DROPBOX,
-            IngestStatus.transferred_to_dropbox_successful: self.__DATAVERSE_MESSAGE_TRANSFERED_TO_DROPBOX_SUCCESSFUL,
-            IngestStatus.transferred_to_dropbox_failed: self.__DATAVERSE_MESSAGE_TRANSFERED_TO_DROPBOX_FAILED,
-            IngestStatus.processing_batch_ingest: self.__DATAVERSE_MESSAGE_PROCESSING_BATCH_INGEST,
-            IngestStatus.batch_ingest_successful: ingest.drs_url,
-            IngestStatus.batch_ingest_failed: self.__DATAVERSE_MESSAGE_BATCH_INGEST_FAILED,
-        }.get(ingest.status, "")
 
     def __create_request_headers(self) -> dict:
         return {"Content-Type": "application/json", "X-Dataverse-key": os.getenv('DATAVERSE_API_KEY')}

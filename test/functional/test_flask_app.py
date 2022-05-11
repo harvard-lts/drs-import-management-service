@@ -74,7 +74,7 @@ class TestFlaskApp(TestCase):
 
             actual_response_body = response.get_json()
             expected_response_body = {
-                "message": "Added to Queue",
+                "message": "Pending transfer to Dropbox",
                 "package_id": "test_package_id",
                 "status": "pending",
                 "status_code": None

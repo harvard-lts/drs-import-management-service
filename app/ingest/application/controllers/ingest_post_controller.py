@@ -12,6 +12,7 @@ from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.infrastructure.api.dataverse_ingest_message_factory import DataverseIngestMessageFactory
 
 
 class IngestPostController:
@@ -47,10 +48,10 @@ class IngestPostController:
                 TransferIngestErrorResponse(message=str(tie))
             )
 
-        # TODO: Dataverse messages
+        dataverse_ingest_status_factory = DataverseIngestMessageFactory()
         return {
                    "package_id": new_ingest.package_id,
                    "status": ResponseStatus.pending.value,
                    "status_code": None,
-                   "message": "Added to Queue"
+                   "message": dataverse_ingest_status_factory.get_dataverse_ingest_message(new_ingest)
                }, 202
