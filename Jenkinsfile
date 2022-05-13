@@ -183,25 +183,27 @@ pipeline {
         }
       }
     }
-    stage('MainQADeploy') {
+    stage('Publish main qa image') {
       when {
-          branch 'main'
+            branch 'main'
         }
       steps {
-          echo "Deploying to qa"
-          script {
-              if (GIT_TAG != "") {
-                  echo "$GIT_TAG"
-                  sshagent(credentials : ['qatest']) {
-                      sh "ssh -t -t ${env.QA_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
-                  }
-              } else {
-                      echo "$GIT_HASH"
-                      sshagent(credentials : ['qatest']) {
-                      sh "ssh -t -t ${env.QA_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
-                  }
-              }
-          }
+        echo 'Pushing docker image to the registry...'
+        echo "$GIT_TAG"
+        script {
+            if (GIT_TAG != "") {
+              echo "Already pushed tagged image in dev deploy"
+            } else {
+                  echo "$GIT_HASH"
+                  sh("docker pull registry.lts.harvard.edu/lts/${imageName}-dev:$GIT_HASH")
+                  sh("docker tag registry.lts.harvard.edu/lts/${imageName}-dev:$GIT_HASH registry.lts.harvard.edu/lts/${imageName}-qa:$GIT_HASH")
+                  qaImage = docker.image("registry.lts.harvard.edu/lts/${imageName}-qa:$GIT_HASH")
+                  docker.withRegistry(registryUri, registryCredentialsId){
+                    qaImage.push()
+                    qaImage.push('latest')
+                }
+            }
+        }
       }
     }
     stage('MainQAIntegrationTest') {
