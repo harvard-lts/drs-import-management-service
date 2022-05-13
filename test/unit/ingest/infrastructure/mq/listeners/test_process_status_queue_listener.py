@@ -24,6 +24,7 @@ class TestProcessStatusQueueListener(TestCase):
             "package_id": cls.TEST_INGEST.package_id,
             "application_name": cls.TEST_INGEST.depositing_application,
             "batch_ingest_status": "successful",
+            "drs_url": "test",
             "message": "test"
         }
 
@@ -42,7 +43,10 @@ class TestProcessStatusQueueListener(TestCase):
         self.sut._handle_received_message(self.TEST_PROCESS_STATUS_RECEIVED_MESSAGE_SUCCESSFUL)
 
         ingest_service_stub.get_ingest_by_package_id.assert_called_once_with("test_package_id")
-        ingest_service_stub.set_ingest_as_processed.assert_called_once_with(self.TEST_INGEST)
+        ingest_service_stub.set_ingest_as_processed.assert_called_once_with(
+            self.TEST_INGEST,
+            self.TEST_PROCESS_STATUS_RECEIVED_MESSAGE_SUCCESSFUL["drs_url"]
+        )
 
     def test_handle_received_message_successful_service_raises_get_ingest_by_package_id_exception(
             self,
@@ -76,7 +80,10 @@ class TestProcessStatusQueueListener(TestCase):
 
         ingest_service_stub.get_ingest_by_package_id.assert_called_once_with(self.TEST_PACKAGE_ID)
         ingest_service_stub.set_ingest_as_processed_failed.assert_not_called()
-        ingest_service_stub.set_ingest_as_processed.assert_called_once_with(self.TEST_INGEST)
+        ingest_service_stub.set_ingest_as_processed.assert_called_once_with(
+            self.TEST_INGEST,
+            self.TEST_PROCESS_STATUS_RECEIVED_MESSAGE_SUCCESSFUL["drs_url"]
+        )
 
     def test_handle_received_message_failure_happy_path(self, create_subscribed_mq_connection_mock) -> None:
         ingest_service_stub = Mock(spec=IngestService)

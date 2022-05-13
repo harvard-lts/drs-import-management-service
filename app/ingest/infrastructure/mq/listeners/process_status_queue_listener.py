@@ -43,7 +43,7 @@ class ProcessStatusQueueListener(StompListenerBase):
                 return
 
             self._logger.info("Setting ingest as processed...")
-            self.__ingest_service.set_ingest_as_processed(ingest)
+            self.__ingest_service.set_ingest_as_processed(ingest, message_body["drs_url"])
 
         except IngestServiceException as e:
             self._logger.error(str(e))

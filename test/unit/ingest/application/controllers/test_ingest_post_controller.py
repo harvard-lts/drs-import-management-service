@@ -58,7 +58,7 @@ class TestIngestPostController(TestCase):
             "package_id": "test",
             "status": ResponseStatus.pending.value,
             "status_code": None,
-            "message": "Added to Queue"
+            "message": "Pending transfer to Dropbox"
         }
         self.assertEqual(actual_response_body, expected_response_body)
 

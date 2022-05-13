@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -12,3 +13,4 @@ class Ingest:
     admin_metadata: dict
     status: IngestStatus
     depositing_application: DepositingApplication
+    drs_url: Optional[str]

@@ -14,6 +14,7 @@ class TestProcessStatusQueueListener(StompListenerIntegrationTestBase):
             "package_id": "test",
             "application_name": "Dataverse",
             "batch_ingest_status": "successful",
+            "drs_url": "test",
             "message": "test"
         }
 
