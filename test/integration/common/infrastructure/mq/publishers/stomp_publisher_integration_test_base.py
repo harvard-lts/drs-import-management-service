@@ -20,9 +20,13 @@ class StompPublisherIntegrationTestBase(StompIntegrationTestBase, ABC):
 
     def _create_subscribed_mq_connection(self) -> stomp.Connection:
         connection = self._create_mq_connection()
-        connection.subscribe(destination=self._get_queue_name(), id=self._get_queue_name() + "-test-connection")
-        connection.set_listener(self._get_queue_name() + "-test-listener",
-                                StompPublisherIntegrationTestBase.TestConnectionListener(self))
+
+        subscription_id = self._get_queue_name() + "-test-connection"
+        connection.subscribe(destination=self._get_queue_name(), id=subscription_id)
+
+        listener_name = self._get_queue_name() + "-test-listener"
+        connection.set_listener(listener_name, StompPublisherIntegrationTestBase.TestConnectionListener(self))
+
         return connection
 
     def _await_until_message_received_or_timeout(self) -> None:
