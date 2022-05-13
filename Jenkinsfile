@@ -228,7 +228,6 @@ pipeline {
           }
       }
     }
-   }
    post {
         fixed {
             script {
