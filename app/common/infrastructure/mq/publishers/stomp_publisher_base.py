@@ -17,11 +17,17 @@ class StompPublisherBase(StompInteractor, ABC):
 
         :param message: message to publish as dictionary
         :type message: dict
+
+        :raises MqMessagePublishException
         """
         connection = self._create_mq_connection()
         try:
             message_json_str = json.dumps(message)
-            connection.send(self._get_queue_name(), message_json_str)
+            connection.send(
+                destination=self._get_queue_name(),
+                body=message_json_str,
+                headers=self.__get_message_custom_headers()
+            )
         except Exception as e:
             self._logger.error(str(e))
             mq_connection_params = self._get_mq_connection_params()
@@ -34,3 +40,12 @@ class StompPublisherBase(StompInteractor, ABC):
         finally:
             self._logger.debug("Disconnecting from MQ...")
             connection.disconnect()
+
+    def __get_message_custom_headers(self) -> dict:
+        """
+        Returns custom headers to the message to be sent.
+        """
+        return {
+            'original_queue': self._get_queue_name(),
+            'retry_count': 0
+        }

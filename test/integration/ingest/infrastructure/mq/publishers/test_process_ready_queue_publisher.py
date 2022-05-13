@@ -9,10 +9,13 @@ from test.resources.ingest.ingest_factory import create_ingest
 
 class TestProcessReadyQueuePublisher(StompPublisherIntegrationTestBase):
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.TEST_INGEST = create_ingest()
+
     def test_publish_message_happy_path(self) -> None:
         sut = ProcessReadyQueuePublisher()
-        test_ingest = create_ingest()
-        sut.publish_message(test_ingest)
+        sut.publish_message(self.TEST_INGEST)
 
         self._await_until_message_received_or_timeout()
 
@@ -29,3 +32,10 @@ class TestProcessReadyQueuePublisher(StompPublisherIntegrationTestBase):
 
     def _get_queue_name(self) -> str:
         return os.getenv('MQ_PROCESS_QUEUE_PROCESS_READY')
+
+    def _get_expected_body(self) -> dict:
+        return {
+            'package_id': self.TEST_INGEST.package_id,
+            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
+            'application_name': self.TEST_INGEST.depositing_application.value
+        }
