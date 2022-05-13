@@ -22,7 +22,6 @@ pipeline {
       }
     }
 
-    // run test step
     // trial is optional and only goes to dev
     stage('Publish trial image') {
       when {
@@ -61,19 +60,17 @@ pipeline {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
                   sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
                   }
               } else {
                       echo "$GIT_HASH"
                       sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
                   }
               }
           }
       }
     }
-   // test that dev is running, smoke tests
-    // test that dev worked
     stage('TrialDevIntegrationTest') {
       when {
           branch 'trial'
@@ -83,7 +80,7 @@ pipeline {
           script {
               sshagent(credentials : ['hgl_svcupd']) {
                 script{
-                  TESTS_PASSED = sh (script: "ssh -t -t ${env.DEV_SERVER} 'curl -k https://${env.CLOUD_DEV}:10582/apps/healthcheck'",
+                  TESTS_PASSED = sh (script: "ssh -t -t ${env.DEV_SERVER} 'curl -k https://${env.CLOUD_DEV}:<itest-container-port>/apps/healthcheck'",
                   returnStdout: true).trim()
                   echo "${TESTS_PASSED}"
                   if (!TESTS_PASSED.contains("\"num_failed\": 0")){
@@ -132,40 +129,40 @@ pipeline {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
                   sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
                   }
               } else {
                       echo "$GIT_HASH"
                       sshagent(credentials : ['hgl_svcupd']) {
-                      sh "ssh -t -t ${env.DEV_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      sh "ssh -t -t ${env.DEV_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
                   }
               }
           }
       }
     }
-   //dev smoke tests
-   stage('MainDevIntegrationTest') {
-     when {
-         branch 'main'
-       }
-     steps {
-         echo "Running integration tests on dev"
-         script {
-             sshagent(credentials : ['hgl_svcupd']) {
-               script{
-                 TESTS_PASSED = sh (script: "ssh -t -t ${env.DEV_SERVER} 'curl -k https://${env.CLOUD_DEV}:10582/apps/healthcheck'",
-                 returnStdout: true).trim()
-                 echo "${TESTS_PASSED}"
-                 if (!TESTS_PASSED.contains("\"num_failed\": 0")){
-                   error "Dev main integration tests did not pass"
-                 } else {
-                   echo "All test passed!"
-                 }
-               }
-             }
-         }
-     }
-   }
+    stage('MainDevIntegrationTest') {
+      when {
+          branch 'main'
+        }
+      steps {
+          echo "Running integration tests on dev"
+          script {
+              sshagent(credentials : ['hgl_svcupd']) {
+                script{
+                  // TODO: Handle multiple curl commands more elegantly
+                  TESTS_PASSED = sh (script: "ssh -t -t ${env.DEV_SERVER} 'curl -k https://${env.CLOUD_DEV}:<itest-container-port>/apps/healthcheck'",
+                  returnStdout: true).trim()
+                  echo "${TESTS_PASSED}"
+                  if (!TESTS_PASSED.contains("\"num_failed\": 0")){
+                    error "Dev main integration tests did not pass"
+                  } else {
+                    echo "All test passed!"
+                  }
+                }
+              }
+          }
+      }
+    }
     stage('Publish main qa image') {
       when {
             branch 'main'
@@ -200,18 +197,17 @@ pipeline {
               if (GIT_TAG != "") {
                   echo "$GIT_TAG"
                   sshagent(credentials : ['qatest']) {
-                      sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      sh "ssh -t -t ${env.QA_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
                   }
               } else {
                       echo "$GIT_HASH"
                       sshagent(credentials : ['qatest']) {
-                      sh "ssh -t -t ${env.QA_SERVER} '${env.RESTART_COMMAND} ${stackName}_${imageName}'"
+                      sh "ssh -t -t ${env.QA_SERVER} '${env.STACK_COMMAND} ${env.HOME}${projName}${env.DOCKER} ${stackName}'"
                   }
               }
           }
       }
     }
-    // qa smoke tests
     stage('MainQAIntegrationTest') {
       when {
           branch 'main'
@@ -221,7 +217,7 @@ pipeline {
           script {
               sshagent(credentials : ['qatest']) {
                 script{
-                  TESTS_PASSED = sh (script: "ssh -t -t ${env.QA_SERVER} 'curl -k https://${env.CLOUD_QA}:10582/apps/healthcheck'",
+                  TESTS_PASSED = sh (script: "ssh -t -t ${env.QA_SERVER} 'curl -k https://${env.CLOUD_QA}:<itest-container-port>/apps/healthcheck'",
                   returnStdout: true).trim()
                   echo "${TESTS_PASSED}"
                   if (!TESTS_PASSED.contains("\"num_failed\": 0")){
@@ -235,9 +231,36 @@ pipeline {
       }
     }
    }
-   environment {
+   post {
+        fixed {
+            script {
+                if(env.BRANCH_NAME == "main" || env.BRANCH_NAME == "trial") {
+                    // Specify your project channel here. Feel free to add/remove states that are relevant to your project (i.e. fixed, failure,...)
+                    slackSend channel: "#<project-channel>", color: "##77caed", message: "Build Fixed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+                }
+            }
+        }
+        failure {
+            script {
+                if(env.BRANCH_NAME == "main" || env.BRANCH_NAME == "trial") {
+                    // Specify your project channel here. Feel free to add/remove states that are relevant to your project (i.e. fixed, failure,...)
+                    slackSend channel: "#<project-channel>", color: "danger", message: "Build Failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+                }
+            }
+        }
+        success {
+            script {
+                if(env.BRANCH_NAME == "main" || env.BRANCH_NAME == "trial") {
+                    // Specify your project channel here. Feel free to add/remove states that are relevant to your project (i.e. fixed, failure,...)
+                    slackSend channel: "#<project-channel>", color: "good", message: "Build Succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+                }
+            }
+        }
+    }
+  environment {
     imageName = 'dims'
     stackName = 'HDC3A'
+    projName = 'hdc3a'
     registryCredentialsId = "${env.REGISTRY_ID}"
     registryUri = 'https://registry.lts.harvard.edu'
    }
