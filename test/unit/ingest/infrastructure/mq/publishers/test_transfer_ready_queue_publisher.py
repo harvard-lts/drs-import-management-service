@@ -26,5 +26,6 @@ class TestTransferReadyQueuePublisher(TestCase):
                 's3_bucket_name': self.TEST_INGEST.s3_bucket_name,
                 'destination_path': self.TEST_DESTINATION_PATH,
                 'admin_metadata': self.TEST_INGEST.admin_metadata,
+                'application_name': self.TEST_INGEST.depositing_application.value
             }
         )
