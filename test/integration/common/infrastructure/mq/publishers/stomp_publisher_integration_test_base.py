@@ -38,19 +38,10 @@ class StompPublisherIntegrationTestBase(StompIntegrationTestBase, ABC):
         if self.received_frame is None:
             self.fail(msg="The queue did not receive the published message")
 
-        actual_headers = self.received_frame.headers
+        actual_body = json.loads(self.received_frame.body)
+        expected_body = self._get_expected_body()
 
-        actual_original_queue_header = actual_headers['original_queue']
-        expected_original_queue_header = self._get_queue_name()
-        self.assertEqual(actual_original_queue_header, expected_original_queue_header)
-
-        actual_retry_count_header = actual_headers['retry_count']
-        expected_retry_count_header = "0"
-        self.assertEqual(actual_retry_count_header, expected_retry_count_header)
-
-        actual_body_str = self.received_frame.body
-        expected_body_str = json.dumps(self._get_expected_body())
-        self.assertEqual(actual_body_str, expected_body_str)
+        self.assertDictEqual(actual_body, expected_body)
 
     @abstractmethod
     def _get_expected_body(self) -> dict:

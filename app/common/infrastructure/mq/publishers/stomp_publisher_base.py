@@ -22,12 +22,9 @@ class StompPublisherBase(StompInteractor, ABC):
         """
         connection = self._create_mq_connection()
         try:
+            self.__add_message_retrying_admin_metadata(message)
             message_json_str = json.dumps(message)
-            connection.send(
-                destination=self._get_queue_name(),
-                body=message_json_str,
-                headers=self.__get_message_custom_headers()
-            )
+            connection.send(destination=self._get_queue_name(), body=message_json_str)
         except Exception as e:
             self._logger.error(str(e))
             mq_connection_params = self._get_mq_connection_params()
@@ -41,11 +38,11 @@ class StompPublisherBase(StompInteractor, ABC):
             self._logger.debug("Disconnecting from MQ...")
             connection.disconnect()
 
-    def __get_message_custom_headers(self) -> dict:
+    def __add_message_retrying_admin_metadata(self, message: dict) -> None:
         """
-        Returns custom headers to the message to be sent.
+        Adds retrying admin metadata fields to the body of the message to be sent.
         """
-        return {
+        message['admin_metadata'] = message.get('admin_metadata', {}) | {
             'original_queue': self._get_queue_name(),
             'retry_count': 0
         }
