@@ -3,6 +3,8 @@ This module defines a StompPublisherBase, which is an abstract class intended
 to define common behavior for stomp-implemented MQ publisher components.
 """
 import json
+import os
+import time
 from abc import ABC
 
 from app.common.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
@@ -10,6 +12,7 @@ from app.common.infrastructure.mq.stomp_interactor import StompInteractor
 
 
 class StompPublisherBase(StompInteractor, ABC):
+    __DEFAULT_MESSAGE_EXPIRATION_MS = 3600000
 
     def _publish_message(self, message: dict) -> None:
         """
@@ -18,13 +21,20 @@ class StompPublisherBase(StompInteractor, ABC):
         :param message: message to publish as dictionary
         :type message: dict
 
-        :raises MqMessagePublishException
+        :raises MqException
         """
         connection = self._create_mq_connection()
         try:
             self.__add_message_retrying_admin_metadata(message)
             message_json_str = json.dumps(message)
-            connection.send(destination=self._get_queue_name(), body=message_json_str)
+            connection.send(
+                destination=self._get_queue_name(),
+                body=message_json_str,
+                headers={
+                    "persistent": "true",
+                    "expires": self.__get_message_expiration_limit_ms()
+                }
+            )
         except Exception as e:
             self._logger.error(str(e))
             mq_connection_params = self._get_mq_connection_params()
@@ -46,3 +56,12 @@ class StompPublisherBase(StompInteractor, ABC):
             'original_queue': self._get_queue_name(),
             'retry_count': 0
         }
+
+    def __get_message_expiration_limit_ms(self) -> int:
+        """
+        Retrieves the message expiration limit in milliseconds.
+        """
+        now_ms = int(time.time()) * 1000
+        message_expiration_ms = int(os.getenv('MESSAGE_EXPIRATION_MS', self.__DEFAULT_MESSAGE_EXPIRATION_MS))
+        message_expiration_limit_ms = now_ms + message_expiration_ms
+        return message_expiration_limit_ms
