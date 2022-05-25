@@ -24,11 +24,6 @@ class TestTransferStatusQueueListener(TestCase):
             "transfer_status": "successful"
         }
 
-        cls.TEST_TRANSFER_STATUS_RECEIVED_MESSAGE_FAILURE = {
-            "package_id": cls.TEST_PACKAGE_ID,
-            "transfer_status": "failure"
-        }
-
         cls.TEST_MESSAGE_ID = "test"
 
         cls.TEST_MESSAGE_SUBSCRIPTION = "test"

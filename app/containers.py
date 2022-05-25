@@ -6,6 +6,7 @@ from app.common.application.controllers.responses.error_response_serializer impo
 from app.health.application.controllers.services.git_service import GitService
 from app.health.infrastructure.compound_connectivity_service import CompoundConnectivityService
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.domain.services.process_service import ProcessService
 from app.ingest.domain.services.transfer_service import TransferService
 from app.ingest.infrastructure.api.dataverse_ingest_status_api_client import DataverseIngestStatusApiClient
 from app.ingest.infrastructure.api.dataverse_params_transformer import DataverseParamsTransformer
@@ -36,8 +37,14 @@ class Services(containers.DeclarativeContainer):
             dataverse_params_transformer=DataverseParamsTransformer()
         )
     )
+    logger = logging.getLogger()
     transfer_service = providers.Factory(
         TransferService,
         ingest_service=ingest_service,
-        logger=logging.getLogger()
+        logger=logger
+    )
+    process_service = providers.Factory(
+        ProcessService,
+        ingest_service=ingest_service,
+        logger=logger
     )

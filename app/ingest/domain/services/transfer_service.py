@@ -1,3 +1,7 @@
+"""
+This module defines a TransferService, which is a domain service that defines Transfer operations.
+"""
+
 from logging import Logger
 
 from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
