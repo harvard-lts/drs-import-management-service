@@ -3,8 +3,7 @@ from unittest.mock import patch, Mock
 
 from stomp import Connection
 
-from app.ingest.domain.services.exceptions.transfer_status_message_handling_exception import \
-    TransferStatusMessageHandlingException
+from app.ingest.domain.services.exceptions.transfer_service_exception import TransferServiceException
 from app.ingest.domain.services.transfer_service import TransferService
 from app.ingest.infrastructure.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
 from test.resources.ingest.ingest_factory import create_ingest
@@ -58,16 +57,10 @@ class TestTransferStatusQueueListener(TestCase):
         )
         self.connection_mock.nack.assert_not_called()
 
-    def test_handle_received_message_service_raises_transfer_status_message_handling_exception(
-            self,
-            create_subscribed_mq_connection_mock
-    ) -> None:
+    def test_handle_received_message_service_raises_exception(self, create_subscribed_mq_connection_mock) -> None:
         create_subscribed_mq_connection_mock.return_value = self.connection_mock
         transfer_service_stub = Mock(spec=TransferService)
-        transfer_service_stub.handle_transfer_status_message.side_effect = TransferStatusMessageHandlingException(
-            "test",
-            "test"
-        )
+        transfer_service_stub.handle_transfer_status_message.side_effect = TransferServiceException()
 
         sut = TransferStatusQueueListener(transfer_service_stub)
         sut._handle_received_message(

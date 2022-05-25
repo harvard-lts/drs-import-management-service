@@ -7,8 +7,7 @@ import os
 from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
-from app.ingest.domain.services.exceptions.transfer_status_message_handling_exception import \
-    TransferStatusMessageHandlingException
+from app.ingest.domain.services.exceptions.transfer_service_exception import TransferServiceException
 from app.ingest.domain.services.transfer_service import TransferService
 
 
@@ -40,6 +39,6 @@ class TransferStatusQueueListener(StompListenerBase):
         try:
             self.__transfer_service.handle_transfer_status_message(message_body, message_id)
             self._acknowledge_message(message_id, message_subscription)
-        except TransferStatusMessageHandlingException as e:
+        except TransferServiceException as e:
             self._logger.error(str(e))
             self._unacknowledge_message(message_id, message_subscription)

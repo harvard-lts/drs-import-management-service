@@ -9,6 +9,8 @@ from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exce
     SetIngestAsTransferredFailedException
 from app.ingest.domain.services.exceptions.transfer_status_message_handling_exception import \
     TransferStatusMessageHandlingException
+from app.ingest.domain.services.exceptions.transfer_status_message_missing_field_exception import \
+    TransferStatusMessageMissingFieldException
 from app.ingest.domain.services.ingest_service import IngestService
 from app.ingest.domain.services.transfer_service import TransferService
 from test.resources.ingest.ingest_factory import create_ingest
@@ -28,6 +30,10 @@ class TestTransferService(TestCase):
         cls.TEST_TRANSFER_STATUS_MESSAGE_FAILURE = {
             "package_id": cls.TEST_PACKAGE_ID,
             "transfer_status": "failure"
+        }
+
+        cls.TEST_TRANSFER_MESSAGE_MISSING_FIELD = {
+            "package_id": cls.TEST_PACKAGE_ID
         }
 
         cls.TEST_MESSAGE_ID = "test"
@@ -141,3 +147,19 @@ class TestTransferService(TestCase):
         ingest_service_stub.set_ingest_as_transferred_failed.assert_called_once_with(self.TEST_INGEST)
         ingest_service_stub.set_ingest_as_transferred.assert_not_called()
         ingest_service_stub.process_ingest.assert_not_called()
+
+    def test_handle_transfer_status_message_missing_message_field(self) -> None:
+        ingest_service_mock = Mock(spec=IngestService)
+        ingest_service_mock.get_ingest_by_package_id.return_value = self.TEST_INGEST
+
+        sut = TransferService(ingest_service_mock, self.logger_mock)
+        with self.assertRaises(TransferStatusMessageMissingFieldException):
+            sut.handle_transfer_status_message(
+                self.TEST_TRANSFER_MESSAGE_MISSING_FIELD,
+                self.TEST_MESSAGE_ID
+            )
+
+        ingest_service_mock.get_ingest_by_package_id.assert_not_called()
+        ingest_service_mock.set_ingest_as_transferred_failed.assert_not_called()
+        ingest_service_mock.set_ingest_as_transferred.assert_not_called()
+        ingest_service_mock.process_ingest.assert_not_called()
