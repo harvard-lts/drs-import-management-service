@@ -29,17 +29,23 @@ class TransferStatusQueueListener(StompListenerBase):
             mq_password=os.getenv('MQ_TRANSFER_PASSWORD')
         )
 
-    def _handle_received_message(self, message_body: dict) -> None:
-        self._logger.info("Received message from Transfer Queue. Message body: " + str(message_body))
-        package_id = message_body['package_id']
+    def _handle_received_message(self, message_body: dict, message_id: str, message_subscription: str) -> None:
+        self._logger.info(
+            "Received message from Transfer Queue. Message body: {}. Message id: {}".format(
+                str(message_body),
+                message_id
+            )
+        )
         try:
-            self._logger.info("Obtaining ingest by the package id of the received message " + package_id + "...")
+            package_id = message_body['package_id']
+            self._logger.info("Obtaining ingest by the package id of the received message {}...".format(package_id))
             ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
 
             transfer_status = message_body['transfer_status']
             if transfer_status == "failure":
                 self._logger.info("Setting ingest as transferred failed...")
                 self.__ingest_service.set_ingest_as_transferred_failed(ingest)
+                self._acknowledge_message(message_id, message_subscription)
                 return
 
             self._logger.info("Setting ingest as transferred...")
@@ -48,6 +54,8 @@ class TransferStatusQueueListener(StompListenerBase):
             self._logger.info("Starting ingest processing...")
             self.__ingest_service.process_ingest(ingest)
 
-        except IngestServiceException as e:
+            self._acknowledge_message(message_id, message_subscription)
+
+        except (IngestServiceException, KeyError) as e:
             self._logger.error(str(e))
-            raise e
+            self._unacknowledge_message(message_id, message_subscription)
