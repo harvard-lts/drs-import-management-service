@@ -9,6 +9,8 @@ RUN wget ${ACTIVEMQ_DOWNLOAD_URL} \
 
 RUN mv apache-activemq-${ACTIVEMQ_VERSION} ${ACTIVEMQ_DIRECTORY}
 RUN sed -i "s|127.0.0.1|0.0.0.0|g" ${ACTIVEMQ_DIRECTORY}/conf/jetty.xml
+# Copy ActiveMQ config file with DLQ policy and redelivery plugin
+COPY ./activemq/activemq.xml ${ACTIVEMQ_DIRECTORY}/conf/activemq.xml
 
 WORKDIR ${ACTIVEMQ_DIRECTORY}/bin
 
