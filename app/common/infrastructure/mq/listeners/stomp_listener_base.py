@@ -20,13 +20,14 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
         self._connection = self.__create_subscribed_mq_connection()
 
     def on_message(self, frame: Frame) -> None:
+        message_id = frame.headers['message-id']
+        message_subscription = frame.headers['subscription']
         try:
             message_body = json.loads(frame.body)
+            self._handle_received_message(message_body, message_id, message_subscription)
         except json.decoder.JSONDecodeError as e:
             self._logger.error(str(e))
-            raise e
-
-        self._handle_received_message(message_body, frame.headers['message-id'], frame.headers['subscription'])
+            self._unacknowledge_message(message_id, message_subscription)
 
     def on_error(self, frame: Frame) -> None:
         self._logger.info("MQ error received: " + frame.body)
