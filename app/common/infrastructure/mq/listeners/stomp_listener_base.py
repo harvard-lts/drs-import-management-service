@@ -16,7 +16,7 @@ from app.common.infrastructure.mq.stomp_interactor import StompInteractor
 class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
     __STOMP_CONN_MIN_RETRY_WAITING_SECONDS = 2
     __STOMP_CONN_MAX_RETRY_WAITING_SECONDS = 10
-    __STOMP_CONN_MAX_ATTEMPTS = 40
+    __STOMP_CONN_MAX_ATTEMPTS = 36
 
     __ACK_CLIENT_INDIVIDUAL = "client-individual"
 
