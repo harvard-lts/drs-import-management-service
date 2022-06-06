@@ -102,14 +102,14 @@ class JwtService:
     def __validate_jwt_token_body(
             self,
             jwt_token_body: dict,
-            jwt_issuer: str,
+            expected_jwt_issuer: str,
             request_body: dict,
             request_body_encoding: str
     ) -> bool:
         received_jwt_issuer = jwt_token_body.get('iss')
-        if received_jwt_issuer is None or received_jwt_issuer != jwt_issuer:
+        if received_jwt_issuer is None or received_jwt_issuer != expected_jwt_issuer:
             self.__logger.debug(
-                "Received 'iss' body param: " + str(received_jwt_issuer) + ". Expected: " + jwt_issuer
+                "Received 'iss' body param: " + str(received_jwt_issuer) + ". Expected: " + expected_jwt_issuer
             )
             return False
 
