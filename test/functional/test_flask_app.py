@@ -43,7 +43,9 @@ class TestFlaskApp(TestCase):
                 "adminCategory": "root"
             }
         }
+
         cls.TEST_INGEST_REQUEST_BODY_CANONICAL_HASH = "698dff27ee8e13447841a3564175e0e7909f96798b8f67b4ba2462f5f107568b"
+
         cls.INVALID_AUTHORIZATION_TOKEN_RESPONSE_BODY = {
             "message": "Invalid authorization token",
             "status": "failure",
@@ -52,7 +54,16 @@ class TestFlaskApp(TestCase):
 
     def setUp(self) -> None:
         load_dotenv(join(dirname(__file__), '.test.env'))
+
         self.test_app = create_app('testing')
+
+        self.dataverse_jwt_issuer = os.getenv('DATAVERSE_JWT_ISSUER')
+        self.dataverse_jwt_kid = os.getenv('DATAVERSE_JWT_KID')
+        self.dataverse_private_key_path = os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH')
+
+        self.epadd_jwt_issuer = os.getenv('EPADD_JWT_ISSUER')
+        self.epadd_jwt_kid = os.getenv('EPADD_JWT_KID')
+        self.epadd_private_key_path = os.getenv('EPADD_JWT_PRIVATE_KEY_FILE_PATH')
 
     def test_health_endpoint_happy_path(self) -> None:
         with self.test_app.test_client() as test_client:
@@ -61,25 +72,31 @@ class TestFlaskApp(TestCase):
             expected_response_status_code = 200
             assert actual_response_status_code == expected_response_status_code
 
-    def test_ingest_endpoint_happy_path(self) -> None:
+    def test_ingest_endpoint_depositing_application_dataverse_happy_path(self) -> None:
         with self.test_app.test_client() as test_client:
             response = self.__post_ingest_endpoint(
                 test_client=test_client,
-                authorization_header=self.__create_ingest_authorization_header()
+                authorization_header=self.__create_ingest_authorization_header(
+                    issuer=self.dataverse_jwt_issuer,
+                    kid=self.dataverse_jwt_kid,
+                    private_key_path=self.dataverse_private_key_path
+                )
             )
 
-            actual_response_status_code = response.status_code
-            expected_response_status_code = 202
-            assert actual_response_status_code == expected_response_status_code
+            self.__assert_successful_ingest_response(response)
 
-            actual_response_body = response.get_json()
-            expected_response_body = {
-                "message": "Pending transfer to Dropbox",
-                "package_id": "test_package_id",
-                "status": "pending",
-                "status_code": None
-            }
-            assert actual_response_body == expected_response_body
+    def test_ingest_endpoint_depositing_application_epadd_happy_path(self) -> None:
+        with self.test_app.test_client() as test_client:
+            response = self.__post_ingest_endpoint(
+                test_client=test_client,
+                authorization_header=self.__create_ingest_authorization_header(
+                    issuer=self.epadd_jwt_issuer,
+                    kid=self.epadd_jwt_kid,
+                    private_key_path=self.epadd_private_key_path
+                )
+            )
+
+            self.__assert_successful_ingest_response(response)
 
     def test_ingest_endpoint_invalid_request_body(self) -> None:
         with self.test_app.test_client() as test_client:
@@ -184,15 +201,19 @@ class TestFlaskApp(TestCase):
             self,
             issuer: str = None,
             kid: str = None,
+            private_key_path: str = None,
             expiration_date_time: datetime = datetime.utcnow() + timedelta(seconds=30)
     ) -> str:
         if issuer is None:
-            issuer = os.getenv('DATAVERSE_JWT_ISSUER')
+            issuer = self.dataverse_jwt_issuer
 
         if kid is None:
-            kid = os.getenv('DATAVERSE_JWT_KID')
+            kid = self.dataverse_jwt_kid
 
-        jwt_private_key = self.__get_test_jwt_private_key()
+        if private_key_path is None:
+            private_key_path = self.dataverse_private_key_path
+
+        jwt_private_key = self.__get_test_jwt_private_key(private_key_path)
         return "Bearer " + jwt.encode(
             key=jwt_private_key,
             payload={
@@ -209,11 +230,25 @@ class TestFlaskApp(TestCase):
             }
         )
 
-    def __get_test_jwt_private_key(self) -> PRIVATE_KEY_TYPES:
-        with open(os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH'), "rb") as key_file:
+    def __get_test_jwt_private_key(self, private_key_path: str) -> PRIVATE_KEY_TYPES:
+        with open(private_key_path, "rb") as key_file:
             key = key_file.read()
         jwt_private_key = load_pem_private_key(key, None, default_backend())
         return jwt_private_key
+
+    def __assert_successful_ingest_response(self, response: Response) -> None:
+        actual_response_status_code = response.status_code
+        expected_response_status_code = 202
+        assert actual_response_status_code == expected_response_status_code
+
+        actual_response_body = response.get_json()
+        expected_response_body = {
+            "message": "Pending transfer to Dropbox",
+            "package_id": "test_package_id",
+            "status": "pending",
+            "status_code": None
+        }
+        assert actual_response_body == expected_response_body
 
     def __assert_invalid_authorization_token_response(self, response: Response) -> None:
         actual_response_status_code = response.status_code
