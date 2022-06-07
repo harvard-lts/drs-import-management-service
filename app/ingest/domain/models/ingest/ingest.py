@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
+from app.common.domain.models.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 
 

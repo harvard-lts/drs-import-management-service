@@ -71,6 +71,9 @@ class AuthorizationMiddleware:
                 start_response
             )
 
+        # Updating the environ dictionary request data to include the changes done by JwtService
+        self.__update_environ_request_body(environ, request_body)
+
         return self.__app(environ, start_response)
 
     def __get_request_body_from_environ(self, environ: dict) -> str:
@@ -79,6 +82,11 @@ class AuthorizationMiddleware:
         environ['wsgi.input'] = BytesIO(body)
         request_body = body.decode(self.REQUEST_BODY_ENCODING)
         return request_body
+
+    def __update_environ_request_body(self, environ: dict, request_body: dict) -> None:
+        request_body_str = json.dumps(request_body).encode(self.REQUEST_BODY_ENCODING)
+        environ['wsgi.input'] = BytesIO(request_body_str)
+        environ['CONTENT_LENGTH'] = len(request_body_str)
 
     def __create_error_response(self, message: str, code: int, environ: dict, start_response: Callable) -> Any:
         response = Response(json.dumps(

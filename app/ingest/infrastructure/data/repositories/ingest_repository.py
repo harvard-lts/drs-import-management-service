@@ -4,8 +4,8 @@ from typing import Optional
 from pymongo.errors import PyMongoError
 from tenacity import retry, stop_after_attempt, retry_if_exception_type, before_log
 
+from app.common.domain.models.depositing_application import DepositingApplication
 from app.common.infrastructure.data.mongo_interactor import MongoInteractor
-from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 from app.ingest.domain.repositories.exceptions.ingest_query_exception import IngestQueryException

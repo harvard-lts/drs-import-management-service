@@ -49,6 +49,9 @@ class JwtService:
             self.__logger.debug("Invalid JWT token body")
             return False
 
+        self.__logger.debug("Adding depositing_application field to request body...")
+        request_body['depositing_application'] = jwt_key.depositing_application.value
+
         return True
 
     def __validate_common_jwt_headers(self, jwt_token_headers: dict) -> bool:
