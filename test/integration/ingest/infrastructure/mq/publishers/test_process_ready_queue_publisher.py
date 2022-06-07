@@ -38,8 +38,6 @@ class TestProcessReadyQueuePublisher(StompPublisherIntegrationTestBase):
             'package_id': self.TEST_INGEST.package_id,
             'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
             'application_name': self.TEST_INGEST.depositing_application.value,
-            'admin_metadata': {
-                'original_queue': self._get_queue_name(),
-                'retry_count': 0
-            }
+            'admin_metadata':
+                self.TEST_INGEST.admin_metadata | {'original_queue': self._get_queue_name(), 'retry_count': 0}
         }
