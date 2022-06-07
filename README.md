@@ -53,7 +53,7 @@ Similar to integration tests, a .test.env file must be created inside /test/func
 
 ### Run test environment
 
-Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and an ActiveMQ container (for integration and functional tests).
+Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and two ActiveMQ containers (one for integration tests and the other for functional tests).
 
 Before running tests locally, the environment must be up and running:
 ````
