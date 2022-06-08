@@ -91,6 +91,6 @@ class TestIngestRepository(MongoIntegrationTestBase):
                 "s3_bucket_name": self.TEST_INGEST.s3_bucket_name,
                 "admin_metadata": self.TEST_INGEST.admin_metadata,
                 "status": self.TEST_INGEST.status.value,
-                "depositing_application": self.TEST_INGEST.depositing_application.value
+                "depositing_application": self.TEST_INGEST.depositing_application
             }
         )

@@ -4,7 +4,6 @@ from flask import request
 
 from app.common.application.controllers.responses.error_response_serializer import ErrorResponseSerializer
 from app.common.application.response_status import ResponseStatus
-from app.common.domain.models.depositing_application import DepositingApplication
 from app.containers import Services, Controllers
 from app.ingest.application.controllers.responses.transfer_ingest_error_response import \
     TransferIngestErrorResponse
@@ -30,9 +29,7 @@ class IngestPostController:
         s3_path: str = request.json.get("s3_path")
         s3_bucket_name: str = request.json.get("s3_bucket_name")
         admin_metadata: dict = request.json.get("admin_metadata")
-        depositing_application: DepositingApplication = DepositingApplication(
-            request.json.get("depositing_application")
-        )
+        depositing_application: str = request.json.get("depositing_application")
 
         new_ingest = Ingest(
             package_id=package_id,

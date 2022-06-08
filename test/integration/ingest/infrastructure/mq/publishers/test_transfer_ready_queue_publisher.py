@@ -43,5 +43,5 @@ class TestTransferReadyQueuePublisher(StompPublisherIntegrationTestBase):
                 'original_queue': self._get_queue_name(),
                 'retry_count': 0
             },
-            'application_name': self.TEST_INGEST.depositing_application.value
+            'application_name': self.TEST_INGEST.depositing_application
         }

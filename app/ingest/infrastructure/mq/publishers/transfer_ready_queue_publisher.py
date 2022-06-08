@@ -36,5 +36,5 @@ class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBa
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
             'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
-            'application_name': ingest.depositing_application.value
+            'application_name': ingest.depositing_application
         }

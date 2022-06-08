@@ -4,7 +4,6 @@ from typing import Optional
 from pymongo.errors import PyMongoError
 from tenacity import retry, stop_after_attempt, retry_if_exception_type, before_log
 
-from app.common.domain.models.depositing_application import DepositingApplication
 from app.common.infrastructure.data.mongo_interactor import MongoInteractor
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -62,7 +61,7 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             "s3_bucket_name": ingest.s3_bucket_name,
             "admin_metadata": ingest.admin_metadata,
             "status": ingest.status.value,
-            "depositing_application": ingest.depositing_application.value,
+            "depositing_application": ingest.depositing_application,
             "drs_url": ingest.drs_url
         }
 
@@ -73,6 +72,6 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             s3_bucket_name=mongo_dict["s3_bucket_name"],
             admin_metadata=mongo_dict["admin_metadata"],
             status=IngestStatus[mongo_dict["status"]],
-            depositing_application=DepositingApplication[mongo_dict["depositing_application"]],
+            depositing_application=mongo_dict["depositing_application"],
             drs_url=mongo_dict.get("drs_url", None)
         )

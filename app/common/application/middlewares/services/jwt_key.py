@@ -1,9 +1,8 @@
-from abc import ABC
-
-from app.common.domain.models.depositing_application import DepositingApplication
+from dataclasses import dataclass
 
 
-class JwtKey(ABC):
+@dataclass
+class JwtKey:
     issuer: str
     public_key_path: str
-    depositing_application: DepositingApplication
+    depositing_application: str

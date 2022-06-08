@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from app.common.domain.models.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 
 
@@ -12,5 +11,5 @@ class Ingest:
     s3_bucket_name: str
     admin_metadata: dict
     status: IngestStatus
-    depositing_application: DepositingApplication
+    depositing_application: str
     drs_url: Optional[str]

@@ -24,6 +24,6 @@ class TestProcessReadyQueuePublisher(TestCase):
                 'package_id': self.TEST_INGEST.package_id,
                 'destination_path': self.TEST_DESTINATION_PATH,
                 'admin_metadata': self.TEST_INGEST.admin_metadata,
-                'application_name': self.TEST_INGEST.depositing_application.value
+                'application_name': self.TEST_INGEST.depositing_application
             }
         )

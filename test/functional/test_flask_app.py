@@ -52,17 +52,19 @@ class TestFlaskApp(TestCase):
             "status_code": None
         }
 
+        cls.JWT_KEY_ID_DATAVERSE = "testKidDataverse"
+        cls.JWT_KEY_ID_EPADD = "testKidEPADD"
+
     def setUp(self) -> None:
         load_dotenv(join(dirname(__file__), '.test.env'))
 
         self.test_app = create_app('testing')
 
-        self.dataverse_jwt_issuer = os.getenv('DATAVERSE_JWT_ISSUER')
-        self.dataverse_jwt_kid = os.getenv('DATAVERSE_JWT_KID')
-        self.dataverse_private_key_path = os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH')
+        jwt_keys_dict = json.loads(os.getenv('JWT_KEYS'))
+        self.dataverse_jwt_issuer = jwt_keys_dict[self.JWT_KEY_ID_DATAVERSE]['iss']
+        self.epadd_jwt_issuer = jwt_keys_dict[self.JWT_KEY_ID_EPADD]['iss']
 
-        self.epadd_jwt_issuer = os.getenv('EPADD_JWT_ISSUER')
-        self.epadd_jwt_kid = os.getenv('EPADD_JWT_KID')
+        self.dataverse_private_key_path = os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH')
         self.epadd_private_key_path = os.getenv('EPADD_JWT_PRIVATE_KEY_FILE_PATH')
 
     def test_health_endpoint_happy_path(self) -> None:
@@ -78,7 +80,7 @@ class TestFlaskApp(TestCase):
                 test_client=test_client,
                 authorization_header=self.__create_ingest_authorization_header(
                     issuer=self.dataverse_jwt_issuer,
-                    kid=self.dataverse_jwt_kid,
+                    kid=self.JWT_KEY_ID_DATAVERSE,
                     private_key_path=self.dataverse_private_key_path
                 )
             )
@@ -91,7 +93,7 @@ class TestFlaskApp(TestCase):
                 test_client=test_client,
                 authorization_header=self.__create_ingest_authorization_header(
                     issuer=self.epadd_jwt_issuer,
-                    kid=self.epadd_jwt_kid,
+                    kid=self.JWT_KEY_ID_EPADD,
                     private_key_path=self.epadd_private_key_path
                 )
             )
@@ -208,7 +210,7 @@ class TestFlaskApp(TestCase):
             issuer = self.dataverse_jwt_issuer
 
         if kid is None:
-            kid = self.dataverse_jwt_kid
+            kid = self.JWT_KEY_ID_DATAVERSE
 
         if private_key_path is None:
             private_key_path = self.dataverse_private_key_path

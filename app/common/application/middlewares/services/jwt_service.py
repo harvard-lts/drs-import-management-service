@@ -1,5 +1,8 @@
 import hashlib
+import json
 import logging
+import os
+from json import JSONDecodeError
 from typing import Optional
 
 import jcs
@@ -9,7 +12,6 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from jwt import InvalidTokenError
 
 from app.common.application.middlewares.services.jwt_key import JwtKey
-from app.common.application.middlewares.services.jwt_key_factory import JwtKeyFactory
 
 
 class JwtService:
@@ -50,7 +52,7 @@ class JwtService:
             return False
 
         self.__logger.debug("Adding depositing_application field to request body...")
-        request_body['depositing_application'] = jwt_key.depositing_application.value
+        request_body['depositing_application'] = jwt_key.depositing_application
 
         return True
 
@@ -76,12 +78,22 @@ class JwtService:
             self.__logger.debug("Missing 'kid' header")
             return None
 
-        jwt_key_factory = JwtKeyFactory()
-        jwt_key = jwt_key_factory.get_jwt_key(kid_header)
-        if jwt_key is None:
+        try:
+            jwt_keys = json.loads(os.getenv('JWT_KEYS'))
+        except JSONDecodeError as e:
+            self.__logger.error(str(e))
+            return None
+
+        jwt_key_dict = jwt_keys.get(kid_header)
+        if jwt_key_dict is None:
             self.__logger.debug("Unrecognized 'kid': {}".format(kid_header))
             return None
 
+        jwt_key = JwtKey(
+            issuer=jwt_key_dict['iss'],
+            public_key_path=jwt_key_dict['public_key_path'],
+            depositing_application=jwt_key_dict['application_name']
+        )
         return jwt_key
 
     def __decode_jwt_token(self, jwt_token: str, jwt_public_key_path: str) -> dict:
