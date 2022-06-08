@@ -1,8 +1,5 @@
 import hashlib
-import json
 import logging
-import os
-from json import JSONDecodeError
 from typing import Optional
 
 import jcs
@@ -11,15 +8,16 @@ from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from jwt import InvalidTokenError
 
-from app.common.application.middlewares.services.jwt_key import JwtKey
+from app.common.application.middlewares.models.jwt_key import JwtKey
 
 
 class JwtService:
     JWT_ENCODING_ALGORITHM = "RS256"
     JWT_HEADER_TYP_VALUE = "JWT"
 
-    def __init__(self) -> None:
+    def __init__(self, jwt_keys: dict) -> None:
         self.__logger = logging.getLogger()
+        self.__jwt_keys = jwt_keys
 
     def validate_jwt_token(self, jwt_token: str, request_body: dict, request_body_encoding: str) -> bool:
         self.__logger.debug("Obtaining JWT token headers...")
@@ -78,22 +76,11 @@ class JwtService:
             self.__logger.debug("Missing 'kid' header")
             return None
 
-        try:
-            jwt_keys = json.loads(os.getenv('JWT_KEYS'))
-        except JSONDecodeError as e:
-            self.__logger.error(str(e))
-            return None
-
-        jwt_key_dict = jwt_keys.get(kid_header)
-        if jwt_key_dict is None:
+        jwt_key = self.__jwt_keys.get(kid_header)
+        if jwt_key is None:
             self.__logger.debug("Unrecognized 'kid': {}".format(kid_header))
             return None
 
-        jwt_key = JwtKey(
-            issuer=jwt_key_dict['iss'],
-            public_key_path=jwt_key_dict['public_key_path'],
-            depositing_application=jwt_key_dict['application_name']
-        )
         return jwt_key
 
     def __decode_jwt_token(self, jwt_token: str, jwt_public_key_path: str) -> dict:

@@ -1,8 +1,12 @@
+import json
+import os
+
 from connexion import FlaskApp
 from connexion.exceptions import BadRequestProblem
 
 from app.common.application.controllers.responses.error_handlers import render_bad_request_problem
 from app.common.application.middlewares.authorization_middleware import AuthorizationMiddleware
+from app.common.application.middlewares.models.jwt_key import JwtKey
 from app.drs_import_management_service_resolver import DrsImportManagementServiceResolver
 from app.health.application.controllers.health_get_controller import HealthGetController
 from app.ingest.infrastructure.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
@@ -15,10 +19,10 @@ class DrsImportManagementServiceApp(FlaskApp):
         super().__init__(import_name, **kwargs)
 
         self.__setup_controllers()
-        self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app)
+        self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app, self.__get_jwt_keys())
         self.__setup_queue_listeners()
 
-    def __setup_controllers(self):
+    def __setup_controllers(self) -> None:
         health_controller = HealthGetController()
         health_controller.__name__ = "app.health.application.controllers.health_get_controller.HealthGetController"
         self.add_url_rule(
@@ -31,6 +35,17 @@ class DrsImportManagementServiceApp(FlaskApp):
             resolver=DrsImportManagementServiceResolver()
         )
         self.add_error_handler(BadRequestProblem, render_bad_request_problem)
+
+    def __get_jwt_keys(self) -> dict:
+        jwt_keys_dict = json.loads(os.getenv('JWT_KEYS'))
+        jwt_keys = {}
+        for kid, values in jwt_keys_dict.items():
+            jwt_keys[kid] = JwtKey(
+                issuer=values['iss'],
+                public_key_path=values['public_key_path'],
+                depositing_application=values['application_name']
+            )
+        return jwt_keys
 
     def __setup_queue_listeners(self) -> None:
         TransferStatusQueueListener()

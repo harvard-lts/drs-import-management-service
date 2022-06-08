@@ -17,8 +17,9 @@ class AuthorizationMiddleware:
     RESPONSE_MESSAGE_INVALID_TOKEN = "Invalid authorization token"
     RESPONSE_MESSAGE_INVALID_REQUEST_BODY_JSON = "Request body is not a valid JSON"
 
-    def __init__(self, app: Flask) -> None:
+    def __init__(self, app: Flask, jwt_keys: dict) -> None:
         self.__app = app
+        self.__jwt_keys = jwt_keys
 
     def __call__(self, environ: dict, start_response: Callable) -> Any:
         logger = logging.getLogger()
@@ -58,7 +59,7 @@ class AuthorizationMiddleware:
         jwt_token = authorization_header[7:]
 
         logger.info("Validating JWT token...")
-        jwt_service = JwtService()
+        jwt_service = JwtService(self.__jwt_keys)
         if not jwt_service.validate_jwt_token(
                 jwt_token=jwt_token,
                 request_body=request_body,
