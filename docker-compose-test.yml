@@ -20,11 +20,20 @@ services:
     volumes:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-  test_activemq:
-    container_name: "test_activemq"
+  test_activemq_integration:
+    container_name: "test_activemq_integration"
     build:
       context: .
       dockerfile: ./activemq/activemq.Dockerfile
     restart: on-failure
     ports:
       - "8162:8161"
+
+  test_activemq_functional:
+    container_name: "test_activemq_functional"
+    build:
+      context: .
+      dockerfile: ./activemq/activemq.Dockerfile
+    restart: on-failure
+    ports:
+      - "8163:8161"

@@ -1,6 +1,5 @@
 from typing import Optional
 
-from app.ingest.domain.models.ingest.depositing_application import DepositingApplication
 from app.ingest.domain.models.ingest.ingest import Ingest
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
 
@@ -19,6 +18,6 @@ def create_ingest(
             "test_admin_metadata_field_2": "test"
         },
         status=status,
-        depositing_application=DepositingApplication.Dataverse,
+        depositing_application="Dataverse",
         drs_url=drs_url
     )

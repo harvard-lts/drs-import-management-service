@@ -39,7 +39,9 @@ class TestTransferReadyQueuePublisher(StompPublisherIntegrationTestBase):
             's3_path': self.TEST_INGEST.s3_path,
             's3_bucket_name': self.TEST_INGEST.s3_bucket_name,
             'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
-            'admin_metadata':
-                self.TEST_INGEST.admin_metadata | {'original_queue': self._get_queue_name(), 'retry_count': 0},
-            'application_name': self.TEST_INGEST.depositing_application.value
+            'admin_metadata': {
+                'original_queue': self._get_queue_name(),
+                'retry_count': 0
+            },
+            'application_name': self.TEST_INGEST.depositing_application
         }

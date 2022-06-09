@@ -17,6 +17,7 @@ class TestIngestPostController(TestCase):
             "package_id": "test",
             "s3_path": "test",
             "s3_bucket_name": "test",
+            "depositing_application": "Dataverse",
             "admin_metadata":
                 {
                     "accessFlag": "N",

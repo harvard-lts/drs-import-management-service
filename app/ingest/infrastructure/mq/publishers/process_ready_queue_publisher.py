@@ -34,5 +34,6 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
         return {
             'package_id': ingest.package_id,
             'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
-            'application_name': ingest.depositing_application.value
+            'admin_metadata': ingest.admin_metadata,
+            'application_name': ingest.depositing_application
         }

@@ -17,8 +17,9 @@ class AuthorizationMiddleware:
     RESPONSE_MESSAGE_INVALID_TOKEN = "Invalid authorization token"
     RESPONSE_MESSAGE_INVALID_REQUEST_BODY_JSON = "Request body is not a valid JSON"
 
-    def __init__(self, app: Flask) -> None:
+    def __init__(self, app: Flask, jwt_keys: dict) -> None:
         self.__app = app
+        self.__jwt_keys = jwt_keys
 
     def __call__(self, environ: dict, start_response: Callable) -> Any:
         logger = logging.getLogger()
@@ -58,7 +59,7 @@ class AuthorizationMiddleware:
         jwt_token = authorization_header[7:]
 
         logger.info("Validating JWT token...")
-        jwt_service = JwtService()
+        jwt_service = JwtService(self.__jwt_keys)
         if not jwt_service.validate_jwt_token(
                 jwt_token=jwt_token,
                 request_body=request_body,
@@ -71,6 +72,9 @@ class AuthorizationMiddleware:
                 start_response
             )
 
+        # Updating the environ dictionary request data to include the changes done by JwtService
+        self.__update_environ_request_body(environ, request_body)
+
         return self.__app(environ, start_response)
 
     def __get_request_body_from_environ(self, environ: dict) -> str:
@@ -79,6 +83,11 @@ class AuthorizationMiddleware:
         environ['wsgi.input'] = BytesIO(body)
         request_body = body.decode(self.REQUEST_BODY_ENCODING)
         return request_body
+
+    def __update_environ_request_body(self, environ: dict, request_body: dict) -> None:
+        request_body_str = json.dumps(request_body).encode(self.REQUEST_BODY_ENCODING)
+        environ['wsgi.input'] = BytesIO(request_body_str)
+        environ['CONTENT_LENGTH'] = len(request_body_str)
 
     def __create_error_response(self, message: str, code: int, environ: dict, start_response: Callable) -> Any:
         response = Response(json.dumps(
