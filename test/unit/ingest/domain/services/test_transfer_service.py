@@ -153,7 +153,6 @@ class TestTransferService(TestCase):
 
     def test_handle_transfer_status_message_missing_message_field(self) -> None:
         ingest_service_mock = Mock(spec=IngestService)
-        ingest_service_mock.get_ingest_by_package_id.return_value = self.TEST_INGEST
 
         sut = TransferService(ingest_service_mock, self.logger_mock)
         with self.assertRaises(TransferStatusMessageHandlingException):
@@ -169,7 +168,6 @@ class TestTransferService(TestCase):
 
     def test_handle_transfer_status_message_none_message_field(self) -> None:
         ingest_service_mock = Mock(spec=IngestService)
-        ingest_service_mock.get_ingest_by_package_id.return_value = self.TEST_INGEST
 
         sut = TransferService(ingest_service_mock, self.logger_mock)
         with self.assertRaises(TransferStatusMessageHandlingException):
