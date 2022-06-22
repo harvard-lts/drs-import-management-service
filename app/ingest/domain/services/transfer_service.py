@@ -5,11 +5,11 @@ This module defines a TransferService, which is a domain service that defines Tr
 from logging import Logger
 
 from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
+from app.ingest.domain.services.exceptions.message_body_field_exception import MessageBodyFieldException
 from app.ingest.domain.services.exceptions.transfer_status_message_handling_exception import \
     TransferStatusMessageHandlingException
-from app.ingest.domain.services.exceptions.transfer_status_message_missing_field_exception import \
-    TransferStatusMessageMissingFieldException
 from app.ingest.domain.services.ingest_service import IngestService
+from app.ingest.domain.services.message_body_transformer import MessageBodyTransformer
 
 
 class TransferService:
@@ -32,11 +32,20 @@ class TransferService:
 
         :raises TransferServiceException
         """
+        message_body_transformer = MessageBodyTransformer()
         try:
-            package_id = message_body['package_id']
-            transfer_status = message_body['transfer_status']
-        except KeyError as e:
-            raise TransferStatusMessageMissingFieldException(message_id, str(e))
+            package_id = message_body_transformer.get_message_body_field_value(
+                'package_id',
+                message_body,
+                message_id
+            )
+            transfer_status = message_body_transformer.get_message_body_field_value(
+                'transfer_status',
+                message_body,
+                message_id
+            )
+        except MessageBodyFieldException as e:
+            raise TransferStatusMessageHandlingException(message_id, str(e))
 
         self.__logger.info("Obtaining ingest by the package id of the received message {}...".format(package_id))
         try:
