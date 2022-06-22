@@ -5,8 +5,6 @@ from unittest.mock import Mock
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_status_message_handling_exception import \
     ProcessStatusMessageHandlingException
-from app.ingest.domain.services.exceptions.process_status_message_missing_field_exception import \
-    ProcessStatusMessageMissingFieldException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception import \
     SetIngestAsProcessedFailedException
@@ -39,6 +37,14 @@ class TestProcessService(TestCase):
 
         cls.TEST_PROCESS_MESSAGE_MISSING_FIELD = {
             "application_name": cls.TEST_INGEST.depositing_application
+        }
+
+        cls.TEST_PROCESS_MESSAGE_NONE_FIELD = {
+            "package_id": None,
+            "application_name": cls.TEST_INGEST.depositing_application,
+            "batch_ingest_status": "successful",
+            "drs_url": "test",
+            "message": "test"
         }
 
         cls.TEST_MESSAGE_ID = "test"
@@ -133,12 +139,26 @@ class TestProcessService(TestCase):
 
     def test_handle_process_status_message_missing_message_field(self) -> None:
         ingest_service_mock = Mock(spec=IngestService)
-        ingest_service_mock.get_ingest_by_package_id.return_value = self.TEST_INGEST
 
-        sut = ProcessService(ingest_service_mock, self.logger_mock)
-        with self.assertRaises(ProcessStatusMessageMissingFieldException):
+        sut = ProcessService(Mock(spec=IngestService), self.logger_mock)
+        with self.assertRaises(ProcessStatusMessageHandlingException):
             sut.handle_process_status_message(
                 self.TEST_PROCESS_MESSAGE_MISSING_FIELD,
+                self.TEST_MESSAGE_ID
+            )
+
+        ingest_service_mock.get_ingest_by_package_id.assert_not_called()
+        ingest_service_mock.set_ingest_as_transferred_failed.assert_not_called()
+        ingest_service_mock.set_ingest_as_transferred.assert_not_called()
+        ingest_service_mock.process_ingest.assert_not_called()
+
+    def test_handle_process_status_message_none_message_field(self) -> None:
+        ingest_service_mock = Mock(spec=IngestService)
+
+        sut = ProcessService(Mock(spec=IngestService), self.logger_mock)
+        with self.assertRaises(ProcessStatusMessageHandlingException):
+            sut.handle_process_status_message(
+                self.TEST_PROCESS_MESSAGE_NONE_FIELD,
                 self.TEST_MESSAGE_ID
             )
 
