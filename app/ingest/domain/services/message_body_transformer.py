@@ -1,6 +1,5 @@
 from app.ingest.domain.services.exceptions.message_body_missing_field_exception import MessageBodyMissingFieldException
-from app.ingest.domain.services.exceptions.message_body_none_field_exception import \
-    MessageBodyNoneFieldException
+from app.ingest.domain.services.exceptions.message_body_none_field_exception import MessageBodyNoneFieldException
 
 
 class MessageBodyTransformer:
