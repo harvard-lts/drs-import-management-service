@@ -44,12 +44,8 @@ class ProcessService:
                 message_body,
                 message_id
             )
-            drs_url = message_body_transformer.get_message_body_field_value('drs_url', message_body, message_id)
-        except MessageBodyFieldException as e:
-            raise ProcessStatusMessageHandlingException(message_id, str(e))
 
-        self.__logger.info("Obtaining ingest by the package id of the received message " + package_id + "...")
-        try:
+            self.__logger.info("Obtaining ingest by the package id of the received message " + package_id + "...")
             ingest = self.__ingest_service.get_ingest_by_package_id(package_id)
 
             if process_status == "failure":
@@ -58,7 +54,8 @@ class ProcessService:
                 return
 
             self.__logger.info("Setting ingest as processed...")
+            drs_url = message_body_transformer.get_message_body_field_value('drs_url', message_body, message_id)
             self.__ingest_service.set_ingest_as_processed(ingest, drs_url)
 
-        except IngestServiceException as e:
+        except (MessageBodyFieldException, IngestServiceException) as e:
             raise ProcessStatusMessageHandlingException(message_id, str(e))
