@@ -16,7 +16,7 @@ class DataverseParamsTransformer:
         """
         Transforms a package id to a tuple of Dataverse 'doi' and 'version' parameters.
 
-        E.g., the package id 'doi-10-5072-fk2-e6cmkr.v1.18' will result in a tuple of '10.5072/FK2/E6CMKR' and '1.18'
+        E.g., the package id 'doi-10-5072-fk2-e6cmkr_v1_18' will result in a tuple of '10.5072/FK2/E6CMKR' and '1.18'
 
         :param package_id: Source package id to generate Dataverse parameters
         :type package_id: str
@@ -33,11 +33,13 @@ class DataverseParamsTransformer:
             # Replacing all "-" occurrences by "/"
             formatted_package_id = formatted_package_id.replace("-", "/")
 
-            # Splitting the resulting string from ".v"
-            formatted_package_id = formatted_package_id.split(".v")
+            # Splitting the resulting string from "_v"
+            formatted_package_id = formatted_package_id.split("_v")
 
             doi = formatted_package_id[0].upper()
-            version = formatted_package_id[1]
+
+            # Replacing "_" occurrences by "." in version number
+            version = formatted_package_id[1].replace("_", ".")
 
             return doi, version
 

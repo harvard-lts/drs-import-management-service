@@ -53,7 +53,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         self.assertEqual(actual_status, expected_status)
 
     def __transform_persistent_id_to_dims_package_id(self) -> str:
-        package_id = self.__persistent_id.replace(":", ".").replace(".", "-").replace("/", "-") + ".v1.0"
+        package_id = self.__persistent_id.replace(":", ".").replace(".", "-").replace("/", "-") + "_v1_0"
         return package_id
 
     def __get_actual_dataset_status(self) -> str:
