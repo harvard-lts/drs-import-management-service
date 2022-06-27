@@ -12,7 +12,7 @@ class TestDataverseParamsTransformer(TestCase):
         self.sut = DataverseParamsTransformer()
 
     def test_transform_package_id_to_dataverse_params_happy_path(self) -> None:
-        test_package_id = "doi-10-5072-fk2-e6cmkr.v1.18"
+        test_package_id = "doi-10-5072-fk2-e6cmkr_v1_18"
         actual_doi, actual_version = self.sut.transform_package_id_to_dataverse_params(test_package_id)
 
         expected_doi = "10.5072/FK2/E6CMKR"
