@@ -24,7 +24,7 @@ class TestTransferReadyQueuePublisher(TestCase):
                 'package_id': self.TEST_INGEST.package_id,
                 's3_path': self.TEST_INGEST.s3_path,
                 's3_bucket_name': self.TEST_INGEST.s3_bucket_name,
-                'destination_path': self.TEST_DESTINATION_PATH,
+                'destination_path': self.TEST_DESTINATION_PATH + "/" + self.TEST_DESTINATION_PATH + "/incoming",
                 'application_name': self.TEST_INGEST.depositing_application
             }
         )
