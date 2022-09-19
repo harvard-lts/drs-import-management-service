@@ -31,10 +31,19 @@ class TransferReadyQueuePublisher(ITransferReadyQueuePublisher, StompPublisherBa
         )
 
     def __create_transfer_ready_message(self, ingest: Ingest) -> dict:
+        # Set destination path based on application
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
+        destination_path = ""
+
+        if ingest.depositing_application == "Dataverse":
+            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming")
+        elif ingest.depositing_application == "ePADD":
+            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
+
         return {
             'package_id': ingest.package_id,
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
-            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
+            'destination_path': destination_path,
             'application_name': ingest.depositing_application
         }

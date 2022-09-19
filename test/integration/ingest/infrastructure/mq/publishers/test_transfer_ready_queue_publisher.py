@@ -34,11 +34,13 @@ class TestTransferReadyQueuePublisher(StompPublisherIntegrationTestBase):
         return os.getenv('MQ_TRANSFER_QUEUE_TRANSFER_READY')
 
     def _get_expected_body(self) -> dict:
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
+
         return {
             'package_id': self.TEST_INGEST.package_id,
             's3_path': self.TEST_INGEST.s3_path,
             's3_bucket_name': self.TEST_INGEST.s3_bucket_name,
-            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
+            'destination_path': os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming"),
             'admin_metadata': {
                 'original_queue': self._get_queue_name(),
                 'retry_count': 0
