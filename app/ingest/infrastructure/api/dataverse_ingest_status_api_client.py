@@ -18,7 +18,7 @@ from app.ingest.infrastructure.api.exceptions.transform_package_id_exception imp
 
 
 class DataverseIngestStatusApiClient(IIngestStatusApiClient):
-    __API_ENDPOINT = "/api/datasets/submitDatasetVersionToArchive/:persistentId/{version}/status?persistentId=doi:{doi}"
+    __API_ENDPOINT = "/api/datasets/:persistentId/{version}/archivalStatus?persistentId=doi:{doi}"
     __API_REQUEST_MAX_RETRIES = 2
 
     def __init__(self, dataverse_params_transformer: DataverseParamsTransformer) -> None:

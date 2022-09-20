@@ -34,9 +34,11 @@ class TestProcessReadyQueuePublisher(StompPublisherIntegrationTestBase):
         return os.getenv('MQ_PROCESS_QUEUE_PROCESS_READY')
 
     def _get_expected_body(self) -> dict:
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
+
         return {
             'package_id': self.TEST_INGEST.package_id,
-            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
+            'destination_path': os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming"),
             'application_name': self.TEST_INGEST.depositing_application,
             'admin_metadata':
                 self.TEST_INGEST.admin_metadata | {'original_queue': self._get_queue_name(), 'retry_count': 0}

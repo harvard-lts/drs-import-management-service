@@ -4,6 +4,7 @@ which includes the necessary logic to connect to the remote MQ and publish a pro
 """
 
 import os
+import os.path
 
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.common.infrastructure.mq.publishers.stomp_publisher_base import StompPublisherBase
@@ -31,9 +32,18 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
         )
 
     def __create_process_ready_message(self, ingest: Ingest) -> dict:
+        # Set destination path based on application
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
+        destination_path = ""
+
+        if ingest.depositing_application == "Dataverse":
+            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming")
+        elif ingest.depositing_application == "ePADD":
+            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
+
         return {
             'package_id': ingest.package_id,
-            'destination_path': os.getenv('INGEST_DESTINATION_PATH'),
+            'destination_path': destination_path,
             'admin_metadata': ingest.admin_metadata,
             'application_name': ingest.depositing_application
         }

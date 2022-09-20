@@ -21,7 +21,7 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         cls.API_DATASET_CREATE_ENDPOINT = "/api/dataverses/{collection_alias}/datasets"
         cls.API_DATASET_PUBLISH_ENDPOINT = "/api/datasets/:persistentId/actions/:publish?persistentId={persistent_id}&type=major&assureIsIndexed=true"
         cls.API_DATASET_DELETE_ENDPOINT = "/api/datasets/{dataset_id}/destroy"
-        cls.API_DATASET_STATUS_ENDPOINT = "/api/datasets/submitDatasetVersionToArchive/{dataset_id}/{version}/status"
+        cls.API_DATASET_STATUS_ENDPOINT = "/api/datasets/{dataset_id}/{version}/archivalStatus"
 
         cls.TEST_DATAVERSE_ALIAS = "test_dataverse_alias"
 
