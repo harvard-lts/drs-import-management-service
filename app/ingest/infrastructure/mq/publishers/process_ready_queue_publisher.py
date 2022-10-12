@@ -46,8 +46,7 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
                 'package_id': ingest.package_id,
                 'destination_path': destination_path,
                 'admin_metadata': ingest.admin_metadata,
-                'application_name': ingest.depositing_application,
-                'dry_run': ingest.dry_run
+                'application_name': ingest.depositing_application
             }
         else:
             return {
@@ -55,4 +54,5 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
                 'destination_path': destination_path,
                 'admin_metadata': ingest.admin_metadata,
                 'application_name': ingest.depositing_application,
+                'dry_run': ingest.dry_run
             }

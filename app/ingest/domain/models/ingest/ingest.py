@@ -13,4 +13,4 @@ class Ingest:
     status: IngestStatus
     depositing_application: str
     drs_url: Optional[str]
-    dry_run: Optional[str]
+    dry_run: Optional[str] = field(default=None)
