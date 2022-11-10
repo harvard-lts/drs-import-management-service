@@ -33,7 +33,8 @@ class TestDataverseIngestStatusApiClient(IntegrationTestBase):
         self.__create_test_resources()
 
     def tearDown(self) -> None:
-        self.__delete_test_resources()
+        #self.__delete_test_resources()
+        pass
 
     def test_report_status_happy_path(self) -> None:
         test_package_id = self.__transform_persistent_id_to_dims_package_id()
