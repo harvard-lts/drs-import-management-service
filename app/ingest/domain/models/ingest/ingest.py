@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -13,3 +13,4 @@ class Ingest:
     status: IngestStatus
     depositing_application: str
     drs_url: Optional[str]
+    dry_run: Optional[str] = field(default=None)

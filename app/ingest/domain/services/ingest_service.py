@@ -94,7 +94,8 @@ class IngestService:
         ingest.status = IngestStatus.transferred_to_dropbox_successful
         try:
             self.__ingest_repository.save(ingest)
-            self.__ingest_status_api_client.report_status(ingest)
+            if ingest.depositing_application == "Dataverse":
+                self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsTransferredException(ingest.package_id, str(e))
 
@@ -110,7 +111,8 @@ class IngestService:
         ingest.status = IngestStatus.transferred_to_dropbox_failed
         try:
             self.__ingest_repository.save(ingest)
-            self.__ingest_status_api_client.report_status(ingest)
+            if ingest.depositing_application == "Dataverse":
+                self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsTransferredFailedException(ingest.package_id, str(e))
 
@@ -128,7 +130,8 @@ class IngestService:
         try:
             self.__process_ready_queue_publisher.publish_message(ingest)
             self.__ingest_repository.save(ingest)
-            self.__ingest_status_api_client.report_status(ingest)
+            if ingest.depositing_application == "Dataverse":
+                self.__ingest_status_api_client.report_status(ingest)
         except (MqException, IngestSaveException, ReportStatusApiClientException) as e:
             raise ProcessIngestException(ingest.package_id, str(e))
 
@@ -147,7 +150,8 @@ class IngestService:
         ingest.drs_url = drs_url
         try:
             self.__ingest_repository.save(ingest)
-            self.__ingest_status_api_client.report_status(ingest)
+            if ingest.depositing_application == "Dataverse":
+                self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsProcessedException(ingest.package_id, str(e))
 
@@ -163,6 +167,7 @@ class IngestService:
         ingest.status = IngestStatus.batch_ingest_failed
         try:
             self.__ingest_repository.save(ingest)
-            self.__ingest_status_api_client.report_status(ingest)
+            if ingest.depositing_application == "Dataverse":
+                self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
             raise SetIngestAsProcessedFailedException(ingest.package_id, str(e))

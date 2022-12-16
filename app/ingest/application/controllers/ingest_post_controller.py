@@ -31,6 +31,11 @@ class IngestPostController:
         admin_metadata: dict = request.json.get("admin_metadata")
         depositing_application: str = request.json.get("depositing_application")
 
+        if "dry_run" in request.json:
+            dry_run: str = request.json.get("dry_run")
+        else:
+            dry_run = None
+
         new_ingest = Ingest(
             package_id=package_id,
             s3_path=s3_path,
@@ -38,7 +43,8 @@ class IngestPostController:
             admin_metadata=admin_metadata,
             status=IngestStatus.pending_transfer_to_dropbox,
             depositing_application=depositing_application,
-            drs_url=None
+            drs_url=None,
+            dry_run=dry_run
         )
 
         try:

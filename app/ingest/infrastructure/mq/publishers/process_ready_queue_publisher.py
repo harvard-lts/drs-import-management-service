@@ -41,9 +41,18 @@ class ProcessReadyQueuePublisher(IProcessReadyQueuePublisher, StompPublisherBase
         elif ingest.depositing_application == "ePADD":
             destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
 
-        return {
-            'package_id': ingest.package_id,
-            'destination_path': destination_path,
-            'admin_metadata': ingest.admin_metadata,
-            'application_name': ingest.depositing_application
-        }
+        if ingest.dry_run is None:
+            return {
+                'package_id': ingest.package_id,
+                'destination_path': destination_path,
+                'admin_metadata': ingest.admin_metadata,
+                'application_name': ingest.depositing_application
+            }
+        else:
+            return {
+                'package_id': ingest.package_id,
+                'destination_path': destination_path,
+                'admin_metadata': ingest.admin_metadata,
+                'application_name': ingest.depositing_application,
+                'dry_run': ingest.dry_run
+            }
