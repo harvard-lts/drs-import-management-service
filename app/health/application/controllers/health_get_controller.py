@@ -8,7 +8,6 @@ from app.health.application.controllers.responses.get_current_commit_error_respo
 from app.health.application.controllers.services.exceptions.get_current_commit_hash_exception import \
     GetCurrentCommitHashException
 from app.health.application.controllers.services.git_service import GitService
-from app.health.infrastructure.connectivity_service import ConnectivityService
 
 
 class HealthGetController:
@@ -18,11 +17,9 @@ class HealthGetController:
     def __init__(
             self,
             error_response_serializer: ErrorResponseSerializer = Controllers.error_response_serializer(),
-            connectivity_service: ConnectivityService = Controllers.get_connectivity_service(),
             git_service: GitService = Controllers.git_service()
     ) -> None:
         self.__error_response_serializer = error_response_serializer
-        self.__connectivity_service = connectivity_service
         self.__git_service = git_service
 
     def __call__(self) -> Any:
@@ -36,7 +33,6 @@ class HealthGetController:
         health_check = HealthCheck(success_ttl=None, failed_ttl=None)
 
         self.__add_application_section(current_commit_hash, health_check)
-        self.__connectivity_service.create_connectivity_check(health_check)
 
         return self.__execute_health_check(health_check)
 
