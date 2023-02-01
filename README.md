@@ -25,6 +25,13 @@ Execute docker-compose up command:
 docker-compose -f docker-compose-dev.yml up
 ````
 
+#### Testing in development environment
+
+Execute the following command:
+````
+docker exec -it dev_dims python3 -m unittest discover
+````
+
 #### Run using Docker commands
 
 Note that this option will only run a DIMS container, without any dependent services.
