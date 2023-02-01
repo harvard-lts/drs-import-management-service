@@ -8,7 +8,6 @@ from app.health.application.controllers.health_get_controller import HealthGetCo
 from app.health.application.controllers.services.exceptions.get_current_commit_hash_exception import \
     GetCurrentCommitHashException
 from app.health.application.controllers.services.git_service import GitService
-from app.health.infrastructure.connectivity_service import ConnectivityService
 
 
 class TestHealthGetController(TestCase):
@@ -29,7 +28,6 @@ class TestHealthGetController(TestCase):
         git_service_stub.get_current_commit_hash.return_value = "test"
 
         sut = HealthGetController(
-            connectivity_service=Mock(spec=ConnectivityService),
             git_service=git_service_stub
         )
 
@@ -58,7 +56,6 @@ class TestHealthGetController(TestCase):
         git_service_stub.get_current_commit_hash.side_effect = test_exception
 
         sut = HealthGetController(
-            connectivity_service=Mock(spec=ConnectivityService),
             git_service=git_service_stub
         )
 
