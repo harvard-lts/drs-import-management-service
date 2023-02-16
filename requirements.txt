@@ -39,4 +39,4 @@ tenacity==8.0.1
 urllib3==1.26.8
 virtualenv==20.13.3
 virtualenv-clone==0.5.7
-Werkzeug==2.0.3
+Werkzeug==2.2.3
