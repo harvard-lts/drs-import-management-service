@@ -1,5 +1,4 @@
 import os
-import unittest
 from unittest.mock import patch
 
 from app.ingest.infrastructure.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
