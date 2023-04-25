@@ -4,7 +4,7 @@ from test.integration.integration_test_base import IntegrationTestBase
 sys.path.append('app')
 import app.notifier.notifier as notifier 
 
-class TestNotifier(TestCase):
+class TestNotifier(IntegrationTestBase):
     def test_notifier(self):
         message = notifier.send_error_notification("Test Subject from DIMS", "Test Body from DIMS", "dts@hu.onmicrosoft.com")
         json_message = json.loads(message)
