@@ -8,7 +8,7 @@ class MessageBodyTransformer:
         try:
             field_value = message_body[field_name]
         except KeyError as e:
-            raise MessageBodyMissingFieldException(message_id, str(e))
+            raise MessageBodyMissingFieldException(message_id, str(e)) from e
 
         if field_value is None:
             raise MessageBodyNoneFieldException(message_id, field_name)

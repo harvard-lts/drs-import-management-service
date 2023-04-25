@@ -57,7 +57,7 @@ class DataverseIngestStatusApiClient(IIngestStatusApiClient):
             )
             response.raise_for_status()
         except (TransformPackageIdException, exceptions.ConnectionError, HTTPError) as e:
-            raise ReportStatusApiClientException(str(e))
+            raise ReportStatusApiClientException(str(e)) from e
 
     def __create_request_body(self, ingest: Ingest) -> str:
         dataverse_ingest_status = \

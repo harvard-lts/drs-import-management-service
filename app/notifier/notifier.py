@@ -2,6 +2,8 @@ import mqresources.mqutils as mqutils
 import os, logging
 
 def send_error_notification(subject, body, recipients=None):
+    if os.getenv("NO_NOTIFICATIONS", "False") == "True":
+        return ""
     logging.getLogger('dims').error(body)
     queue = os.getenv("EMAIL_QUEUE_NAME")
     subject = "DIMS: " + subject   

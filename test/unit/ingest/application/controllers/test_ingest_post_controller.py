@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
-import flask
+import flask, os
 
 from app.common.application.response_status import ResponseStatus
 from app.ingest.application.controllers.ingest_post_controller import IngestPostController
@@ -39,6 +39,7 @@ class TestIngestPostController(TestCase):
                     "adminCategory": "root"
                 }
         }
+        os.environ["NO_NOTIFICATIONS"] = "True"
 
     def setUp(self) -> None:
         self.app = flask.Flask(__name__)

@@ -1,3 +1,4 @@
+import unittest
 from unittest import TestCase
 
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
@@ -6,6 +7,7 @@ from app.ingest.infrastructure.api.exceptions.transform_package_id_exception imp
 from app.ingest.infrastructure.api.dataverse_ingest_status import DataverseIngestStatus
 
 
+@unittest.skip('Dataverse disabled until ready to process ingests')
 class TestDataverseParamsTransformer(TestCase):
 
     def setUp(self) -> None:

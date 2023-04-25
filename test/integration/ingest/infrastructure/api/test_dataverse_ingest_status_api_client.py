@@ -1,4 +1,5 @@
 import os
+import unittest
 from os.path import join, dirname
 
 from requests import post, delete, get
@@ -9,7 +10,7 @@ from app.ingest.infrastructure.api.dataverse_params_transformer import Dataverse
 from test.integration.integration_test_base import IntegrationTestBase
 from test.resources.ingest.ingest_factory import create_ingest
 
-
+@unittest.skip('Dataverse disabled until ready to process ingests')
 class TestDataverseIngestStatusApiClient(IntegrationTestBase):
 
     @classmethod

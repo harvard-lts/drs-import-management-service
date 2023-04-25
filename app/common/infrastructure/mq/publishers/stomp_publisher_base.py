@@ -54,7 +54,7 @@ class StompPublisherBase(StompInteractor, ABC):
                 queue_host=mq_connection_params.mq_host,
                 queue_port=mq_connection_params.mq_port,
                 reason=str(e)
-            )
+            ) from e
         finally:
             self._logger.debug("Disconnecting from MQ...")
             connection.disconnect()

@@ -7,6 +7,7 @@ from app.ingest.domain.services.exceptions.transfer_service_exception import Tra
 from app.ingest.domain.services.transfer_service import TransferService
 from app.ingest.infrastructure.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
 from test.resources.ingest.ingest_factory import create_ingest
+import os
 
 
 @patch(
@@ -27,10 +28,12 @@ class TestTransferStatusQueueListener(TestCase):
         cls.TEST_MESSAGE_ID = "test"
 
         cls.TEST_MESSAGE_SUBSCRIPTION = "test"
+        os.environ["NO_NOTIFICATIONS"] = "True"
+       
 
     def setUp(self) -> None:
         self.connection_mock = Mock(spec=Connection)
-
+        
     def test_handle_received_message_successful_happy_path(self, create_subscribed_mq_connection_mock) -> None:
         create_subscribed_mq_connection_mock.return_value = self.connection_mock
         transfer_service_mock = Mock(spec=TransferService)

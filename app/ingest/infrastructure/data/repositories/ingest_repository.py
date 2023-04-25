@@ -32,7 +32,7 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             self._logger.info("Ingest with package id " + ingest.package_id + " saved")
         except PyMongoError as pme:
             self._logger.error(str(pme))
-            raise IngestSaveException(ingest.package_id, str(pme))
+            raise IngestSaveException(ingest.package_id, str(pme)) from pme
 
     @retry(
         stop=stop_after_attempt(MongoInteractor._MONGO_OPERATION_MAX_RETRIES),
@@ -52,7 +52,7 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             return self.__transform_mongo_dict_to_ingest(ingest_mongo_dict)
         except PyMongoError as pme:
             self._logger.error(str(pme))
-            raise IngestQueryException(package_id, str(pme))
+            raise IngestQueryException(package_id, str(pme)) from pme
 
     def __transform_ingest_to_mongo_dict(self, ingest: Ingest) -> dict:
         return {

@@ -63,7 +63,7 @@ class StompInteractor(ABC):
                 queue_host=mq_host,
                 queue_port=mq_port,
                 reason=str(e)
-            )
+            ) from e
 
     @abstractmethod
     def _get_mq_connection_params(self) -> MqConnectionParams:

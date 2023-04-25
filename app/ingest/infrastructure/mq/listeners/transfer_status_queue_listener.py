@@ -2,13 +2,14 @@
 This module defines a TransferStatusQueueListener, which defines the necessary
 logic to connect to the remote MQ and listen for transfer status messages.
 """
-import os
+import os, traceback
 
 from app.common.infrastructure.mq.listeners.stomp_listener_base import StompListenerBase
 from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from app.containers import Services
 from app.ingest.domain.services.exceptions.transfer_service_exception import TransferServiceException
 from app.ingest.domain.services.transfer_service import TransferService
+import app.notifier.notifier as notifier
 
 
 class TransferStatusQueueListener(StompListenerBase):
@@ -40,5 +41,9 @@ class TransferStatusQueueListener(StompListenerBase):
             self.__transfer_service.handle_transfer_status_message(message_body, message_id)
             self._acknowledge_message(message_id, message_subscription)
         except TransferServiceException as e:
-            self._logger.error(str(e))
+            msg = "Could not transfer ingest for {}.  Error {}.".format(str(message_body), str(e))
+            exception_msg = traceback.format_exc()
+            body = msg + "\n" + exception_msg
+            notifier.send_error_notification(str(e), body)
+            
             self._unacknowledge_message(message_id, message_subscription)
