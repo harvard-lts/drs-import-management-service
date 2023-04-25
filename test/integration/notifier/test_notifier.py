@@ -1,4 +1,3 @@
-from unittest import TestCase
 import json, sys
 from test.integration.integration_test_base import IntegrationTestBase
 sys.path.append('app')
