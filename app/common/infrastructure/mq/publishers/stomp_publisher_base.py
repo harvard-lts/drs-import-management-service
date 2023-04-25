@@ -23,7 +23,7 @@ class StompPublisherBase(StompInteractor, ABC):
         stop=stop_after_attempt(__STOMP_PUBLISH_MAX_RETRIES),
         retry=retry_if_exception_type(MqException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.INFO)
+        before=before_log(logging.getLogger('dims'), logging.INFO)
     )
     def _publish_message(self, message: dict) -> None:
         """

@@ -22,7 +22,7 @@ class AuthorizationMiddleware:
         self.__jwt_keys = jwt_keys
 
     def __call__(self, environ: dict, start_response: Callable) -> Any:
-        logger = logging.getLogger()
+        logger = logging.getLogger('dims')
         logger.info("Request entered in authorization middleware")
 
         request = Request(environ)

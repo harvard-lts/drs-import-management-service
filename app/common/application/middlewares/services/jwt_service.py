@@ -16,7 +16,7 @@ class JwtService:
     JWT_HEADER_TYP_VALUE = "JWT"
 
     def __init__(self, jwt_keys: dict) -> None:
-        self.__logger = logging.getLogger()
+        self.__logger = logging.getLogger('dims')
         self.__jwt_keys = jwt_keys
 
     def validate_jwt_token(self, jwt_token: str, request_body: dict, request_body_encoding: str) -> bool:

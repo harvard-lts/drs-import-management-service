@@ -18,7 +18,7 @@ class IngestRepository(IIngestRepository, MongoInteractor):
         stop=stop_after_attempt(MongoInteractor._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestSaveException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.INFO)
+        before=before_log(logging.getLogger('dims'), logging.INFO)
     )
     def save(self, ingest: Ingest) -> None:
         try:
@@ -38,7 +38,7 @@ class IngestRepository(IIngestRepository, MongoInteractor):
         stop=stop_after_attempt(MongoInteractor._MONGO_OPERATION_MAX_RETRIES),
         retry=retry_if_exception_type(IngestQueryException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.INFO)
+        before=before_log(logging.getLogger('dims'), logging.INFO)
     )
     def get_by_package_id(self, package_id: str) -> Optional[Ingest]:
         try:

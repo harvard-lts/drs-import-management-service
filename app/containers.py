@@ -37,7 +37,7 @@ class Services(containers.DeclarativeContainer):
             dataverse_params_transformer=DataverseParamsTransformer()
         )
     )
-    logger = logging.getLogger()
+    logger = logging.getLogger('dims')
     transfer_service = providers.Factory(
         TransferService,
         ingest_service=ingest_service,

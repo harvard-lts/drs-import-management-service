@@ -15,7 +15,7 @@ class GitService:
 
         :raises GetCurrentCommitHashException
         """
-        logger = logging.getLogger()
+        logger = logging.getLogger('dims')
         try:
             logger.info("Obtaining current git commit hash...")
             repo = Repo(self.__PATH_TO_REPO)
