@@ -44,7 +44,7 @@ class DataverseParamsTransformer:
             return doi, version
 
         except IndexError as ie:
-            raise TransformPackageIdException(package_id, str(ie)) from e
+            raise TransformPackageIdException(package_id, str(ie)) from ie
 
     def transform_ingest_status_to_dataverse_ingest_status(self, ingest_status: IngestStatus) -> str:
         """
