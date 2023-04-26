@@ -6,7 +6,6 @@ from app.common.infrastructure.mq.mq_connection_params import MqConnectionParams
 from test.integration.common.infrastructure.mq.listeners.stomp_listener_integration_test_base import \
     StompListenerIntegrationTestBase
 
-
 class TestTransferStatusQueueListener(StompListenerIntegrationTestBase):
     @classmethod
     def setUpClass(cls) -> None:

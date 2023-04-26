@@ -45,7 +45,7 @@ class TransferService:
                 message_id
             )
         except MessageBodyFieldException as e:
-            raise TransferStatusMessageHandlingException(message_id, str(e))
+            raise TransferStatusMessageHandlingException(message_id, str(e)) from e
 
         self.__logger.info("Obtaining ingest by the package id of the received message {}...".format(package_id))
         try:
@@ -63,4 +63,4 @@ class TransferService:
             self.__ingest_service.process_ingest(ingest)
 
         except IngestServiceException as e:
-            raise TransferStatusMessageHandlingException(message_id, str(e))
+            raise TransferStatusMessageHandlingException(message_id, str(e)) from e

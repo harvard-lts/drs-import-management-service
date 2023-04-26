@@ -16,7 +16,7 @@ class StompInteractor(ABC):
     __STOMP_CONN_TIMEOUT_MS = 5000
 
     def __init__(self) -> None:
-        self._logger = logging.getLogger()
+        self._logger = logging.getLogger('dims')
 
     def _create_mq_connection(self) -> stomp.Connection:
         """
@@ -63,7 +63,7 @@ class StompInteractor(ABC):
                 queue_host=mq_host,
                 queue_port=mq_port,
                 reason=str(e)
-            )
+            ) from e
 
     @abstractmethod
     def _get_mq_connection_params(self) -> MqConnectionParams:

@@ -23,7 +23,7 @@ class StompPublisherBase(StompInteractor, ABC):
         stop=stop_after_attempt(__STOMP_PUBLISH_MAX_RETRIES),
         retry=retry_if_exception_type(MqException),
         reraise=True,
-        before=before_log(logging.getLogger(), logging.INFO)
+        before=before_log(logging.getLogger('dims'), logging.INFO)
     )
     def _publish_message(self, message: dict) -> None:
         """
@@ -54,7 +54,7 @@ class StompPublisherBase(StompInteractor, ABC):
                 queue_host=mq_connection_params.mq_host,
                 queue_port=mq_connection_params.mq_port,
                 reason=str(e)
-            )
+            ) from e
         finally:
             self._logger.debug("Disconnecting from MQ...")
             connection.disconnect()

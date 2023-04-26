@@ -8,6 +8,8 @@ from flask import Flask, Response, Request
 
 from app.common.application.middlewares.services.jwt_service import JwtService
 from app.common.application.response_status import ResponseStatus
+from app.common.application.middlewares.services.exceptions.authorization_exception import AuthorizationException
+import app.notifier.notifier as notifier
 
 
 class AuthorizationMiddleware:
@@ -22,7 +24,7 @@ class AuthorizationMiddleware:
         self.__jwt_keys = jwt_keys
 
     def __call__(self, environ: dict, start_response: Callable) -> Any:
-        logger = logging.getLogger()
+        logger = logging.getLogger('dims')
         logger.info("Request entered in authorization middleware")
 
         request = Request(environ)
@@ -60,11 +62,13 @@ class AuthorizationMiddleware:
 
         logger.info("Validating JWT token...")
         jwt_service = JwtService(self.__jwt_keys)
-        if not jwt_service.validate_jwt_token(
+        try:
+            jwt_service.validate_jwt_token(
                 jwt_token=jwt_token,
                 request_body=request_body,
                 request_body_encoding=self.REQUEST_BODY_ENCODING
-        ):
+            )
+        except AuthorizationException:
             return self.__create_error_response(
                 self.RESPONSE_MESSAGE_INVALID_TOKEN,
                 401,
@@ -90,11 +94,15 @@ class AuthorizationMiddleware:
         environ['CONTENT_LENGTH'] = len(request_body_str)
 
     def __create_error_response(self, message: str, code: int, environ: dict, start_response: Callable) -> Any:
-        response = Response(json.dumps(
+        json_response = json.dumps(
             {
                 "status": ResponseStatus.failure.value,
                 "status_code": None,
                 "message": message
             }
-        ), status=code, mimetype='application/json')
+        )
+        response = Response(json_response, status=code, mimetype='application/json')
+                    
+        body = message + "\nResponse Sent:\n" + json_response
+        notifier.send_error_notification(message, body)
         return response(environ, start_response)

@@ -96,7 +96,7 @@ class StompListenerBase(stomp.ConnectionListener, StompInteractor, ABC):
             max=__STOMP_CONN_MAX_RETRY_WAITING_SECONDS
         ),
         stop=stop_after_attempt(__STOMP_CONN_MAX_ATTEMPTS),
-        before=before_log(logging.getLogger(), logging.INFO)
+        before=before_log(logging.getLogger('dims'), logging.INFO)
     )
     def __create_subscribed_mq_connection(self) -> stomp.Connection:
         connection = self._create_mq_connection()

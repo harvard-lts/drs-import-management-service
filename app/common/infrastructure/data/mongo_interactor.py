@@ -17,7 +17,7 @@ class MongoInteractor(ABC):
     __MONGO_CONN_TIMEOUT_MS = 5000
 
     def __init__(self) -> None:
-        self._logger = logging.getLogger()
+        self._logger = logging.getLogger('dims')
 
     def _get_database(self) -> Database:
         """

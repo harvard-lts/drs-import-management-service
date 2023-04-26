@@ -58,6 +58,12 @@ A .test.env file must be created inside /test/integration by copying the existin
 
 Similar to integration tests, a .test.env file must be created inside /test/functional, by copying the existing test.env.file.
 
+### Create the necessary functional testing keys
+
+Make copies of the four keys under test/functional and remove the .example from the name:
+Example
+test_epadd_private.key.example => test_epadd_private.key
+
 ### Run test environment
 
 Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and two ActiveMQ containers (one for integration tests and the other for functional tests).

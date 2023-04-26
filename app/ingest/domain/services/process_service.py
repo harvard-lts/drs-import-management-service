@@ -66,4 +66,4 @@ class ProcessService:
                 self.__ingest_service.set_ingest_as_processed(ingest, drs_url)
 
         except (MessageBodyFieldException, IngestServiceException) as e:
-            raise ProcessStatusMessageHandlingException(message_id, str(e))
+            raise ProcessStatusMessageHandlingException(message_id, str(e)) from e

@@ -63,7 +63,7 @@ class IngestService:
                                                     f"No ingest found for package id {ingest_package_id}")
             return ingest
         except IngestQueryException as iqe:
-            raise GetIngestByPackageIdException(ingest_package_id, str(iqe))
+            raise GetIngestByPackageIdException(ingest_package_id, str(iqe)) from iqe
 
     def transfer_ingest(self, ingest: Ingest) -> None:
         """
@@ -80,7 +80,7 @@ class IngestService:
             self.__transfer_ready_queue_publisher.publish_message(ingest)
             self.__ingest_repository.save(ingest)
         except (MqException, IngestSaveException) as e:
-            raise TransferIngestException(ingest.package_id, str(e))
+            raise TransferIngestException(ingest.package_id, str(e)) from e
 
     def set_ingest_as_transferred(self, ingest: Ingest) -> None:
         """
@@ -97,7 +97,7 @@ class IngestService:
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
-            raise SetIngestAsTransferredException(ingest.package_id, str(e))
+            raise SetIngestAsTransferredException(ingest.package_id, str(e)) from e
 
     def set_ingest_as_transferred_failed(self, ingest: Ingest) -> None:
         """
@@ -114,7 +114,7 @@ class IngestService:
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
-            raise SetIngestAsTransferredFailedException(ingest.package_id, str(e))
+            raise SetIngestAsTransferredFailedException(ingest.package_id, str(e)) from e
 
     def process_ingest(self, ingest: Ingest) -> None:
         """
@@ -133,7 +133,7 @@ class IngestService:
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
         except (MqException, IngestSaveException, ReportStatusApiClientException) as e:
-            raise ProcessIngestException(ingest.package_id, str(e))
+            raise ProcessIngestException(ingest.package_id, str(e)) from e
 
     def set_ingest_as_processed(self, ingest: Ingest, drs_url: str) -> None:
         """
@@ -153,7 +153,7 @@ class IngestService:
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
-            raise SetIngestAsProcessedException(ingest.package_id, str(e))
+            raise SetIngestAsProcessedException(ingest.package_id, str(e)) from e
 
     def set_ingest_as_processed_failed(self, ingest: Ingest) -> None:
         """
@@ -170,4 +170,4 @@ class IngestService:
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
         except (IngestSaveException, ReportStatusApiClientException) as e:
-            raise SetIngestAsProcessedFailedException(ingest.package_id, str(e))
+            raise SetIngestAsProcessedFailedException(ingest.package_id, str(e)) from e

@@ -1,6 +1,6 @@
 import logging
 import os
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 from flask import Flask
 from requests import Response
@@ -10,8 +10,8 @@ from config import config
 
 LOG_FILE_DEFAULT_PATH = "/home/dimsuser/logs/dims.log"
 LOG_FILE_DEFAULT_LEVEL = logging.DEBUG
-LOG_FILE_MAX_SIZE_BYTES = 2 * 1024 * 1024
 LOG_FILE_BACKUP_COUNT = 1
+LOG_ROTATION = "midnight"
 
 
 def create_app(config_name: str = 'default') -> Flask:
@@ -38,15 +38,19 @@ def disable_cached_responses(app: Flask) -> None:
 
 
 def configure_logger() -> None:
-    log_file_path = os.getenv('LOG_FILE_PATH', LOG_FILE_DEFAULT_PATH)
-    logger = logging.getLogger()
-
-    file_handler = RotatingFileHandler(
-        filename=log_file_path,
-        maxBytes=LOG_FILE_MAX_SIZE_BYTES,
-        backupCount=LOG_FILE_BACKUP_COUNT
-    )
-    logger.addHandler(file_handler)
 
     log_level = os.getenv('LOG_LEVEL', LOG_FILE_DEFAULT_LEVEL)
+        
+    log_file_path = os.getenv("LOG_FILE_PATH", LOG_FILE_DEFAULT_PATH)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    file_handler = TimedRotatingFileHandler(
+        filename=log_file_path,
+        when=LOG_ROTATION,
+        backupCount=LOG_FILE_BACKUP_COUNT
+    )
+    logger = logging.getLogger('dims')
+        
+    logger.addHandler(file_handler)
+    file_handler.setFormatter(formatter)
     logger.setLevel(log_level)
