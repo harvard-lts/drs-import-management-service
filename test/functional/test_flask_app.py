@@ -68,7 +68,7 @@ class TestFlaskApp(TestCase):
         self.dataverse_private_key_path = os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH')
         self.epadd_private_key_path = os.getenv('EPADD_JWT_PRIVATE_KEY_FILE_PATH')
 
-    @unittest.skip('Broken- needs investigation')
+    @unittest.skip('Broken- needs investigation - ticket https://jira.huit.harvard.edu/browse/LTSEPADD-116')
     def test_health_endpoint_happy_path(self) -> None:
         with self.test_app.test_client() as test_client:
             response = test_client.get("/health")
