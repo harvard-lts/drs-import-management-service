@@ -2,13 +2,9 @@ from dataclasses import replace
 from unittest import TestCase
 from unittest.mock import Mock
 
-from app.common.domain.mq.exceptions.mq_connection_exception import MqConnectionException
-from app.common.domain.mq.exceptions.mq_message_publish_exception import MqMessagePublishException
 from app.ingest.domain.api.exceptions.report_status_api_client_exception import ReportStatusApiClientException
 from app.ingest.domain.api.ingest_status_api_client import IIngestStatusApiClient
 from app.ingest.domain.models.ingest.ingest_status import IngestStatus
-from app.ingest.domain.mq.process_ready_queue_publisher import IProcessReadyQueuePublisher
-from app.ingest.domain.mq.transfer_ready_queue_publisher import ITransferReadyQueuePublisher
 from app.ingest.domain.repositories.exceptions.ingest_query_exception import IngestQueryException
 from app.ingest.domain.repositories.exceptions.ingest_save_exception import IngestSaveException
 from app.ingest.domain.repositories.ingest_repository import IIngestRepository
@@ -36,8 +32,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
         )
 
@@ -52,8 +46,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
         )
 
@@ -66,8 +58,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
         )
 
@@ -76,71 +66,17 @@ class TestIngestService(TestCase):
 
     def test_transfer_ingest_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
-        transfer_ready_queue_publisher_mock = Mock(spec=ITransferReadyQueuePublisher)
-
+        
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=transfer_ready_queue_publisher_mock,
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
         )
 
         sut.transfer_ingest(self.TEST_INGEST)
 
-        transfer_ready_queue_publisher_mock.publish_message.assert_called_once()
         ingest_repository_mock.save.assert_called_once_with(
             replace(self.TEST_INGEST, status=IngestStatus.pending_transfer_to_dropbox))
 
-    def test_transfer_ingest_publisher_raises_mq_connection_exception(self) -> None:
-        ingest_repository_mock = Mock(spec=IIngestRepository)
-        transfer_ready_queue_publisher_stub = Mock(spec=ITransferReadyQueuePublisher)
-        transfer_ready_queue_publisher_stub.publish_message.side_effect = MqConnectionException("test", "test", "test")
-
-        sut = IngestService(
-            ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=transfer_ready_queue_publisher_stub,
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
-        )
-
-        with self.assertRaises(TransferIngestException):
-            sut.transfer_ingest(self.TEST_INGEST)
-
-        ingest_repository_mock.save.assert_not_called()
-
-    def test_transfer_ingest_publisher_raises_mq_message_publish_exception(self) -> None:
-        ingest_repository_mock = Mock(spec=IIngestRepository)
-        transfer_ready_queue_publisher_stub = Mock(spec=ITransferReadyQueuePublisher)
-        transfer_ready_queue_publisher_stub.publish_message.side_effect = MqMessagePublishException("test", "test",
-                                                                                                    "test", "test")
-        sut = IngestService(
-            ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=transfer_ready_queue_publisher_stub,
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
-        )
-
-        with self.assertRaises(TransferIngestException):
-            sut.transfer_ingest(self.TEST_INGEST)
-
-        ingest_repository_mock.save.assert_not_called()
-
-    def test_transfer_ingest_repository_raises_ingest_save_exception(self) -> None:
-        ingest_repository_stub = Mock(spec=IIngestRepository)
-        transfer_ready_queue_publisher_mock = Mock(spec=ITransferReadyQueuePublisher)
-        ingest_repository_stub.save.side_effect = IngestSaveException("test", "test")
-
-        sut = IngestService(
-            ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=transfer_ready_queue_publisher_mock,
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
-            ingest_status_api_client=Mock(spec=IIngestStatusApiClient)
-        )
-
-        with self.assertRaises(TransferIngestException):
-            sut.transfer_ingest(self.TEST_INGEST)
-
-        transfer_ready_queue_publisher_mock.publish_message.assert_called_once()
 
     def test_set_ingest_as_transferred_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
@@ -148,8 +84,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -166,8 +100,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -182,8 +114,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -200,8 +130,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -217,8 +145,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_stub
         )
 
@@ -230,72 +156,27 @@ class TestIngestService(TestCase):
 
     def test_process_ingest_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)
-        process_ready_queue_publisher_mock = Mock(spec=IProcessReadyQueuePublisher)
         ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=process_ready_queue_publisher_mock,
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
         sut.process_ingest(self.TEST_INGEST)
 
         expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest)
-        process_ready_queue_publisher_mock.publish_message.assert_called_once_with(expected_ingest_parameter)
         ingest_repository_mock.save.assert_called_once_with(expected_ingest_parameter)
         ingest_status_api_client_mock.report_status.assert_called_once_with(expected_ingest_parameter)
 
-    def test_process_ingest_publisher_raises_mq_connection_exception(self) -> None:
-        ingest_repository_mock = Mock(spec=IIngestRepository)
-        process_ready_queue_publisher_stub = Mock(spec=IProcessReadyQueuePublisher)
-        process_ready_queue_publisher_stub.publish_message.side_effect = MqConnectionException("test", "test", "test")
-        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
-
-        sut = IngestService(
-            ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=process_ready_queue_publisher_stub,
-            ingest_status_api_client=ingest_status_api_client_mock
-        )
-
-        with self.assertRaises(ProcessIngestException):
-            sut.process_ingest(self.TEST_INGEST)
-
-        ingest_repository_mock.save.assert_not_called()
-        ingest_status_api_client_mock.report_status.assert_not_called()
-
-    def test_process_ingest_publisher_raises_mq_message_publish_exception(self) -> None:
-        ingest_repository_mock = Mock(spec=IIngestRepository)
-        process_ready_queue_publisher_stub = Mock(spec=IProcessReadyQueuePublisher)
-        process_ready_queue_publisher_stub.publish_message.side_effect = MqMessagePublishException("test", "test",
-                                                                                                   "test", "test")
-        ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
-
-        sut = IngestService(
-            ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=process_ready_queue_publisher_stub,
-            ingest_status_api_client=ingest_status_api_client_mock
-        )
-
-        with self.assertRaises(ProcessIngestException):
-            sut.process_ingest(self.TEST_INGEST)
-
-        ingest_repository_mock.save.assert_not_called()
-        ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_process_ingest_repository_raises_ingest_save_exception(self) -> None:
         ingest_repository_stub = Mock(spec=IIngestRepository)
-        process_ready_queue_publisher_mock = Mock(spec=IProcessReadyQueuePublisher)
         ingest_repository_stub.save.side_effect = IngestSaveException("test", "test")
         ingest_status_api_client_mock = Mock(spec=IIngestStatusApiClient)
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=process_ready_queue_publisher_mock,
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -303,7 +184,6 @@ class TestIngestService(TestCase):
             sut.process_ingest(self.TEST_INGEST)
 
         expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest)
-        process_ready_queue_publisher_mock.publish_message.assert_called_once_with(expected_ingest_parameter)
         ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_processed_happy_path(self) -> None:
@@ -312,8 +192,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -335,8 +213,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -352,8 +228,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_stub
         )
 
@@ -374,8 +248,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -392,8 +264,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_stub,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_mock
         )
 
@@ -409,8 +279,6 @@ class TestIngestService(TestCase):
 
         sut = IngestService(
             ingest_repository=ingest_repository_mock,
-            transfer_ready_queue_publisher=Mock(spec=ITransferReadyQueuePublisher),
-            process_ready_queue_publisher=Mock(spec=IProcessReadyQueuePublisher),
             ingest_status_api_client=ingest_status_api_client_stub
         )
 

@@ -9,8 +9,6 @@ from app.common.application.middlewares.authorization_middleware import Authoriz
 from app.common.application.middlewares.models.jwt_key import JwtKey
 from app.drs_import_management_service_resolver import DrsImportManagementServiceResolver
 from app.health.application.controllers.health_get_controller import HealthGetController
-from app.ingest.infrastructure.mq.listeners.process_status_queue_listener import ProcessStatusQueueListener
-from app.ingest.infrastructure.mq.listeners.transfer_status_queue_listener import TransferStatusQueueListener
 
 
 class DrsImportManagementServiceApp(FlaskApp):
@@ -20,7 +18,6 @@ class DrsImportManagementServiceApp(FlaskApp):
 
         self.__setup_controllers()
         self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app, self.__get_jwt_keys())
-        self.__setup_queue_listeners()
 
     def __setup_controllers(self) -> None:
         health_controller = HealthGetController()
@@ -47,6 +44,3 @@ class DrsImportManagementServiceApp(FlaskApp):
             )
         return jwt_keys
 
-    def __setup_queue_listeners(self) -> None:
-        TransferStatusQueueListener()
-        ProcessStatusQueueListener()

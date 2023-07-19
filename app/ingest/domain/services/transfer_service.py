@@ -3,14 +3,17 @@ This module defines a TransferService, which is a domain service that defines Tr
 """
 
 from logging import Logger
-
+from celery import Celery
 from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
 from app.ingest.domain.services.exceptions.message_body_field_exception import MessageBodyFieldException
 from app.ingest.domain.services.exceptions.transfer_status_message_handling_exception import \
     TransferStatusMessageHandlingException
 from app.ingest.domain.services.ingest_service import IngestService
 from app.ingest.domain.services.message_body_transformer import MessageBodyTransformer
+import os
 
+app1 = Celery('tasks')
+app1.config_from_object('celeryconfig')
 
 class TransferService:
     def __init__(
@@ -32,6 +35,10 @@ class TransferService:
 
         :raises TransferServiceException
         """
+        if "testing" in message_body:
+            app1.send_task("dims.tasks.do_task", args=[message_body], kwargs={},
+                    queue=os.getenv("TRANSFER_PUBLISH_QUEUE_NAME")) 
+            return
         message_body_transformer = MessageBodyTransformer()
         try:
             package_id = message_body_transformer.get_message_body_field_value(

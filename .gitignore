@@ -37,5 +37,5 @@ supervisord.pid
 
 # Logs
 *.log
-/logs/*
+logs/*
 !/logs/.keep

@@ -2,15 +2,11 @@ from healthcheck import HealthCheck
 
 from app.health.infrastructure.connectivity_service import ConnectivityService
 from app.health.infrastructure.data.services.mongo_connectivity_service import MongoConnectivityService
-from app.health.infrastructure.mq.services.mq_process_connectivity_service import MqProcessConnectivityService
-from app.health.infrastructure.mq.services.mq_transfer_connectivity_service import MqTransferConnectivityService
 
 
 class CompoundConnectivityService(ConnectivityService):
     __connectivity_checkers = [
         MongoConnectivityService(),
-        MqTransferConnectivityService(),
-        MqProcessConnectivityService()
     ]
 
     def create_connectivity_check(self, health_check: HealthCheck) -> None:

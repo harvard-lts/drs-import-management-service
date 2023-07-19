@@ -1,9 +1,9 @@
-version: "3.8"
+# `docker-compose -f docker-compose-local.yml up -d --build --force-recreate`
 
+version: '3.8'
 services:
-
-  dev_dims:
-    container_name: "dev_dims"
+  dims:
+    container_name: "dims"
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -17,8 +17,8 @@ services:
       - ./logs:/home/dimsuser/logs
       - ./test:/home/dimsuser/test
 
-  dev_mongodb:
-    container_name: "dev_mongodb"
+  mongodb:
+    container_name: "mongodb"
     image: "mongo:4.0.28"
     restart: on-failure
     ports:
@@ -26,15 +26,3 @@ services:
     volumes:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - ./mongodb/data:/data/db
-
-  dev_activemq:
-    container_name: "dev_activemq"
-    build:
-      context: .
-      dockerfile: ./activemq/activemq.Dockerfile
-    restart: on-failure
-    ports:
-      - "8161:8161"
-      - "61613:61613"
-    volumes:
-      - ./activemq/data:/opt/apache-activemq/data
