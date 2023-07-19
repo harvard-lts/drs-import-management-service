@@ -1,12 +1,9 @@
 from celery import Celery
 import os
 import traceback
-import logging
-from app.ingest.domain.services.process_service import ProcessService
 from app.ingest.domain.services.exceptions.process_service_exception import ProcessServiceException
 from app.ingest.domain.services.exceptions.transfer_service_exception import TransferServiceException
 from app.containers import Services
-from app.ingest.domain.services.transfer_service import TransferService
 import app.notifier.notifier as notifier
 
 app = Celery()
@@ -41,16 +38,6 @@ def send_error_notifications(message_body, exception, exception_msg):
     else:
         application_name = "ePADD"
 
-    msg_json = {
-        "package_id": package_id,
-        "application_name": application_name,
-        "batch_ingest_status": "failed",
-        "admin_metadata": {
-            "original_queue": os.getenv("PROCESS_PUBLISH_QUEUE_NAME"),
-            "retry_count": 0
-        }
-    }
-    
     msg = "Could not process export for DRSIngest for {}.  Error {}.".format(message_body.get("package_id"), str(exception))
     body = msg + "\n" + exception_msg
     notifier.send_error_notification(str(exception), body)
