@@ -32,12 +32,6 @@ def handle_transfer_status(self, message_body):
         send_error_notifications(message_body, e, exception_msg)
 
 def send_error_notifications(message_body, exception, exception_msg):
-    package_id = message_body.get("package_id")
-    if "doi" in package_id:
-        application_name = "Dataverse"
-    else:
-        application_name = "ePADD"
-
     msg = "Could not process export for DRSIngest for {}.  Error {}.".format(message_body.get("package_id"), str(exception))
     body = msg + "\n" + exception_msg
     notifier.send_error_notification(str(exception), body)
