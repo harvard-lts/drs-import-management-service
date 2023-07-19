@@ -16,7 +16,6 @@ from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_except
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
     SetIngestAsTransferredFailedException
-from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
 from app.ingest.domain.services.ingest_service import IngestService
 from test.resources.ingest.ingest_factory import create_ingest
 
@@ -154,7 +153,7 @@ class TestIngestService(TestCase):
         with self.assertRaises(ProcessIngestException):
             sut.process_ingest(self.TEST_INGEST)
 
-        expected_ingest_parameter = replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest)
+        replace(self.TEST_INGEST, status=IngestStatus.processing_batch_ingest)
         ingest_status_api_client_mock.report_status.assert_not_called()
 
     def test_set_ingest_as_processed_happy_path(self) -> None:
