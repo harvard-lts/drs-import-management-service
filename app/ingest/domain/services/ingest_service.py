@@ -178,9 +178,9 @@ class IngestService:
         destination_path = ""
 
         if ingest.depositing_application == "Dataverse":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME', 'dvndev'), "incoming")
         elif ingest.depositing_application == "ePADD":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME', 'epadddev_secure'), "incoming")
 
         return {
             'package_id': ingest.package_id,
@@ -196,9 +196,9 @@ class IngestService:
         destination_path = ""
 
         if ingest.depositing_application == "Dataverse":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME', 'dvndev'), "incoming")
         elif ingest.depositing_application == "ePADD":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME', 'epadddev-secure'), "incoming")
 
         if ingest.dry_run is None:
             return {

@@ -29,7 +29,7 @@ def handle_transfer_status(self, message_body):
         transfer_service.handle_transfer_status_message(message_body, self.request.id)
         if 'testing' in message_body:
             app.send_task("dims.tasks.do_task", args=[message_body], kwargs={},
-                    queue=os.getenv("PROCESS_PUBLISH_QUEUE_NAME")) 
+                    queue=(os.getenv("PROCESS_PUBLISH_QUEUE_NAME") +'-dryrun')) 
     except TransferServiceException as e:
         exception_msg = traceback.format_exc()
         send_error_notifications(message_body, e, exception_msg)
