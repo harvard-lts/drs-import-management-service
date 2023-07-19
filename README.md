@@ -2,102 +2,54 @@
 
 DRS Import Management Service (DIMS) is a Python/Flask project written in Python 3.
 
-## Development environment setup
+## Local setup
+    
+1. Make a copy of the env.example to .env and modify the user and password variables.
 
-### Create .env file
+2. Start the container
+    
+```
+docker-compose -f docker-compose-local.yml up -d --build --force-recreate
+```
 
-Create an .env file by copying the existing env.example file from the repository.
+## Testing
+Note, testing uses its own queues so they will not interfere with the queues used by the actual program.
 
-### Run development environment
+1. Start the container up as described in the <b>Local Setup</b> instructions.
 
-DIMS is intended to be executed in a Docker container, so it has its own Docker Image, which is defined within this repository in a Dockerfile.
+2. Exec into the container:
 
-To run a DIMS development container on the local machine, there are two supported options: do it using docker-compose-dev.yml file available in the repository, or using Docker commands.
+```
+docker exec -it dims bash
+```
 
-By using docker-compose-dev.yml, docker-compose will also bring up an ActiveMQ development container. If you want to use a remote MQ, all you have to do is to update the corresponding MQ environment variables in the .env file to access the desired MQ.
+3. Run the tests
 
-#### Run using docker-compose
+```
+pytest
+```
 
-Note that for this option docker-compose must be installed.
+## Invoking the task manually
 
-Execute docker-compose up command:
-````
-docker-compose -f docker-compose-dev.yml up
-````
+- Clone this repo from github 
 
-#### Testing in development environment
+- Create the .env from the env-example and replace with proper values (use LPE Shared-DAIS for passwords)
 
-Execute the following command:
-````
-docker exec -it dev_dims python3 -m unittest discover
-````
+- Start up docker  
 
-#### Run using Docker commands
+`docker-compose -f docker-compose-local.yml up --build -d --force-recreate`
 
-Note that this option will only run a DIMS container, without any dependent services.
+- Exec into the docker container
 
-First, build DIMS Docker image:
-````
-docker build --tag dims .
-````
+`docker exec -it dims bash`
 
-Then, execute Docker run command:
-````
-docker run -p 10580:5000 -v "$(pwd)"/app/:/home/dimsuser/app dims
-````
+- Run invoke task python script
 
-Remember to add the above run command volume mapping to allow automatic updating of code changes in the running container.
+`python3 scripts/invoke-task.py`
 
-## Test environment setup
+- Bring up [DEV DAIS Rabbit UI](https://b-e9f45d5f-039d-4226-b5df-1a776c736346.mq.us-east-1.amazonaws.com/)  - credentials in LPE Shared-DAIS
 
-### Create integration .env file
-
-A .test.env file must be created inside /test/integration by copying the existing test.env.example file which can be found in the same folder.
-
-### Create functional .env file
-
-Similar to integration tests, a .test.env file must be created inside /test/functional, by copying the existing test.env.file.
-
-### Create the necessary functional testing keys
-
-Make copies of the four keys under test/functional and remove the .example from the name:
-Example
-test_epadd_private.key.example => test_epadd_private.key
-
-### Run test environment
-
-Similar to the development environment, for running a local test environment there is a docker-compose-test.yml file, which contains a test runner container and two ActiveMQ containers (one for integration tests and the other for functional tests).
-
-Before running tests locally, the environment must be up and running:
-````
-docker-compose -f docker-compose-test.yml up
-````
-
-### Running tests
-
-Once the test environment is up and running, you can run the tests by executing pytest within the test runner container.
-
-Running all tests:
-````
-docker exec -it test_runner pytest test
-````
-
-Running unit tests:
-````
-docker exec -it test_runner pytest test/unit
-````
-
-Running integration tests:
-````
-docker exec -it test_runner pytest test/integration
-````
-
-Running functional tests:
-````
-docker exec -it test_runner pytest test/functional
-````
-
-If you want to use a remote test environment for integration or functional testing, you will need to update the environment variables in the corresponding .test.env file to access the desired environment.
+- Look for the queue with `-dryrun` (eg `dims-data-ready-dryrun`) appended to its name and verify a message made it
 
 ## Versioning
 
