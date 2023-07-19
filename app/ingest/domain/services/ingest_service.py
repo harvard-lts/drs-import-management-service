@@ -18,6 +18,7 @@ from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception i
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
     SetIngestAsTransferredFailedException
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
+from kombu.exceptions import OperationalError
 from celery import Celery
 import os
 import os.path
@@ -132,7 +133,7 @@ class IngestService:
             self.__ingest_repository.save(ingest)
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
-        except (IngestSaveException, ReportStatusApiClientException) as e:
+        except (OperationalError, IngestSaveException, ReportStatusApiClientException) as e:
             raise ProcessIngestException(ingest.package_id, str(e)) from e
 
     def set_ingest_as_processed(self, ingest: Ingest, drs_url: str) -> None:
