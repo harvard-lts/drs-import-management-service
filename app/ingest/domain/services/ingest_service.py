@@ -18,17 +18,13 @@ from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception i
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
     SetIngestAsTransferredFailedException
 from app.ingest.domain.services.exceptions.transfer_ingest_exception import TransferIngestException
-from kombu.exceptions import OperationalError
 from celery import Celery
 import os
 import os.path
-from kombu import Queue
 
 app = Celery('tasks')
 app.config_from_object('celeryconfig')
 
-process_ready_task = os.getenv('PROCESS_READY_TASK_NAME', 'dts.tasks.prepare_and_send_to_drs')
-transfer_ready_task = os.getenv('TRANSFER_READY_TASK_NAME', 'transfer_service.tasks.transfer_data')
 
 class IngestService:
 
@@ -77,10 +73,8 @@ class IngestService:
         ingest.status = IngestStatus.pending_transfer_to_dropbox
         msg_json = self.__create_transfer_ready_message(ingest)
         try:
-            transfer_publish_queue = Queue(
-                os.getenv("TRANSFER_PUBLISH_QUEUE_NAME"), no_declare=True)
-            app.send_task(transfer_ready_task, args=[msg_json], kwargs={},
-                    queue=transfer_publish_queue) 
+            app.send_task("transfer_service.tasks.transfer_data", args=[msg_json], kwargs={},
+                    queue=os.getenv("TRANSFER_PUBLISH_QUEUE_NAME")) 
     
             self.__ingest_repository.save(ingest)
         except (IngestSaveException) as e:
@@ -133,14 +127,12 @@ class IngestService:
         ingest.status = IngestStatus.processing_batch_ingest
         msg_json = self.__create_process_ready_message(ingest)
         try:
-            process_publish_queue = Queue(
-                os.getenv("PROCESS_PUBLISH_QUEUE_NAME"), no_declare=True)
-            app.send_task(process_ready_task, args=[msg_json], kwargs={},
-                    queue=process_publish_queue) 
+            app.send_task("dts.tasks.prepare_and_send_to_drs", args=[msg_json], kwargs={},
+                    queue=os.getenv("PROCESS_PUBLISH_QUEUE_NAME")) 
             self.__ingest_repository.save(ingest)
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)
-        except (OperationalError, IngestSaveException, ReportStatusApiClientException) as e:
+        except (IngestSaveException, ReportStatusApiClientException) as e:
             raise ProcessIngestException(ingest.package_id, str(e)) from e
 
     def set_ingest_as_processed(self, ingest: Ingest, drs_url: str) -> None:
@@ -182,35 +174,32 @@ class IngestService:
         
     def __create_transfer_ready_message(self, ingest: Ingest) -> dict:
         # Set destination path based on application
-        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH', '/drs2dev/drsfs/dropboxes/')
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
         destination_path = ""
 
         if ingest.depositing_application == "Dataverse":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME', 'dvndev'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming")
         elif ingest.depositing_application == "ePADD":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME', 'epadddev_secure'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
 
-        ingest.admin_metadata["task_name"] = transfer_ready_task
         return {
             'package_id': ingest.package_id,
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
             'destination_path': destination_path,
-            'application_name': ingest.depositing_application,
-            'admin_metadata': ingest.admin_metadata
+            'application_name': ingest.depositing_application
         }
         
     def __create_process_ready_message(self, ingest: Ingest) -> dict:
         # Set destination path based on application
-        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH', '/drs2dev/drsfs/dropboxes/')
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
         destination_path = ""
 
         if ingest.depositing_application == "Dataverse":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME', 'dvndev'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME'), "incoming")
         elif ingest.depositing_application == "ePADD":
-            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME', 'epadddev-secure'), "incoming")
+            destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME'), "incoming")
 
-        ingest.admin_metadata["task_name"] = process_ready_task
         if ingest.dry_run is None:
             return {
                 'package_id': ingest.package_id,
