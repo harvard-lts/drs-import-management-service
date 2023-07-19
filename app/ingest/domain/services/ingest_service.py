@@ -174,7 +174,7 @@ class IngestService:
         
     def __create_transfer_ready_message(self, ingest: Ingest) -> dict:
         # Set destination path based on application
-        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH', '/drs2dev/drsfs/dropboxes/')
         destination_path = ""
 
         if ingest.depositing_application == "Dataverse":
@@ -192,7 +192,7 @@ class IngestService:
         
     def __create_process_ready_message(self, ingest: Ingest) -> dict:
         # Set destination path based on application
-        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH')
+        base_dropbox_path = os.getenv('BASE_DROPBOX_PATH', '/drs2dev/drsfs/dropboxes/')
         destination_path = ""
 
         if ingest.depositing_application == "Dataverse":
