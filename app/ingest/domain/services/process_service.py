@@ -10,7 +10,6 @@ from app.ingest.domain.services.exceptions.process_status_message_handling_excep
     ProcessStatusMessageHandlingException
 from app.ingest.domain.services.ingest_service import IngestService
 from app.ingest.domain.services.message_body_transformer import MessageBodyTransformer
-import os
 
 app1 = Celery('tasks')
 app1.config_from_object('celeryconfig')
