@@ -9,8 +9,11 @@ import app.notifier.notifier as notifier
 app = Celery()
 app.config_from_object('celeryconfig')
 
+process_task = os.getenv('PROCESS_TASK_NAME', 'dims.tasks.handle_process_status')
+transfer_task = os.getenv('TRANSFER_TASK_NAME', 'dims.tasks.handle_transfer_status')
+retries = os.getenv('MESSAGE_MAX_RETRIES', 3)
 
-@app.task(bind=True, serializer='json', name='dims.tasks.handle_process_status')
+@app.task(bind=True, serializer='json', name=process_task, max_retries=retries)
 def handle_process_status(self, message_body):
     try:
         process_service = Services.process_service()
@@ -19,7 +22,7 @@ def handle_process_status(self, message_body):
         exception_msg = traceback.format_exc()
         send_error_notifications(message_body, e, exception_msg)
         
-@app.task(bind=True, serializer='json', name='dims.tasks.handle_transfer_status')
+@app.task(bind=True, serializer='json', name=transfer_task, max_retries=retries)
 def handle_transfer_status(self, message_body):
     try:
         transfer_service = Services.transfer_service()
