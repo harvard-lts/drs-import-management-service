@@ -1,6 +1,7 @@
 from celery import Celery
 import os
 import traceback
+import logging
 from app.ingest.domain.services.exceptions.process_service_exception import ProcessServiceException
 from app.ingest.domain.services.exceptions.transfer_service_exception import TransferServiceException
 from app.containers import Services
@@ -9,6 +10,8 @@ from celery.exceptions import Reject
 
 app = Celery()
 app.config_from_object('celeryconfig')
+
+logger = logging.getLogger('dims')
 
 process_task = os.getenv('PROCESS_TASK_NAME', 'dims.tasks.handle_process_status')
 transfer_task = os.getenv('TRANSFER_TASK_NAME', 'dims.tasks.handle_transfer_status')
