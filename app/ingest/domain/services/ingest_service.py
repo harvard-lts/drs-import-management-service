@@ -76,8 +76,8 @@ class IngestService:
         ingest.status = IngestStatus.pending_transfer_to_dropbox
         msg_json = self.__create_transfer_ready_message(ingest)
         try:
-            app.send_task(transfer_ready_task, args=[msg_json], kwargs={},
-                    queue=os.getenv("TRANSFER_PUBLISH_QUEUE_NAME")) 
+            app.send_task(transfer_ready_task, args=[msg_json], kwargs={})
+                    #queue=os.getenv("TRANSFER_PUBLISH_QUEUE_NAME")) 
     
             self.__ingest_repository.save(ingest)
         except (IngestSaveException) as e:
