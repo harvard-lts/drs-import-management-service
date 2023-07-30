@@ -15,7 +15,7 @@ logger = logging.getLogger('dims')
 
 process_task = os.getenv('PROCESS_TASK_NAME', 'dims.tasks.handle_process_status')
 transfer_task = os.getenv('TRANSFER_TASK_NAME', 'dims.tasks.handle_transfer_status')
-retries = os.getenv('MESSAGE_MAX_RETRIES', 3)
+retries = int(os.getenv('MESSAGE_MAX_RETRIES', 3))
 
 @app.task(bind=True, serializer='json', name=process_task, max_retries=retries, acks_late=True, autoretry_for=(Exception,))
 def handle_process_status(self, message_body):
