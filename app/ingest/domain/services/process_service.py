@@ -3,7 +3,7 @@ This module defines a ProcessService, which is a domain service that defines Pro
 """
 
 from logging import Logger
-
+from celery import Celery
 from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
 from app.ingest.domain.services.exceptions.message_body_field_exception import MessageBodyFieldException
 from app.ingest.domain.services.exceptions.process_status_message_handling_exception import \
@@ -11,6 +11,8 @@ from app.ingest.domain.services.exceptions.process_status_message_handling_excep
 from app.ingest.domain.services.ingest_service import IngestService
 from app.ingest.domain.services.message_body_transformer import MessageBodyTransformer
 
+app1 = Celery('tasks')
+app1.config_from_object('celeryconfig')
 
 class ProcessService:
     def __init__(
@@ -32,6 +34,7 @@ class ProcessService:
 
         :raises ProcessServiceException
         """
+        
         message_body_transformer = MessageBodyTransformer()
         try:
             package_id = message_body_transformer.get_message_body_field_value(
