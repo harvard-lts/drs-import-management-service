@@ -6,7 +6,9 @@ DRS Import Management Service (DIMS) is a Python/Flask project written in Python
     
 1. Make a copy of the env.example to .env and modify the user and password variables.
 
-2. Start the container
+2. Copy the test/functional/*.example keys to test/functional/. and remove the .example from the name
+
+3. Start the container
     
 ```
 docker-compose -f docker-compose-local.yml up -d --build --force-recreate
