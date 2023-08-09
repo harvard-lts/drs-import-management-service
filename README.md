@@ -79,3 +79,7 @@ pytest
 ## Versioning
 
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+
+## DLX/DLQ
+
+The DAIS services use a dead letter queue to collect messages that were rejected after a configurable amount of retries.  Information on the DLX/DLQ setup and use can be found on this [LTS internal wiki](https://wiki.harvard.edu/confluence/pages/viewpage.action?pageId=337150659).
