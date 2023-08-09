@@ -75,7 +75,6 @@ pytest
 
 - Look for the DLQ queue (`dais-dead-letter-queue`) verify the message lands here
 
-
 ## Versioning
 
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
