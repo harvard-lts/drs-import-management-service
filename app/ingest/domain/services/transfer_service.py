@@ -4,6 +4,7 @@ This module defines a TransferService, which is a domain service that defines Tr
 
 from logging import Logger
 from celery import Celery
+from kombu import Queue
 from app.ingest.domain.services.exceptions.ingest_service_exception import IngestServiceException
 from app.ingest.domain.services.exceptions.message_body_field_exception import MessageBodyFieldException
 from app.ingest.domain.services.exceptions.transfer_status_message_handling_exception import \
@@ -36,8 +37,10 @@ class TransferService:
         :raises TransferServiceException
         """
         if "testing" in message_body:
+            publish_queue = Queue(
+                os.getenv("TRANSFER_PUBLISH_QUEUE_NAME"), no_declare=True)
             app1.send_task("dims.tasks.do_task", args=[message_body], kwargs={},
-                    queue=os.getenv("TRANSFER_PUBLISH_QUEUE_NAME")) 
+                    queue=publish_queue) 
             return
         message_body_transformer = MessageBodyTransformer()
         try:

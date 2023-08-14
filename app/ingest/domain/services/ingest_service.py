@@ -22,6 +22,7 @@ from kombu.exceptions import OperationalError
 from celery import Celery
 import os
 import os.path
+from kombu import Queue
 
 app = Celery('tasks')
 app.config_from_object('celeryconfig')
@@ -76,8 +77,10 @@ class IngestService:
         ingest.status = IngestStatus.pending_transfer_to_dropbox
         msg_json = self.__create_transfer_ready_message(ingest)
         try:
+            transfer_publish_queue = Queue(
+                os.getenv("TRANSFER_PUBLISH_QUEUE_NAME"), no_declare=True)
             app.send_task(transfer_ready_task, args=[msg_json], kwargs={},
-                    queue=os.getenv("TRANSFER_PUBLISH_QUEUE_NAME")) 
+                    queue=transfer_publish_queue) 
     
             self.__ingest_repository.save(ingest)
         except (IngestSaveException) as e:
@@ -130,8 +133,10 @@ class IngestService:
         ingest.status = IngestStatus.processing_batch_ingest
         msg_json = self.__create_process_ready_message(ingest)
         try:
+            process_publish_queue = Queue(
+                os.getenv("PROCESS_PUBLISH_QUEUE_NAME"), no_declare=True)
             app.send_task(process_ready_task, args=[msg_json], kwargs={},
-                    queue=os.getenv("PROCESS_PUBLISH_QUEUE_NAME")) 
+                    queue=process_publish_queue) 
             self.__ingest_repository.save(ingest)
             if ingest.depositing_application == "Dataverse":
                 self.__ingest_status_api_client.report_status(ingest)

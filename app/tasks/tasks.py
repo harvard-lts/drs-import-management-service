@@ -6,6 +6,7 @@ from app.ingest.domain.services.exceptions.process_service_exception import Proc
 from app.ingest.domain.services.exceptions.transfer_service_exception import TransferServiceException
 from app.containers import Services
 import app.notifier.notifier as notifier
+from celery.exceptions import Reject
 
 app = Celery()
 app.config_from_object('celeryconfig')
@@ -18,6 +19,15 @@ retries = int(os.getenv('MESSAGE_MAX_RETRIES', 3))
 
 @app.task(bind=True, serializer='json', name=process_task, max_retries=retries, acks_late=True, autoretry_for=(Exception,))
 def handle_process_status(self, message_body):
+    if "dlq_testing" in message_body:
+        if self.request.retries < retries:
+            logger.debug("retrying DIMS Process")
+            self.retry(countdown=3)
+        else:
+            logger.debug("Sending to DLQ")
+            send_max_retry_notifications(message_body)
+            raise Reject("reject", requeue=False)  
+    
     try:
         process_service = Services.process_service()
         process_service.handle_process_status_message(message_body, self.request.id)
@@ -27,6 +37,14 @@ def handle_process_status(self, message_body):
         
 @app.task(bind=True, serializer='json', name=transfer_task, max_retries=retries, acks_late=True)
 def handle_transfer_status(self, message_body):
+    if "dlq_testing" in message_body:
+        if self.request.retries < retries:
+            logger.debug("retrying DIMS Transfer")
+            self.retry(countdown=3)
+        else:
+            logger.debug("Sending to DLQ")
+            send_max_retry_notifications(message_body)
+            raise Reject("reject", requeue=False) 
     try:
         transfer_service = Services.transfer_service()
         transfer_service.handle_transfer_status_message(message_body, self.request.id)
