@@ -1,4 +1,4 @@
-import json, sys
+import sys
 from celery.result import AsyncResult
 from test.integration.integration_test_base import IntegrationTestBase
 sys.path.append('app')
