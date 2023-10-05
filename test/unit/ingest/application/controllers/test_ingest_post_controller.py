@@ -17,6 +17,8 @@ class TestIngestPostController(TestCase):
             "package_id": "test",
             "s3_path": "test",
             "s3_bucket_name": "test",
+            "fs_source_path": "test",
+            "fs_source_server": "test",
             "depositing_application": "Dataverse",
             "admin_metadata":
                 {
@@ -48,13 +50,15 @@ class TestIngestPostController(TestCase):
         ingest_service_mock = Mock(spec=IngestService)
         sut = IngestPostController(ingest_service=ingest_service_mock)
 
-        with self.app.test_request_context(self.REQUEST_ENDPOINT, json=self.CORRECT_REQUEST_JSON):
+        with self.app.test_request_context(self.REQUEST_ENDPOINT,
+                                           json=self.CORRECT_REQUEST_JSON):
             actual_response_body, actual_response_http_code = sut.__call__()
 
         ingest_service_mock.transfer_ingest.assert_called_once()
 
         expected_response_http_code = 202
-        self.assertEqual(actual_response_http_code, expected_response_http_code)
+        self.assertEqual(actual_response_http_code,
+                         expected_response_http_code)
 
         expected_response_body = {
             "package_id": "test",
@@ -71,13 +75,15 @@ class TestIngestPostController(TestCase):
         test_exception = TransferIngestException("test", "test")
         ingest_service_stub.transfer_ingest.side_effect = test_exception
 
-        with self.app.test_request_context(self.REQUEST_ENDPOINT, json=self.CORRECT_REQUEST_JSON):
+        with self.app.test_request_context(self.REQUEST_ENDPOINT,
+                                           json=self.CORRECT_REQUEST_JSON):
             actual_response_body, actual_response_http_code = sut.__call__()
 
         ingest_service_stub.transfer_ingest.assert_called_once()
 
         expected_response_http_code = 500
-        self.assertEqual(actual_response_http_code, expected_response_http_code)
+        self.assertEqual(actual_response_http_code,
+                         expected_response_http_code)
 
         expected_response_body = {
             "status": ResponseStatus.failure.value,

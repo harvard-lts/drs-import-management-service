@@ -59,6 +59,8 @@ class IngestRepository(IIngestRepository, MongoInteractor):
             "package_id": ingest.package_id,
             "s3_path": ingest.s3_path,
             "s3_bucket_name": ingest.s3_bucket_name,
+            "fs_source_path": ingest.fs_source_path,
+            "fs_source_server": ingest.fs_source_server,
             "admin_metadata": ingest.admin_metadata,
             "status": ingest.status.value,
             "depositing_application": ingest.depositing_application,
@@ -68,8 +70,10 @@ class IngestRepository(IIngestRepository, MongoInteractor):
     def __transform_mongo_dict_to_ingest(self, mongo_dict: dict) -> Ingest:
         return Ingest(
             package_id=mongo_dict["package_id"],
-            s3_path=mongo_dict["s3_path"],
-            s3_bucket_name=mongo_dict["s3_bucket_name"],
+            s3_path=mongo_dict.get("s3_path"),
+            s3_bucket_name=mongo_dict.get("s3_bucket_name"),
+            fs_source_path=mongo_dict.get("fs_source_path"),
+            fs_source_server=mongo_dict.get("fs_source_server"),
             admin_metadata=mongo_dict["admin_metadata"],
             status=IngestStatus[mongo_dict["status"]],
             depositing_application=mongo_dict["depositing_application"],

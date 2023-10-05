@@ -189,12 +189,16 @@ class IngestService:
             destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME', 'dvndev'), "incoming")
         elif ingest.depositing_application == "ePADD":
             destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME', 'epadddev_secure'), "incoming")
+        elif ingest.depositing_application == "ETD":
+            destination_path = os.path.join(base_dropbox_path, os.getenv('ETD_DROPBOX_NAME', 'etddev'), "incoming")
 
         ingest.admin_metadata["task_name"] = transfer_ready_task
         return {
             'package_id': ingest.package_id,
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
+            'fs_source_path': ingest.fs_source_path,
+            'fs_source_server': ingest.fs_source_server,
             'destination_path': destination_path,
             'application_name': ingest.depositing_application,
             'admin_metadata': ingest.admin_metadata
@@ -209,6 +213,8 @@ class IngestService:
             destination_path = os.path.join(base_dropbox_path, os.getenv('DATAVERSE_DROPBOX_NAME', 'dvndev'), "incoming")
         elif ingest.depositing_application == "ePADD":
             destination_path = os.path.join(base_dropbox_path, os.getenv('EPADD_DROPBOX_NAME', 'epadddev-secure'), "incoming")
+        elif ingest.depositing_application == "ETD":
+            destination_path = os.path.join(base_dropbox_path, os.getenv('ETD_DROPBOX_NAME', 'etddev'), "incoming")
 
         ingest.admin_metadata["task_name"] = process_ready_task
         if ingest.dry_run is None:
