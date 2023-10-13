@@ -17,7 +17,7 @@ class DrsImportManagementServiceApp(FlaskApp):
         super().__init__(import_name, **kwargs)
 
         self.__setup_controllers()
-        self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app, self.__get_jwt_keys())
+        #self.app.wsgi_app = AuthorizationMiddleware(self.app.wsgi_app, self.__get_jwt_keys())
 
     def __setup_controllers(self) -> None:
         health_controller = HealthGetController()
