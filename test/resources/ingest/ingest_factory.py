@@ -14,7 +14,6 @@ def create_ingest(
         s3_path="test_s3_path",
         s3_bucket_name="test_s3_bucket_name",
         fs_source_path="test_fs_source_path",
-        fs_source_server="test_fs_source_server",
         admin_metadata={
             "test_admin_metadata_field_1": "test",
             "test_admin_metadata_field_2": "test"

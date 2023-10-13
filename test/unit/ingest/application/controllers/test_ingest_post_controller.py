@@ -18,7 +18,6 @@ class TestIngestPostController(TestCase):
             "s3_path": "test",
             "s3_bucket_name": "test",
             "fs_source_path": "test",
-            "fs_source_server": "test",
             "depositing_application": "Dataverse",
             "admin_metadata":
                 {

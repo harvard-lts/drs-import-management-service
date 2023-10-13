@@ -36,7 +36,6 @@ class IngestPostController:
         s3_path: str = request.json.get("s3_path")
         s3_bucket_name: str = request.json.get("s3_bucket_name")
         fs_source_path: str = request.json.get("fs_source_path")
-        fs_source_server: str = request.json.get("fs_source_server")
         admin_metadata: dict = request.json.get("admin_metadata")
         depositing_application: str = request.json.get("depositing_application")
 
@@ -50,7 +49,6 @@ class IngestPostController:
             s3_path=s3_path,
             s3_bucket_name=s3_bucket_name,
             fs_source_path=fs_source_path,
-            fs_source_server=fs_source_server,
             admin_metadata=admin_metadata,
             status=IngestStatus.pending_transfer_to_dropbox,
             depositing_application=depositing_application,
@@ -65,7 +63,6 @@ class IngestPostController:
                     "s3_path": s3_path,
                     "s3_bucket_name": s3_bucket_name,
                     "fs_source_path": fs_source_path,
-                    "fs_source_server": fs_source_server,
                     "admin_metadata": admin_metadata,
                     "depositing_application": depositing_application}
             msg = "Could not transfer ingest for {} package {}.  Error {}." \

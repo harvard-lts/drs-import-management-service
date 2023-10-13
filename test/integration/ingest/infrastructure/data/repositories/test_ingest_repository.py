@@ -98,7 +98,6 @@ class TestIngestRepository(MongoIntegrationTestBase):
                 "s3_path": self.TEST_INGEST.s3_path,
                 "s3_bucket_name": self.TEST_INGEST.s3_bucket_name,
                 "fs_source_path": self.TEST_INGEST.fs_source_path,
-                "fs_source_server": self.TEST_INGEST.fs_source_server,
                 "admin_metadata": self.TEST_INGEST.admin_metadata,
                 "status": self.TEST_INGEST.status.value,
                 "depositing_application": 

@@ -10,7 +10,6 @@ class Ingest:
     s3_path: str
     s3_bucket_name: str
     fs_source_path: str
-    fs_source_server: str
     admin_metadata: dict
     status: IngestStatus
     depositing_application: str

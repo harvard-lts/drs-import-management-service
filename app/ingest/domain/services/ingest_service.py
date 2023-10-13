@@ -193,7 +193,6 @@ class IngestService:
             's3_path': ingest.s3_path,
             's3_bucket_name': ingest.s3_bucket_name,
             'fs_source_path': ingest.fs_source_path,
-            'fs_source_server': ingest.fs_source_server,
             'destination_path': destination_path,
             'application_name': ingest.depositing_application,
             'admin_metadata': ingest.admin_metadata
