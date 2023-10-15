@@ -195,6 +195,7 @@ class IngestService:
             'fs_source_path': ingest.fs_source_path,
             'destination_path': destination_path,
             'application_name': ingest.depositing_application,
+            'fs_cleanup': ingest.fs_cleanup,
             'admin_metadata': ingest.admin_metadata
         }
         

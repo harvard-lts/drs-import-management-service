@@ -15,3 +15,4 @@ class Ingest:
     depositing_application: str
     drs_url: Optional[str]
     dry_run: Optional[str] = field(default=None)
+    fs_cleanup: Optional[str] = field(default=None)

@@ -39,6 +39,10 @@ class IngestPostController:
         admin_metadata: dict = request.json.get("admin_metadata")
         depositing_application: str = request.json.get("depositing_application")
 
+        fs_cleanup = None
+        if "fs_cleanup" in request.json:
+            fs_cleanup: str = request.json.get("fs_cleanup")
+
         if "dry_run" in request.json:
             dry_run: str = request.json.get("dry_run")
         else:
@@ -53,7 +57,8 @@ class IngestPostController:
             status=IngestStatus.pending_transfer_to_dropbox,
             depositing_application=depositing_application,
             drs_url=None,
-            dry_run=dry_run
+            dry_run=dry_run,
+            fs_cleanup=fs_cleanup
         )
 
         try:
