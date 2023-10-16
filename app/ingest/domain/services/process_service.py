@@ -58,6 +58,8 @@ class ProcessService:
 
             if depositing_application == "ePADD":
                 return
+            elif depositing_application == "ETD":
+                return
             elif depositing_application == "Dataverse":
                 if process_status == "failure":
                     self.__logger.info("Setting ingest as processed failed...")

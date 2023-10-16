@@ -13,6 +13,7 @@ def create_ingest(
         package_id=package_id,
         s3_path="test_s3_path",
         s3_bucket_name="test_s3_bucket_name",
+        fs_source_path="test_fs_source_path",
         admin_metadata={
             "test_admin_metadata_field_1": "test",
             "test_admin_metadata_field_2": "test"

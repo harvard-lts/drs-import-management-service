@@ -11,8 +11,8 @@ from app.ingest.domain.repositories.ingest_repository import IIngestRepository
 from app.ingest.domain.services.exceptions.get_ingest_by_package_id_exception import GetIngestByPackageIdException
 from app.ingest.domain.services.exceptions.process_ingest_exception import ProcessIngestException
 from app.ingest.domain.services.exceptions.set_ingest_as_processed_exception import SetIngestAsProcessedException
-from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception import \
-    SetIngestAsProcessedFailedException
+from app.ingest.domain.services.exceptions.set_ingest_as_processed_failed_exception \
+    import SetIngestAsProcessedFailedException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_exception import SetIngestAsTransferredException
 from app.ingest.domain.services.exceptions.set_ingest_as_transferred_failed_exception import \
     SetIngestAsTransferredFailedException
@@ -62,7 +62,6 @@ class TestIngestService(TestCase):
 
         with self.assertRaises(GetIngestByPackageIdException):
             sut.get_ingest_by_package_id(self.TEST_INGEST.package_id)
-
 
     def test_set_ingest_as_transferred_happy_path(self) -> None:
         ingest_repository_mock = Mock(spec=IIngestRepository)

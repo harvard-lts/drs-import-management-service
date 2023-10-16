@@ -114,8 +114,6 @@ components:
       type: object
       required:
         - package_id
-        - s3_path
-        - s3_bucket_name
         - admin_metadata
       properties:
         package_id:
