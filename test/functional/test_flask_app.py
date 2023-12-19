@@ -55,6 +55,7 @@ class TestFlaskApp(TestCase):
 
         cls.JWT_KEY_ID_DATAVERSE = "testKidDataverse"
         cls.JWT_KEY_ID_EPADD = "testKidEPADD"
+        cls.JWT_KEY_ID_ETD = "testKidETD"
 
     def setUp(self) -> None:
         load_dotenv(join(dirname(__file__), '.test.env'))
@@ -64,9 +65,11 @@ class TestFlaskApp(TestCase):
         jwt_keys_dict = json.loads(os.getenv('JWT_KEYS'))
         self.dataverse_jwt_issuer = jwt_keys_dict[self.JWT_KEY_ID_DATAVERSE]['iss']
         self.epadd_jwt_issuer = jwt_keys_dict[self.JWT_KEY_ID_EPADD]['iss']
+        self.etd_jwt_issuer = jwt_keys_dict[self.JWT_KEY_ID_ETD]['iss']
 
         self.dataverse_private_key_path = os.getenv('DATAVERSE_JWT_PRIVATE_KEY_FILE_PATH')
         self.epadd_private_key_path = os.getenv('EPADD_JWT_PRIVATE_KEY_FILE_PATH')
+        self.etd_private_key_path = os.getenv('ETD_JWT_PRIVATE_KEY_FILE_PATH')
 
     @unittest.skip('Broken- needs investigation - ticket https://jira.huit.harvard.edu/browse/LTSEPADD-116')
     def test_health_endpoint_happy_path(self) -> None:
@@ -98,6 +101,19 @@ class TestFlaskApp(TestCase):
                     issuer=self.epadd_jwt_issuer,
                     kid=self.JWT_KEY_ID_EPADD,
                     private_key_path=self.epadd_private_key_path
+                )
+            )
+
+            self.__assert_successful_ingest_response(response)
+
+    def test_ingest_endpoint_depositing_application_etd_happy_path(self) -> None:
+        with self.test_app.test_client() as test_client:
+            response = self.__post_ingest_endpoint(
+                test_client=test_client,
+                authorization_header=self.__create_ingest_authorization_header(
+                    issuer=self.etd_jwt_issuer,
+                    kid=self.JWT_KEY_ID_ETD,
+                    private_key_path=self.etd_private_key_path
                 )
             )
 
